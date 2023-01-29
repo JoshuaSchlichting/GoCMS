@@ -235,16 +235,12 @@
 
 </aside>
 <script type="text/javascript">
-  $(function () {
+
     alert("loaded!!!");
-    $(document).on('click', 'dashboardLink', function () {
+
+    $("#dashboardLink").click(() => {
       alert("dashboard clicked");
       $("#main").load("securedashboard");
     });
-  });
-    // $("#dashboardLink").click(() => {
-    //   alert("dashboard clicked");
-    //   $("#main").load("securedashboard");
-    // });
 </script>
 {{end}}
