@@ -3,7 +3,7 @@
 
   <ul class="sidebar-nav" id="sidebar-nav">
 
-    <li class="nav-item" >
+    <li class="nav-item">
       <a class="nav-link">
         <i class="bi bi-grid"></i>
         <span>Dashboard</span>
@@ -235,11 +235,13 @@
 
 </aside>
 <script type="text/javascript">
-    alert("loaded");
-    $(document).on('click', '#dashboardLink', function() {
+  $(function () {
+    alert("loaded!!!");
+    $(document).on('click', 'dashboardLink', function () {
       alert("dashboard clicked");
       $("#main").load("securedashboard");
     });
+  });
     // $("#dashboardLink").click(() => {
     //   alert("dashboard clicked");
     //   $("#main").load("securedashboard");
