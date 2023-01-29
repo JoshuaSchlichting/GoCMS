@@ -1,0 +1,10 @@
+{{ define "securedashboard" }}
+<div id="cookieData">
+    
+</div>
+<script type="text/javascript">
+    var cookieData = document.getElementById("cookieData");
+    var cookie = document.cookie;
+    cookieData.innerHTML = cookie;
+</script>
+{{ end }}

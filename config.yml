@@ -1,0 +1,9 @@
+auth:
+  jwt:
+    secret_key: xyz
+    jwt_expiration: 3600
+    issuer: issuerstring
+    audience: audiencestring
+    subject: 'user'
+
+  sign_in_url: cognito sign in url
