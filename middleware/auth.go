@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"errors"
 	"log"
 	"net/http"
 	"strings"
@@ -12,6 +11,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/joshuaschlichting/gocms/auth"
 	"github.com/joshuaschlichting/gocms/config"
+	"github.com/joshuaschlichting/gocms/data"
+	"github.com/joshuaschlichting/gocms/models"
 	"github.com/lestrrat-go/jwx/jwt"
 )
 
@@ -31,6 +32,7 @@ func AddURLAccessCodeToCtx(h http.Handler) http.Handler {
 
 func AddAccessTokenToCtx(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("AddAccessTokenToCtx: %s", r.URL.Path)
 		// get accessCode from context
 		code := r.Context().Value(AccessCode).(string)
 		if code == "" {
@@ -38,7 +40,7 @@ func AddAccessTokenToCtx(h http.Handler) http.Handler {
 			h.ServeHTTP(w, r)
 		}
 		// get access token from cognito
-		token, err := getAccessToken(code)
+		token, err := auth.GetAccessToken(code)
 		if err != nil {
 			if strings.Contains(err.Error(), "invalid_grant") {
 				// redirect to login page
@@ -52,22 +54,10 @@ func AddAccessTokenToCtx(h http.Handler) http.Handler {
 
 func AddUserInfoToCtx(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// get access token in context
-		if r.Context().Value(AccessToken) == nil {
-			// log.Println("No access token found in context")
-			h.ServeHTTP(w, r)
-			return
-		}
-		// get access token from context
-		token := r.Context().Value(AccessToken).(string)
-		if token == "" {
-			// log.Println("No access token found in context")
-			h.ServeHTTP(w, r)
-		}
 		// get user info from cognito
-		cognitoClient, _ := auth.NewCognito()
-
-		userInfo, _, _ := cognitoClient.GetUserInfo(token)
+		stubData := data.StubData{}
+		userInfo, _ := stubData.GetUser("userid")
+		log.Printf("User is logged in: %s", userInfo.UserName)
 		// set user info in context
 		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), UserInfo, userInfo)))
 	})
@@ -77,16 +67,19 @@ func AddClientJWTToCtx(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		// extract JWT from request
-		jwtToken := r.Header.Get("Authorization")
-		if jwtToken == "" {
-			// log.Println("No JWT token found in context")
+		// jwtToken := r.Header.Get("Authorization")
+		// extract JWT from cookie
+		jwtToken, err := r.Cookie("jwt")
+		if err != nil {
+			log.Println("No JWT cookie found")
 			h.ServeHTTP(w, r)
 			return
 		}
+
 		// cast to *jwtauth.JWTAuth
 		// tokenAuth := jwtauth.New("HS256", []byte("secret"), nil)
 		// jwtAuthToken, _ := tokenAuth.Decode(jwtToken)
-		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), JWTToken, jwtToken)))
+		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), JWTToken, jwtToken.Value)))
 	})
 }
 
@@ -96,13 +89,15 @@ func AddNewJwtToCtxCookie(h http.Handler) http.Handler {
 			h.ServeHTTP(w, r)
 			return
 		}
-		userInfo := r.Context().Value(UserInfo).(string)
-		if userInfo == "" {
+		userInfo := r.Context().Value(UserInfo).(models.User)
+		if userInfo.UserName == "" {
 			log.Println("user was set in context but is empty string")
 			h.ServeHTTP(w, r)
 		}
-		tokenAuth := jwtauth.New("HS256", []byte("secret"), nil)
-		expirationTime := time.Now().Add(5 * time.Minute)
+		tokenAuth := jwtauth.New("HS256", []byte(conf.Auth.JWT.SecretKey), nil)
+		// conf.Auth.JWT.ExpirationTime add to now
+		expirationTime := time.Now().Add(time.Second * time.Duration(conf.Auth.JWT.ExpirationTime))
+		// set token expiration
 
 		_, tokenString, _ := tokenAuth.Encode(map[string]interface{}{
 			"userInfo": userInfo,
@@ -127,7 +122,8 @@ func AuthenticateJWT(h http.Handler) http.Handler {
 		// get JWT in context
 		if r.Context().Value(JWTToken) == nil {
 			// log.Println("no JWT to authenticate")
-			h.ServeHTTP(w, r)
+			// error
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
 		token := r.Context().Value(JWTToken).(string)
@@ -137,14 +133,15 @@ func AuthenticateJWT(h http.Handler) http.Handler {
 			return
 		}
 		// cast to *jwtauth.JWTAuth
-		tokenAuth := jwtauth.New("HS256", []byte("secret"), nil)
+		tokenAuth := jwtauth.New("HS256", []byte(conf.Auth.JWT.SecretKey), nil)
 		jwtToken, err := tokenAuth.Decode(token)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
 		// get jwtToken is expired
-
+		// get expiry from token
+		// print jwt claims
 		if jwtToken.Expiration().Before(time.Now()) || jwt.Validate(jwtToken) != nil {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			// cancel context
@@ -158,17 +155,4 @@ func AuthenticateJWT(h http.Handler) http.Handler {
 		// Token is authenticated, pass it through
 		h.ServeHTTP(w, r)
 	})
-}
-
-func getAccessToken(authorizationCode string) (string, error) {
-	if authorizationCode == "" {
-		return "", errors.New("no authorization code found")
-	}
-	cognitoClient, _ := auth.NewCognito()
-	payload, err := cognitoClient.GetCognitoTokenEndpointPayload(authorizationCode)
-	if err != nil {
-		log.Printf("Error getting token endpoint payload: %v\n", err)
-		return "", err
-	}
-	return payload.AccessToken, nil
 }

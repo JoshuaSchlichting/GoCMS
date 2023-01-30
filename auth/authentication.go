@@ -26,7 +26,7 @@ var clientSecret string
 var awsAccessKeyId string
 var awsSecretAccessKey string
 
-const redirectUri string = "http://localhost:8000/secure"
+const redirectUri string = "http://localhost:8000/getjwtandlogin"
 
 func init() {
 	poolId = os.Getenv("POOL_ID")
@@ -144,4 +144,17 @@ func (c *Cognito) GetUserInfo(accessToken string) (username, email string, err e
 	}
 	return *output.Username, emailAddress, nil
 
+}
+
+func GetAccessToken(authorizationCode string) (string, error) {
+	if authorizationCode == "" {
+		return "", errors.New("no authorization code found")
+	}
+	cognitoClient, _ := NewCognito()
+	payload, err := cognitoClient.GetCognitoTokenEndpointPayload(authorizationCode)
+	if err != nil {
+		log.Printf("Error getting token endpoint payload: %v\n", err)
+		return "", err
+	}
+	return payload.AccessToken, nil
 }

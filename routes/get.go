@@ -4,11 +4,15 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/jwtauth"
+	"github.com/google/uuid"
+	"github.com/joshuaschlichting/gocms/auth"
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/middleware"
+	"github.com/joshuaschlichting/gocms/models"
 )
 
 func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config) {
@@ -30,15 +34,69 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config) {
 		}
 	})
 
+	r.Get("/getjwtandlogin", func(w http.ResponseWriter, r *http.Request) {
+		// get access code from request
+		code := r.URL.Query().Get("code")
+		// get JWT
+		accessToken, err := auth.GetAccessToken(code)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		cognitoAuth, err := auth.NewCognito()
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		username, email, err := cognitoAuth.GetUserInfo(accessToken)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		var tokenAuth *jwtauth.JWTAuth = jwtauth.New("HS256", []byte(config.Auth.JWT.SecretKey), nil)
+		claims := map[string]interface{}{
+			"userInfo": username,
+			"email":    email,
+			"exp":      time.Now().Add(time.Duration(config.Auth.JWT.ExpirationTime) * time.Second).Unix(),
+			"iat":      time.Now().Unix(),
+			"iss":      config.Auth.JWT.Issuer,
+			"aud":      config.Auth.JWT.Audience,
+			"sub":      config.Auth.JWT.Subject,
+			// guid for jti
+			"jti": uuid.New().String(),
+		}
+		// jwtauth.SetExpiryIn(claims, time.Duration(config.Auth.JWT.ExpirationTime))
+		jwtToken, tokenString, err := tokenAuth.Encode(claims)
+		// check expiry
+		if jwtToken.Expiration().Before(time.Now()) {
+			log.Println("Token expired")
+			http.Error(w, "Token expired", http.StatusInternalServerError)
+			return
+		}
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		http.SetCookie(w, &http.Cookie{
+			Name:  "jwt",
+			Value: tokenString,
+			Path:  "/",
+		})
+		http.Redirect(w, r, "/secure", http.StatusFound)
+	})
+
 	r.Group(func(r chi.Router) {
-		r.Use(middleware.AddURLAccessCodeToCtx)
-		r.Use(middleware.AddAccessTokenToCtx)
-		r.Use(middleware.AddUserInfoToCtx)
-		r.Use(middleware.AddClientJWTToCtx)
 		jwtAuth := jwtauth.New("HS256", []byte(config.Auth.JWT.SecretKey), nil)
 		r.Use(jwtauth.Verifier(jwtAuth))
-		r.Use(middleware.AuthenticateJWT)
-		r.Use(middleware.AddNewJwtToCtxCookie)
+		r.Use(jwtauth.Authenticator)
+		r.Use(middleware.AddUserInfoToCtx)
+
+		// r.Use(middleware.AddNewJwtToCtxCookie)
 
 		r.Get("/securedashboard", func(w http.ResponseWriter, r *http.Request) {
 			err := tmpl.ExecuteTemplate(w, "securedashboard", map[string]interface{}{})
@@ -52,7 +110,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config) {
 			if r.Context().Value(middleware.UserInfo) == nil {
 				username = ""
 			} else {
-				username = r.Context().Value(middleware.UserInfo).(string)
+				username = r.Context().Value(middleware.UserInfo).(models.User).UserName
 			}
 
 			err := tmpl.ExecuteTemplate(w, "index", map[string]interface{}{
