@@ -44,6 +44,7 @@ func main() {
 	middleware.InitMiddleware(config)
 
 	// Register common middleware
+	r.Use(middleware.AddUserInfoToCtx)
 	r.Use(middleware.LogAllButStaticRequests)
 	// End Middleware /////////////////////////////////////////////////////////
 

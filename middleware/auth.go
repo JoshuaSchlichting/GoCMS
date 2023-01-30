@@ -57,7 +57,6 @@ func AddUserInfoToCtx(h http.Handler) http.Handler {
 		// get user info from cognito
 		stubData := data.StubData{}
 		userInfo, _ := stubData.GetUser("userid")
-		log.Printf("User is logged in: %s", userInfo.UserName)
 		// set user info in context
 		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), UserInfo, userInfo)))
 	})
@@ -139,9 +138,6 @@ func AuthenticateJWT(h http.Handler) http.Handler {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
-		// get jwtToken is expired
-		// get expiry from token
-		// print jwt claims
 		if jwtToken.Expiration().Before(time.Now()) || jwt.Validate(jwtToken) != nil {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			// cancel context
