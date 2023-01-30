@@ -1,7 +1,7 @@
 auth:
   jwt:
     secret_key: xyz
-    jwt_expiration: 3600
+    expiration_time: 1000
     issuer: issuerstring
     audience: audiencestring
     subject: 'user'
