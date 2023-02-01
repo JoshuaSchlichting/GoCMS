@@ -93,10 +93,8 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config) {
 	r.Group(func(r chi.Router) {
 		jwtAuth := jwtauth.New("HS256", []byte(config.Auth.JWT.SecretKey), nil)
 		r.Use(jwtauth.Verifier(jwtAuth))
-		r.Use(jwtauth.Authenticator)
-		r.Use(middleware.AddUserInfoToCtx)
-
-		// r.Use(middleware.AddNewJwtToCtxCookie)
+		r.Use(middleware.AddClientJWTToCtx)
+		r.Use(middleware.AuthenticateJWT)
 
 		r.Get("/securedashboard", func(w http.ResponseWriter, r *http.Request) {
 			err := tmpl.ExecuteTemplate(w, "securedashboard", map[string]interface{}{})
