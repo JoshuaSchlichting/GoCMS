@@ -7,3 +7,6 @@ GoCMS is in early stages of development and is not even close to being ready for
 
 ### Dependencies
 While the idea is to not have many dependencies, some things are still being imported. At the time of writing this, routing and JWT are handled by [Chi](https://github.com/go-chi/chi) (and they probably always will be).
+
+### Design
+As of now, the CMS is relying on free templates from BootStrapMade.com.
