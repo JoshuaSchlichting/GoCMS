@@ -50,7 +50,7 @@ type Cognito struct {
 	client  cognito.CognitoIdentityProvider
 }
 
-func NewCognito() (*Cognito, error) {
+func New() (*Cognito, error) {
 
 	session, err := session.NewSession(&aws.Config{
 		Region: aws.String(region),
@@ -150,7 +150,7 @@ func GetAccessToken(authorizationCode string) (string, error) {
 	if authorizationCode == "" {
 		return "", errors.New("no authorization code found")
 	}
-	cognitoClient, _ := NewCognito()
+	cognitoClient, _ := New()
 	payload, err := cognitoClient.GetCognitoTokenEndpointPayload(authorizationCode)
 	if err != nil {
 		log.Printf("Error getting token endpoint payload: %v\n", err)

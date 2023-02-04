@@ -44,7 +44,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		cognitoAuth, err := auth.NewCognito()
+		cognitoAuth, err := auth.New()
 		if err != nil {
 			log.Println(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
