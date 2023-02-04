@@ -43,17 +43,12 @@
 
   <!-- Template Main JS File -->
   <script src="static/assets/js/main.js"></script>
+  <script src="static/js/index.js"></script>
   <script src="static/js/jwt.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.1.min.js"
-    integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
   <!-- Custom logic JS File -->
   <script type="application/javascript">
 
-    function getCookie(name) {
-      let value = "; " + document.cookie;
-      let parts = value.split("; " + name + "=");
-      if (parts.length == 2) return parts.pop().split(";").shift();
-    } 
+
     $.ajaxSetup({
       'headers': { "Authorization": getCookie('jwt') }
     });
