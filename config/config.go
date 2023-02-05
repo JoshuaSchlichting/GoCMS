@@ -11,8 +11,8 @@ type Config struct {
 	// Server config
 	// Database config
 	Database struct {
-		ConnectionString string `yml:"connection_string"`
-	} `yml:"database"`
+		ConnectionString string `yaml:"connection_string"`
+	} `yaml:"database"`
 	// Auth config
 	Auth struct {
 		JWT struct {
