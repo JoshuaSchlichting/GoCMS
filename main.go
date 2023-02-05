@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"embed"
 	"flag"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/joshuaschlichting/gocms/config"
+	"github.com/joshuaschlichting/gocms/data"
 	"github.com/joshuaschlichting/gocms/middleware"
 	"github.com/joshuaschlichting/gocms/routes"
 )
@@ -27,8 +29,18 @@ func main() {
 		port = flag.String("port", "8000", "port number for http listener")
 	)
 	flag.Parse()
-
 	config := config.LoadConfig()
+
+	// Initialize Database
+	db, err := sql.Open("postgres", config.Database.ConnectionString)
+
+	data.Init(db)
+	dataLayer := data.StubData{}
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
 
 	templ, err := parseTemplateDir("templates", templateFS)
 	if err != nil {
@@ -55,6 +67,7 @@ func main() {
 
 	// Register routes
 	routes.InitGetRoutes(r, templ, config)
+	routes.InitPostRoutes(r, templ, config, dataLayer)
 
 	if err := listenServe(addr, r); err != nil {
 		log.Fatal(err)

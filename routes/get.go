@@ -96,6 +96,16 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config) {
 		r.Use(middleware.AddClientJWTToCtx)
 		r.Use(middleware.AuthenticateJWT)
 
+		r.Get("/upload_form", func(w http.ResponseWriter, r *http.Request) {
+			err := tmpl.ExecuteTemplate(w, "upload_form", map[string]interface{}{
+				"Token":   r.Context().Value(middleware.JWTToken).(string),
+				"PostURL": "/upload",
+			})
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		})
+
 		r.Get("/securedashboard", func(w http.ResponseWriter, r *http.Request) {
 			err := tmpl.ExecuteTemplate(w, "securedashboard", map[string]interface{}{})
 			if err != nil {
