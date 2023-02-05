@@ -1,3 +1,5 @@
+database:
+  connection_string: postgresql://<your connection string>
 auth:
   jwt:
     secret_key: xyz
