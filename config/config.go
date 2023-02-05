@@ -10,13 +10,9 @@ import (
 type Config struct {
 	// Server config
 	// Database config
-	// Database struct {
-	// 	Host     string `yml:"host"`
-	// 	Port     string `yml:"port"`
-	// 	User     string `yml:"user"`
-	// 	Password string `yml:"password"`
-	// 	Database string `yml:"database"`
-	// } `yml:"database"`
+	Database struct {
+		ConnectionString string `yml:"connection_string"`
+	} `yml:"database"`
 	// Auth config
 	Auth struct {
 		JWT struct {
