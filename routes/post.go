@@ -25,8 +25,6 @@ func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, 
 			}
 			log.Printf("file: %v\n\tsize: %v", y.Header, size)
 			data.UploadFile(payload, y.Filename, "userid")
-
-			// payload := r.Context().Value("payload").(map[string]interface{})
 		})
 	})
 }
