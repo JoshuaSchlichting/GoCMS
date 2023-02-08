@@ -5,5 +5,6 @@ sql:
     schema: "schema.sql"
     gen:
       go:
+        emit_json_tags: true
         package: "db"
         out: "../."
