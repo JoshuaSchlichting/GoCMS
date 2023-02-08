@@ -14,6 +14,15 @@ INSERT INTO public.user (
 )
 RETURNING *;
 
+-- name: UpdateUser :one
+UPDATE public.user
+  set name = $2,
+    email = $3,
+    attributes = $4,
+    updated_at = $5
+WHERE id = $1
+RETURNING *;
+
 -- name: DeleteUser :exec
 DELETE FROM public.user
 WHERE id = $1;

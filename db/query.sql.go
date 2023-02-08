@@ -188,3 +188,42 @@ func (q *Queries) UpdatUser(ctx context.Context, arg UpdatUserParams) (User, err
 	)
 	return i, err
 }
+
+const updateUser = `-- name: UpdateUser :one
+UPDATE public.user
+  set name = $2,
+    email = $3,
+    attributes = $4,
+    updated_at = $5
+WHERE id = $1
+RETURNING id, name, email, attributes, password, created_at, updated_at
+`
+
+type UpdateUserParams struct {
+	ID         int32           `json:"id"`
+	Name       string          `json:"name"`
+	Email      string          `json:"email"`
+	Attributes json.RawMessage `json:"attributes"`
+	UpdatedAt  time.Time       `json:"updated_at"`
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUser,
+		arg.ID,
+		arg.Name,
+		arg.Email,
+		arg.Attributes,
+		arg.UpdatedAt,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.Attributes,
+		&i.Password,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
