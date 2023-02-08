@@ -1,12 +1,12 @@
 -- name: GetUser :one
-SELECT * FROM public."user"
+SELECT * FROM public.user
 WHERE id = $1 LIMIT 1;
 
 -- name: ListUsers :many
 SELECT * FROM public.user
 ORDER BY name;
 
--- name: CreateAuthor :one
+-- name: CreateUser :one
 INSERT INTO public.user (
     name, email, attributes, created_at, updated_at
 ) VALUES (
@@ -22,7 +22,7 @@ WHERE id = $1;
 SELECT * FROM public.files
 ORDER BY name;
 
--- name: UpdateAuthor :one
+-- name: UpdatUser :one
 UPDATE public.user
   set name = $2,
     email = $3,
