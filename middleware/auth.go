@@ -11,8 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/joshuaschlichting/gocms/auth"
 	"github.com/joshuaschlichting/gocms/config"
-	"github.com/joshuaschlichting/gocms/data"
-	"github.com/joshuaschlichting/gocms/models"
+	"github.com/joshuaschlichting/gocms/db"
 	"github.com/lestrrat-go/jwx/jwt"
 )
 
@@ -54,10 +53,9 @@ func AddAccessTokenToCtx(h http.Handler) http.Handler {
 
 func AddUserInfoToCtx(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// get user info from cognito
-		stubData := data.StubData{}
-		userInfo, _ := stubData.GetUser("userid")
-		// set user info in context
+
+		jwt := r.Context().Value(JWTEncodedString).(string)
+
 		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), UserInfo, userInfo)))
 	})
 }
@@ -78,7 +76,7 @@ func AddClientJWTToCtx(h http.Handler) http.Handler {
 		// cast to *jwtauth.JWTAuth
 		// tokenAuth := jwtauth.New("HS256", []byte("secret"), nil)
 		// jwtAuthToken, _ := tokenAuth.Decode(jwtToken)
-		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), JWTToken, jwtToken.Value)))
+		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), JWTEncodedString, jwtToken.Value)))
 	})
 }
 
@@ -88,8 +86,8 @@ func AddNewJwtToCtxCookie(h http.Handler) http.Handler {
 			h.ServeHTTP(w, r)
 			return
 		}
-		userInfo := r.Context().Value(UserInfo).(models.User)
-		if userInfo.UserName == "" {
+		user := r.Context().Value(UserInfo).(db.User)
+		if user.Name == "" {
 			log.Println("user was set in context but is empty string")
 			h.ServeHTTP(w, r)
 		}
@@ -99,7 +97,7 @@ func AddNewJwtToCtxCookie(h http.Handler) http.Handler {
 		// set token expiration
 
 		_, tokenString, _ := tokenAuth.Encode(map[string]interface{}{
-			"userInfo": userInfo,
+			"username": user.Name,
 			"exp":      expirationTime.Unix(),
 			"iat":      time.Now().Unix(),
 			"iss":      conf.Auth.JWT.Issuer,
@@ -112,20 +110,20 @@ func AddNewJwtToCtxCookie(h http.Handler) http.Handler {
 			Name:  "jwt",
 			Value: tokenString,
 		})
-		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), JWTToken, tokenString)))
+		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), JWTEncodedString, tokenString)))
 	})
 }
 
 func AuthenticateJWT(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// get JWT in context
-		if r.Context().Value(JWTToken) == nil {
+		if r.Context().Value(JWTEncodedString) == nil {
 			// log.Println("no JWT to authenticate")
 			// error
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
-		token := r.Context().Value(JWTToken).(string)
+		token := r.Context().Value(JWTEncodedString).(string)
 		if token == "" {
 			// log.Println("No JWT token found in context")
 			h.ServeHTTP(w, r)

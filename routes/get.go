@@ -11,8 +11,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/joshuaschlichting/gocms/auth"
 	"github.com/joshuaschlichting/gocms/config"
+	"github.com/joshuaschlichting/gocms/db"
 	"github.com/joshuaschlichting/gocms/middleware"
-	"github.com/joshuaschlichting/gocms/models"
 )
 
 func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config) {
@@ -95,10 +95,11 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config) {
 		r.Use(jwtauth.Verifier(jwtAuth))
 		r.Use(middleware.AddClientJWTToCtx)
 		r.Use(middleware.AuthenticateJWT)
+		r.Use(middleware.AddUserInfoToCtx)
 
 		r.Get("/upload_form", func(w http.ResponseWriter, r *http.Request) {
 			err := tmpl.ExecuteTemplate(w, "upload_form", map[string]interface{}{
-				"Token":   r.Context().Value(middleware.JWTToken).(string),
+				"Token":   r.Context().Value(middleware.JWTEncodedString).(string),
 				"PostURL": "/upload",
 			})
 			if err != nil {
@@ -118,7 +119,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config) {
 			if r.Context().Value(middleware.UserInfo) == nil {
 				username = ""
 			} else {
-				username = r.Context().Value(middleware.UserInfo).(models.User).UserName
+				username = r.Context().Value(middleware.UserInfo).(db.User).Name
 			}
 
 			err := tmpl.ExecuteTemplate(w, "index", map[string]interface{}{

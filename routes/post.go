@@ -10,7 +10,7 @@ import (
 	"github.com/joshuaschlichting/gocms/data"
 )
 
-func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, data data.Data) {
+func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, data ) {
 	r.Group(func(r chi.Router) {
 		r.Post("/upload", func(w http.ResponseWriter, r *http.Request) {
 			// get payload
@@ -18,6 +18,20 @@ func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, 
 			header := y.Header
 			log.Printf("header: %v", header)
 			// convert file to []byte
+			payload := make([]byte, y.Size)
+			size, err := file.Read(payload)
+			if err != nil {
+				log.Printf("error reading file: %v", err)
+			}
+			log.Printf("file: %v\n\tsize: %v", y.Header, size)
+			data.UploadFile(payload, y.Filename, "userid")
+		})
+
+		r.Post("/upload_media", func(w http.ResponseWriter, r *http.Request) {
+			// get payload
+			file, y, _ := r.FormFile("file")
+			header := y.Header
+			log.Printf("header: %v", header)
 			payload := make([]byte, y.Size)
 			size, err := file.Read(payload)
 			if err != nil {

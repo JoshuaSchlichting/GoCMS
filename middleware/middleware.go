@@ -12,7 +12,7 @@ const (
 	AccessCode contextKey = iota
 	AccessToken
 	UserInfo
-	JWTToken
+	JWTEncodedString
 )
 
 func LogAllButStaticRequests(h http.Handler) http.Handler {
