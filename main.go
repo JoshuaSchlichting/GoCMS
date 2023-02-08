@@ -12,7 +12,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/joshuaschlichting/gocms/config"
-	"github.com/joshuaschlichting/gocms/data"
+	database "github.com/joshuaschlichting/gocms/db"
 	"github.com/joshuaschlichting/gocms/middleware"
 	"github.com/joshuaschlichting/gocms/routes"
 )
@@ -30,16 +30,21 @@ func main() {
 	)
 	flag.Parse()
 	config := config.LoadConfig()
-
+	log.Print("connection string: ", config.Database.ConnectionString)
 	// Initialize Database
+	// db, err := sql.Open("postgres", config.Database.ConnectionString)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// create a table with db
+	// _, err = db.Exec("CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name VARCHAR(255), email VARCHAR(255), attributes VARCHAR(255))")
+
 	db, err := sql.Open("postgres", config.Database.ConnectionString)
-
-	data.Init(db)
-	dataLayer := data.StubData{}
-
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	queries := database.New(db)
 	defer db.Close()
 
 	templ, err := parseTemplateDir("templates", templateFS)
@@ -56,7 +61,6 @@ func main() {
 	middleware.InitMiddleware(config)
 
 	// Register common middleware
-	r.Use(middleware.AddUserInfoToCtx)
 	r.Use(middleware.LogAllButStaticRequests)
 	// End Middleware /////////////////////////////////////////////////////////
 
@@ -67,7 +71,7 @@ func main() {
 
 	// Register routes
 	routes.InitGetRoutes(r, templ, config)
-	routes.InitPostRoutes(r, templ, config, dataLayer)
+	routes.InitPostRoutes(r, templ, config, queries)
 
 	if err := listenServe(addr, r); err != nil {
 		log.Fatal(err)
