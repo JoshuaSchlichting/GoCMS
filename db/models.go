@@ -18,6 +18,14 @@ type File struct {
 	OwnerID   int32     `json:"owner_id"`
 }
 
+type Message struct {
+	ID        int32     `json:"id"`
+	Message   string    `json:"message"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	OwnerID   int32     `json:"owner_id"`
+}
+
 type User struct {
 	ID         int32           `json:"id"`
 	Name       string          `json:"name"`

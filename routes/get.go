@@ -15,7 +15,7 @@ import (
 	"github.com/joshuaschlichting/gocms/middleware"
 )
 
-func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config) {
+func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, middlewareMap map[string]func(http.Handler) http.Handler) {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		// if not logged in
 		if r.Context().Value(middleware.UserInfo) == nil {
@@ -93,9 +93,9 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config) {
 	r.Group(func(r chi.Router) {
 		jwtAuth := jwtauth.New("HS256", []byte(config.Auth.JWT.SecretKey), nil)
 		r.Use(jwtauth.Verifier(jwtAuth))
-		r.Use(middleware.AddClientJWTToCtx)
+		r.Use(middleware.AddClientJWTStringToCtx)
 		r.Use(middleware.AuthenticateJWT)
-		r.Use(middleware.AddUserInfoToCtx)
+		r.Use(middlewareMap["addUserToCtx"])
 
 		r.Get("/upload_form", func(w http.ResponseWriter, r *http.Request) {
 			err := tmpl.ExecuteTemplate(w, "upload_form", map[string]interface{}{

@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-
 )
 
 type QueriesInterface interface {
@@ -13,4 +12,6 @@ type QueriesInterface interface {
 	ListUsers(ctx context.Context) ([]User, error)
 	UpdatUser(ctx context.Context, arg UpdatUserParams) (User, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
+	UploadFile(ctx context.Context, arg UploadFileParams) (File, error)
+	GetUserByName(ctx context.Context, name string) (User, error)
 }

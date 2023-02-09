@@ -3,7 +3,7 @@ create table public.user
     id serial not null
         constraint user_pk
             primary key,
-    name text not null,
+    name text not null unique,
     email text not null,
     attributes jsonb not null,
     password text not null,
@@ -11,7 +11,7 @@ create table public.user
     updated_at timestamp not null
 );
 
-create table public.files
+create table public.file
 (
     id serial not null
         constraint files_pk
@@ -22,5 +22,18 @@ create table public.files
     updated_at timestamp not null,
     owner_id integer not null
         constraint files_user_id_fk
+            references public.user
+);
+
+create table public.messages
+(
+    id serial not null
+        constraint messages_pk
+            primary key,
+    message text not null,
+    created_at timestamp not null,
+    updated_at timestamp not null,
+    owner_id integer not null
+        constraint messages_user_id_fk
             references public.user
 );

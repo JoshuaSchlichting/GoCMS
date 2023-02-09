@@ -51,16 +51,7 @@ func AddAccessTokenToCtx(h http.Handler) http.Handler {
 	})
 }
 
-func AddUserInfoToCtx(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		jwt := r.Context().Value(JWTEncodedString).(string)
-
-		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), UserInfo, userInfo)))
-	})
-}
-
-func AddClientJWTToCtx(h http.Handler) http.Handler {
+func AddClientJWTStringToCtx(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		// extract JWT from request
@@ -73,9 +64,6 @@ func AddClientJWTToCtx(h http.Handler) http.Handler {
 			return
 		}
 
-		// cast to *jwtauth.JWTAuth
-		// tokenAuth := jwtauth.New("HS256", []byte("secret"), nil)
-		// jwtAuthToken, _ := tokenAuth.Decode(jwtToken)
 		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), JWTEncodedString, jwtToken.Value)))
 	})
 }

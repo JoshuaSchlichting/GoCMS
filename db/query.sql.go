@@ -79,8 +79,28 @@ func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
 	return i, err
 }
 
+const getUserByName = `-- name: GetUserByName :one
+SELECT id, name, email, attributes, password, created_at, updated_at FROM public.user
+WHERE name = $1 LIMIT 1
+`
+
+func (q *Queries) GetUserByName(ctx context.Context, name string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByName, name)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.Attributes,
+		&i.Password,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const listFiles = `-- name: ListFiles :many
-SELECT id, name, blob, created_at, updated_at, owner_id FROM public.files
+SELECT id, name, blob, created_at, updated_at, owner_id FROM public.file
 ORDER BY name
 `
 
@@ -224,6 +244,43 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.Password,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const uploadFile = `-- name: UploadFile :one
+INSERT INTO public.file (
+    name, blob, created_at, updated_at, owner_id
+) VALUES (
+  $1, $2, $3, $4, $5
+)
+RETURNING id, name, blob, created_at, updated_at, owner_id
+`
+
+type UploadFileParams struct {
+	Name      string    `json:"name"`
+	Blob      []byte    `json:"blob"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	OwnerID   int32     `json:"owner_id"`
+}
+
+func (q *Queries) UploadFile(ctx context.Context, arg UploadFileParams) (File, error) {
+	row := q.db.QueryRowContext(ctx, uploadFile,
+		arg.Name,
+		arg.Blob,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+		arg.OwnerID,
+	)
+	var i File
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Blob,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.OwnerID,
 	)
 	return i, err
 }

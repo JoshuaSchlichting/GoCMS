@@ -7,10 +7,10 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/joshuaschlichting/gocms/config"
-	"github.com/joshuaschlichting/gocms/data"
+	"github.com/joshuaschlichting/gocms/db"
 )
 
-func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, data ) {
+func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, data db.QueriesInterface) {
 	r.Group(func(r chi.Router) {
 		r.Post("/upload", func(w http.ResponseWriter, r *http.Request) {
 			// get payload
@@ -24,7 +24,7 @@ func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, 
 				log.Printf("error reading file: %v", err)
 			}
 			log.Printf("file: %v\n\tsize: %v", y.Header, size)
-			data.UploadFile(payload, y.Filename, "userid")
+			// data.UploadFile(payload, y.Filename, "userid")
 		})
 
 		r.Post("/upload_media", func(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +38,7 @@ func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, 
 				log.Printf("error reading file: %v", err)
 			}
 			log.Printf("file: %v\n\tsize: %v", y.Header, size)
-			data.UploadFile(payload, y.Filename, "userid")
+			// data.UploadFile(payload, y.Filename, "userid")
 		})
 	})
 }

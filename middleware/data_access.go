@@ -1,8 +1,10 @@
 package middleware
 
 import (
+	"log"
 	"net/http"
 
+	"github.com/go-chi/jwtauth"
 	"github.com/joshuaschlichting/gocms/db"
 )
 
@@ -10,21 +12,35 @@ type MiddlewareWithDB interface {
 	AddUserToCtx(h http.Handler) http.Handler
 }
 
-func New(db db.QueriesInterface) DBMiddleware {
+func NewMiddlewareWithDB(db db.QueriesInterface, jwtSecretKey string) DBMiddleware {
 	r := DBMiddleware{
-		DB: db,
+		db:           db,
+		jwtSecretKey: jwtSecretKey,
 	}
 	return r
 }
 
 type DBMiddleware struct {
-	DB db.QueriesInterface
+	db           db.QueriesInterface
+	jwtSecretKey string
 }
 
 func (m DBMiddleware) AddUserToCtx(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// get user from db
-		m.DB.GetUser(r.Context(), 1)
+		jwt := r.Context().Value(JWTEncodedString).(string)
+		// unmarshal jwt
+
+		// cast to *jwtauth.JWTAuth
+		tokenAuth := jwtauth.New("HS256", []byte(m.jwtSecretKey), nil)
+		jwtAuthToken, err := tokenAuth.Decode(jwt)
+		if err != nil {
+			log.Printf("Unable to decode JWT: %s", jwt)
+			log.Printf("Error: %s", err.Error())
+			h.ServeHTTP(w, r)
+			return
+		}
+		username, _ := jwtAuthToken.Get("userInfo")
+
 		h.ServeHTTP(w, r)
 	})
 }
