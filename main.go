@@ -9,12 +9,14 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi"
 	"github.com/joshuaschlichting/gocms/config"
 	database "github.com/joshuaschlichting/gocms/db"
 	"github.com/joshuaschlichting/gocms/middleware"
 	"github.com/joshuaschlichting/gocms/routes"
+	_ "github.com/lib/pq"
 )
 
 //go:embed static
@@ -29,7 +31,8 @@ func main() {
 		port = flag.String("port", "8000", "port number for http listener")
 	)
 	flag.Parse()
-	config := config.LoadConfig()
+
+	config := config.LoadConfig(readConfigFile())
 	log.Print("connection string: ", config.Database.ConnectionString)
 	// Initialize Database
 	// db, err := sql.Open("postgres", config.Database.ConnectionString)
@@ -61,7 +64,11 @@ func main() {
 	middleware.InitMiddleware(config)
 
 	// Register common middleware
+	dbMiddlware := middleware.NewMiddlewareWithDB(queries, config.Auth.JWT.SecretKey)
 	r.Use(middleware.LogAllButStaticRequests)
+
+	middlewareMap := map[string]func(http.Handler) http.Handler{}
+	middlewareMap["addUserToCtx"] = dbMiddlware.AddUserToCtx
 	// End Middleware /////////////////////////////////////////////////////////
 
 	// Register static file serve
@@ -70,7 +77,7 @@ func main() {
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
 
 	// Register routes
-	routes.InitGetRoutes(r, templ, config)
+	routes.InitGetRoutes(r, templ, config, middlewareMap)
 	routes.InitPostRoutes(r, templ, config, queries)
 
 	if err := listenServe(addr, r); err != nil {
@@ -85,4 +92,13 @@ func listenServe(listenAddr string, handler http.Handler) error {
 	}
 	fmt.Printf("Starting HTTP listener at %s\n", listenAddr)
 	return s.ListenAndServe()
+}
+
+func readConfigFile() []byte {
+	// read config.yml
+	configYml, err := os.ReadFile("config.yml")
+	if err != nil {
+		log.Fatalf("Error reading config.yml: %v", err)
+	}
+	return configYml
 }
