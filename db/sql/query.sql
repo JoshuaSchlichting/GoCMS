@@ -14,7 +14,7 @@ ORDER BY name;
 INSERT INTO public.user (
     name, email, attributes, created_at, updated_at
 ) VALUES (
-  $1, $2, $3, $4, $5
+  $1, $2, $3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 )
 RETURNING *;
 
