@@ -29,8 +29,7 @@ type Config struct {
 	} `yaml:"auth"`
 }
 
-func LoadConfig() *Config {
-	var configYml []byte = readConfigFile()
+func LoadConfig(configYml []byte) *Config {
 	return loadConfigYaml(configYml)
 }
 

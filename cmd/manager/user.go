@@ -1,0 +1,42 @@
+package main
+
+import (
+	"context"
+	"database/sql"
+	"encoding/json"
+	"fmt"
+	"log"
+
+	database "github.com/joshuaschlichting/gocms/db"
+)
+
+func deleteAllUsers(db *sql.DB) {
+	result, error := db.Exec("drop table public.user;")
+	if error != nil {
+		fmt.Println(error)
+		return
+	}
+	fmt.Println(result)
+	fmt.Println("All users have been deleted! :(")
+}
+
+func createSuperUser(queries database.QueriesInterface, username, email string) {
+	user := database.CreateUserParams{
+		Name:       username,
+		Email:      email,
+		Attributes: json.RawMessage(`{"is_superuser": true}`),
+	}
+	userModel, err := queries.CreateUser(context.TODO(), user)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Print("Successfully created user: ", userModel.Name)
+}
+
+func getUsers(queries database.QueriesInterface) {
+	users, err := queries.ListUsers(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(users)
+}
