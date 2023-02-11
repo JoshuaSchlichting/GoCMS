@@ -46,8 +46,6 @@ func (m DBMiddleware) AddUserToCtx(h http.Handler) http.Handler {
 			log.Printf("Unable to get user from db: %s", username)
 			log.Printf("Error: %s", err.Error())
 		}
-		// add user to context
-
 		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), User, user)))
 	})
 }
