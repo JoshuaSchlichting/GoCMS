@@ -10,7 +10,6 @@ type QueriesInterface interface {
 	GetUser(ctx context.Context, id int64) (User, error)
 	ListFiles(ctx context.Context) ([]File, error)
 	ListUsers(ctx context.Context) ([]User, error)
-	UpdatUser(ctx context.Context, arg UpdateUserParams) (User, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 	UploadFile(ctx context.Context, arg UploadFileParams) (File, error)
 	GetUserByName(ctx context.Context, name string) (User, error)
