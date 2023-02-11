@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"log"
 	"net/http"
 
@@ -40,7 +41,13 @@ func (m DBMiddleware) AddUserToCtx(h http.Handler) http.Handler {
 			return
 		}
 		username, _ := jwtAuthToken.Get("userInfo")
+		user, err := m.db.GetUserByName(r.Context(), username.(string))
+		if err != nil {
+			log.Printf("Unable to get user from db: %s", username)
+			log.Printf("Error: %s", err.Error())
+		}
+		// add user to context
 
-		h.ServeHTTP(w, r)
+		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), User, user)))
 	})
 }

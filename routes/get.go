@@ -15,10 +15,10 @@ import (
 	"github.com/joshuaschlichting/gocms/middleware"
 )
 
-func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, middlewareMap map[string]func(http.Handler) http.Handler) {
+func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.QueriesInterface, middlewareMap map[string]func(http.Handler) http.Handler) {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		// if not logged in
-		if r.Context().Value(middleware.UserInfo) == nil {
+		if r.Context().Value(middleware.User) == nil {
 			// redirect to login
 			// set Content-Type header
 			w.Header().Set("Content-Type", "")
@@ -97,6 +97,36 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, m
 		r.Use(middleware.AuthenticateJWT)
 		r.Use(middlewareMap["addUserToCtx"])
 
+		r.Get("/list_users", func(w http.ResponseWriter, r *http.Request) {
+			users, err := queries.ListUsers(r.Context())
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			err = tmpl.ExecuteTemplate(w, "list_users", map[string]interface{}{
+				"Users": users,
+			})
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		})
+
+		r.Get("/edit_user_form", func(w http.ResponseWriter, r *http.Request) {
+			users, err := queries.ListUsers(r.Context())
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			err = tmpl.ExecuteTemplate(w, "edit_user_form", map[string]interface{}{
+				"Token":   r.Context().Value(middleware.JWTEncodedString).(string),
+				"PostURL": "/edit_user",
+				"Users":   users,
+			})
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		})
+
 		r.Get("/upload_form", func(w http.ResponseWriter, r *http.Request) {
 			err := tmpl.ExecuteTemplate(w, "upload_form", map[string]interface{}{
 				"Token":   r.Context().Value(middleware.JWTEncodedString).(string),
@@ -116,10 +146,10 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, m
 
 		r.Get("/secure", func(w http.ResponseWriter, r *http.Request) {
 			var username string
-			if r.Context().Value(middleware.UserInfo) == nil {
+			if r.Context().Value(middleware.User) == nil {
 				username = ""
 			} else {
-				username = r.Context().Value(middleware.UserInfo).(db.User).Name
+				username = r.Context().Value(middleware.User).(db.User).Name
 			}
 
 			err := tmpl.ExecuteTemplate(w, "index", map[string]interface{}{

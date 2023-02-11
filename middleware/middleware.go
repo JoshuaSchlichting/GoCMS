@@ -11,7 +11,7 @@ type contextKey int
 const (
 	AccessCode contextKey = iota
 	AccessToken
-	UserInfo
+	User
 	JWTEncodedString
 )
 

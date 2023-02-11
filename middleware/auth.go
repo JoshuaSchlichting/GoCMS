@@ -70,11 +70,11 @@ func AddClientJWTStringToCtx(h http.Handler) http.Handler {
 
 func AddNewJwtToCtxCookie(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Context().Value(UserInfo) == nil {
+		if r.Context().Value(User) == nil {
 			h.ServeHTTP(w, r)
 			return
 		}
-		user := r.Context().Value(UserInfo).(db.User)
+		user := r.Context().Value(User).(db.User)
 		if user.Name == "" {
 			log.Println("user was set in context but is empty string")
 			h.ServeHTTP(w, r)
