@@ -35,15 +35,6 @@ WHERE id = $1;
 SELECT * FROM public.file
 ORDER BY name;
 
--- name: UpdateUser :one
-UPDATE public.user
-  set name = $2,
-    email = $3,
-    attributes = $4,
-    updated_at = current_timestamp
-WHERE id = $1
-RETURNING *;
-
 -- name: UploadFile :one
 INSERT INTO public.file (
     name, blob, created_at, updated_at, owner_id
@@ -52,3 +43,9 @@ INSERT INTO public.file (
 )
 RETURNING *;
 
+-- name: UpdateOrganization :one
+update public.organization
+  set name = $2,
+    updated_at = current_timestamp
+WHERE id = $1
+RETURNING *;

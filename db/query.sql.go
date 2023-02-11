@@ -8,14 +8,13 @@ package db
 import (
 	"context"
 	"encoding/json"
-	"time"
 )
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO public.user (
     name, email, attributes, created_at, updated_at
 ) VALUES (
-  $1, $2, $3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+  $1, $2, $3, current_timestamp, current_timestamp
 )
 RETURNING id, organization_id, name, email, attributes, created_at, updated_at
 `
@@ -73,7 +72,7 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 
 const getUserByName = `-- name: GetUserByName :one
 SELECT id, organization_id, name, email, attributes, created_at, updated_at FROM public.user
-WHERE name = $1 LIMIT 1
+WHERE name = $1
 `
 
 func (q *Queries) GetUserByName(ctx context.Context, name string) (User, error) {
@@ -162,39 +161,25 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 	return items, nil
 }
 
-const updatUser = `-- name: UpdatUser :one
-UPDATE public.user
+const updateOrganization = `-- name: UpdateOrganization :one
+update public.organization
   set name = $2,
-    email = $3,
-    attributes = $4,
-    updated_at = $5
+    updated_at = current_timestamp
 WHERE id = $1
-RETURNING id, organization_id, name, email, attributes, created_at, updated_at
+RETURNING id, name, created_at, updated_at
 `
 
-type UpdatUserParams struct {
-	ID         int64           `json:"id"`
-	Name       string          `json:"name"`
-	Email      string          `json:"email"`
-	Attributes json.RawMessage `json:"attributes"`
-	UpdatedAt  time.Time       `json:"updated_at"`
+type UpdateOrganizationParams struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
-func (q *Queries) UpdatUser(ctx context.Context, arg UpdatUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, updatUser,
-		arg.ID,
-		arg.Name,
-		arg.Email,
-		arg.Attributes,
-		arg.UpdatedAt,
-	)
-	var i User
+func (q *Queries) UpdateOrganization(ctx context.Context, arg UpdateOrganizationParams) (Organization, error) {
+	row := q.db.QueryRowContext(ctx, updateOrganization, arg.ID, arg.Name)
+	var i Organization
 	err := row.Scan(
 		&i.ID,
-		&i.OrganizationID,
 		&i.Name,
-		&i.Email,
-		&i.Attributes,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -206,7 +191,7 @@ UPDATE public.user
   set name = $2,
     email = $3,
     attributes = $4,
-    updated_at = $5
+    updated_at = current_timestamp
 WHERE id = $1
 RETURNING id, organization_id, name, email, attributes, created_at, updated_at
 `
@@ -216,7 +201,6 @@ type UpdateUserParams struct {
 	Name       string          `json:"name"`
 	Email      string          `json:"email"`
 	Attributes json.RawMessage `json:"attributes"`
-	UpdatedAt  time.Time       `json:"updated_at"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
@@ -225,7 +209,6 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		arg.Name,
 		arg.Email,
 		arg.Attributes,
-		arg.UpdatedAt,
 	)
 	var i User
 	err := row.Scan(
@@ -244,27 +227,19 @@ const uploadFile = `-- name: UploadFile :one
 INSERT INTO public.file (
     name, blob, created_at, updated_at, owner_id
 ) VALUES (
-  $1, $2, $3, $4, $5
+  $1, $2, current_timestamp, current_timestamp, $3
 )
 RETURNING id, name, blob, created_at, updated_at, owner_id
 `
 
 type UploadFileParams struct {
-	Name      string    `json:"name"`
-	Blob      []byte    `json:"blob"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	OwnerID   int32     `json:"owner_id"`
+	Name    string `json:"name"`
+	Blob    []byte `json:"blob"`
+	OwnerID int32  `json:"owner_id"`
 }
 
 func (q *Queries) UploadFile(ctx context.Context, arg UploadFileParams) (File, error) {
-	row := q.db.QueryRowContext(ctx, uploadFile,
-		arg.Name,
-		arg.Blob,
-		arg.CreatedAt,
-		arg.UpdatedAt,
-		arg.OwnerID,
-	)
+	row := q.db.QueryRowContext(ctx, uploadFile, arg.Name, arg.Blob, arg.OwnerID)
 	var i File
 	err := row.Scan(
 		&i.ID,

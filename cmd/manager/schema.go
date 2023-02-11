@@ -40,4 +40,5 @@ func DestroySchema(db *sql.DB) {
 	db.Exec("drop table public.user;")
 	db.Exec("drop table public.messages;")
 	db.Exec("drop table public.invoice;")
+	db.Exec("drop table public.organization;")
 }

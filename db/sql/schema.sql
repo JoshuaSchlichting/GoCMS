@@ -1,3 +1,14 @@
+
+create table if not exists public.organization
+(
+    id bigserial not null
+        constraint organization_pk
+            primary key,
+    name text not null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp not null default current_timestamp
+);
+
 create table if not exists public.user
 (
     id bigserial not null
@@ -13,15 +24,7 @@ create table if not exists public.user
     updated_at timestamp not null default current_timestamp
 );
 
-create table if not exists public.organization
-(
-    id bigserial not null
-        constraint organization_pk
-            primary key,
-    name text not null,
-    created_at timestamp not null default current_timestamp,
-    updated_at timestamp not null default current_timestamp
-);
+
 
 create table if not exists public.file
 (
