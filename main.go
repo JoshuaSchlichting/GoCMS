@@ -34,13 +34,6 @@ func main() {
 
 	config := config.LoadConfig(readConfigFile())
 	log.Print("connection string: ", config.Database.ConnectionString)
-	// Initialize Database
-	// db, err := sql.Open("postgres", config.Database.ConnectionString)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// create a table with db
-	// _, err = db.Exec("CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name VARCHAR(255), email VARCHAR(255), attributes VARCHAR(255))")
 
 	db, err := sql.Open("postgres", config.Database.ConnectionString)
 	if err != nil {
