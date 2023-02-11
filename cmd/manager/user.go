@@ -38,5 +38,8 @@ func getUsers(queries database.QueriesInterface) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(users)
+	fmt.Println("Users: ")
+	for _, user := range users {
+		fmt.Println(user.Name)
+	}
 }

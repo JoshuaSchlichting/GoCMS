@@ -5,12 +5,13 @@
 package db
 
 import (
+	"database/sql"
 	"encoding/json"
 	"time"
 )
 
 type File struct {
-	ID        int32     `json:"id"`
+	ID        int64     `json:"id"`
 	Name      string    `json:"name"`
 	Blob      []byte    `json:"blob"`
 	CreatedAt time.Time `json:"created_at"`
@@ -18,19 +19,37 @@ type File struct {
 	OwnerID   int32     `json:"owner_id"`
 }
 
+type Invoice struct {
+	ID             int64     `json:"id"`
+	Amount         float64   `json:"amount"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+	UserID         int32     `json:"user_id"`
+	OrgnaizationID int32     `json:"orgnaization_id"`
+}
+
 type Message struct {
-	ID        int32     `json:"id"`
+	ID        int64     `json:"id"`
+	ToID      int32     `json:"to_id"`
 	Message   string    `json:"message"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	OwnerID   int32     `json:"owner_id"`
+	FromID    int32     `json:"from_id"`
+}
+
+type Organization struct {
+	ID        int64     `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type User struct {
-	ID         int32           `json:"id"`
-	Name       string          `json:"name"`
-	Email      string          `json:"email"`
-	Attributes json.RawMessage `json:"attributes"`
-	CreatedAt  time.Time       `json:"created_at"`
-	UpdatedAt  time.Time       `json:"updated_at"`
+	ID             int64           `json:"id"`
+	OrganizationID sql.NullInt32   `json:"organization_id"`
+	Name           string          `json:"name"`
+	Email          string          `json:"email"`
+	Attributes     json.RawMessage `json:"attributes"`
+	CreatedAt      time.Time       `json:"created_at"`
+	UpdatedAt      time.Time       `json:"updated_at"`
 }

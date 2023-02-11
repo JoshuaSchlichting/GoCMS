@@ -42,6 +42,9 @@ func main() {
 
 	var executeRawSqlFlag string
 	flag.StringVar(&executeRawSqlFlag, "exec-sql", "", "Execute raw sql")
+
+	var DestroySchemaFlag bool
+	flag.BoolVar(&DestroySchemaFlag, "destroy-schema", false, "Destroy database schema")
 	flag.Parse()
 	switch {
 	case createSuperUserFlag:
@@ -53,10 +56,25 @@ func main() {
 	case deleteAllUsersFlag:
 		deleteAllUsers(db)
 	case executeRawSqlFlag != "":
-		_, err := db.Exec(executeRawSqlFlag)
-		if err != nil {
-			log.Fatal(err)
+		if strings.HasPrefix(strings.ToLower(executeRawSqlFlag), "select") {
+			rows, err := db.Query(executeRawSqlFlag)
+			if err != nil {
+				log.Fatal(err)
+			}
+			scanResult := interface{}(nil)
+			for rows.Next() {
+				fmt.Printf("%v", rows.Scan(&scanResult))
+			}
+		} else {
+			result, err := db.Exec(executeRawSqlFlag)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(result)
 		}
+		// iterate over results and print them
+	case DestroySchemaFlag:
+		DestroySchema(db)
 	default:
 		fmt.Println("No flags set")
 	}

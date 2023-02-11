@@ -17,7 +17,7 @@ INSERT INTO public.user (
 ) VALUES (
   $1, $2, $3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 )
-RETURNING id, name, email, attributes, created_at, updated_at
+RETURNING id, organization_id, name, email, attributes, created_at, updated_at
 `
 
 type CreateUserParams struct {
@@ -31,6 +31,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	var i User
 	err := row.Scan(
 		&i.ID,
+		&i.OrganizationID,
 		&i.Name,
 		&i.Email,
 		&i.Attributes,
@@ -45,21 +46,22 @@ DELETE FROM public.user
 WHERE id = $1
 `
 
-func (q *Queries) DeleteUser(ctx context.Context, id int32) error {
+func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 	_, err := q.db.ExecContext(ctx, deleteUser, id)
 	return err
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, name, email, attributes, created_at, updated_at FROM public.user
+SELECT id, organization_id, name, email, attributes, created_at, updated_at FROM public.user
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
+func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUser, id)
 	var i User
 	err := row.Scan(
 		&i.ID,
+		&i.OrganizationID,
 		&i.Name,
 		&i.Email,
 		&i.Attributes,
@@ -70,7 +72,7 @@ func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
 }
 
 const getUserByName = `-- name: GetUserByName :one
-SELECT id, name, email, attributes, created_at, updated_at FROM public.user
+SELECT id, organization_id, name, email, attributes, created_at, updated_at FROM public.user
 WHERE name = $1 LIMIT 1
 `
 
@@ -79,6 +81,7 @@ func (q *Queries) GetUserByName(ctx context.Context, name string) (User, error) 
 	var i User
 	err := row.Scan(
 		&i.ID,
+		&i.OrganizationID,
 		&i.Name,
 		&i.Email,
 		&i.Attributes,
@@ -124,7 +127,7 @@ func (q *Queries) ListFiles(ctx context.Context) ([]File, error) {
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, name, email, attributes, created_at, updated_at FROM public.user
+SELECT id, organization_id, name, email, attributes, created_at, updated_at FROM public.user
 ORDER BY name
 `
 
@@ -139,6 +142,7 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 		var i User
 		if err := rows.Scan(
 			&i.ID,
+			&i.OrganizationID,
 			&i.Name,
 			&i.Email,
 			&i.Attributes,
@@ -165,11 +169,11 @@ UPDATE public.user
     attributes = $4,
     updated_at = $5
 WHERE id = $1
-RETURNING id, name, email, attributes, created_at, updated_at
+RETURNING id, organization_id, name, email, attributes, created_at, updated_at
 `
 
 type UpdatUserParams struct {
-	ID         int32           `json:"id"`
+	ID         int64           `json:"id"`
 	Name       string          `json:"name"`
 	Email      string          `json:"email"`
 	Attributes json.RawMessage `json:"attributes"`
@@ -187,6 +191,7 @@ func (q *Queries) UpdatUser(ctx context.Context, arg UpdatUserParams) (User, err
 	var i User
 	err := row.Scan(
 		&i.ID,
+		&i.OrganizationID,
 		&i.Name,
 		&i.Email,
 		&i.Attributes,
@@ -203,11 +208,11 @@ UPDATE public.user
     attributes = $4,
     updated_at = $5
 WHERE id = $1
-RETURNING id, name, email, attributes, created_at, updated_at
+RETURNING id, organization_id, name, email, attributes, created_at, updated_at
 `
 
 type UpdateUserParams struct {
-	ID         int32           `json:"id"`
+	ID         int64           `json:"id"`
 	Name       string          `json:"name"`
 	Email      string          `json:"email"`
 	Attributes json.RawMessage `json:"attributes"`
@@ -225,6 +230,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 	var i User
 	err := row.Scan(
 		&i.ID,
+		&i.OrganizationID,
 		&i.Name,
 		&i.Email,
 		&i.Attributes,
