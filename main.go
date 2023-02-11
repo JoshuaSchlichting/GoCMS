@@ -77,7 +77,7 @@ func main() {
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
 
 	// Register routes
-	routes.InitGetRoutes(r, templ, config, middlewareMap)
+	routes.InitGetRoutes(r, templ, config, queries, middlewareMap)
 	routes.InitPostRoutes(r, templ, config, queries)
 
 	if err := listenServe(addr, r); err != nil {
