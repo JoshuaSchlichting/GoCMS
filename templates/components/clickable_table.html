@@ -1,0 +1,76 @@
+{{ define "clickable_table" }}
+<div>
+<table id="{{ .TableID }}" class="table table-hover">
+    {{ range $i, $row := .Table }}
+    <thead>
+        {{ if eq $i 0 }}
+        <tr>
+            {{ range $key, $val := $row }}
+            <th scope="col">{{ $key }}</th>
+            {{ end }}
+        </tr>
+        {{ end }}
+    </thead>
+    <tbody>
+        <tr>
+            {{ range $key, $val := $row }}
+            <td>{{ $val }}</td>
+            {{ end }}
+        </tr>
+    </tbody>
+    {{ end }}
+</table>
+<script type="application/javascript">
+    var {{ .TableID }}SelectedRow = null;
+    function redirectWithPayload(table, url) {
+        if (url === undefined || url === null || url === "") {
+            return;
+        }
+        // Get all rows in the table
+        const rows = table.getElementsByTagName("tr");
+        // Add click event listener to each row
+        for (let i = 0; i < rows.length; i++) {
+            rows[i].addEventListener("click", function () {
+                // Get all columns in the row
+                const cols = this.getElementsByTagName("td");
+
+                // Create an object to store the data for each column
+                const payload = {};
+                for (let j = 0; j < cols.length; j++) {
+                    // Get the key from the header
+                    const key = table.getElementsByTagName("th")[j].innerHTML;
+
+                    // Get the value from the column
+                    const val = cols[j].innerHTML;
+
+                    // Add the key-value pair to the payload
+                    payload[key] = val;
+                }
+                const apiEndpoint = "/user/" + payload["ID"];
+                alert("API endpoint: " + apiEndpoint);
+                // set row as "selected"
+                {{ .TableID }}SelectedRow = payload["ID"];
+
+                fetch(apiEndpoint, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(userData)
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to update user");
+                    }
+                    return response.json();
+                }).then(data => {
+                    console.log("User updated successfully", data);
+                }).catch(error => {
+                    console.error("Error updating user", error);
+                });
+            });
+        }
+    }
+    redirectWithPayload(document.getElementById("user_table"), "{{ .PostURL }}");
+</script>
+</div>
+{{ end }}

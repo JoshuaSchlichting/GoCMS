@@ -24,7 +24,7 @@ func loadTemplates() {
 	})
 }
 
-func parseTemplateDir(dir string, templateFS fs.FS) (*template.Template, error) {
+func parseTemplateDir(dir string, templateFS fs.FS, funcMap template.FuncMap) (*template.Template, error) {
 	var paths []string
 	err := fs.WalkDir(templateFS, dir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -40,5 +40,6 @@ func parseTemplateDir(dir string, templateFS fs.FS) (*template.Template, error) 
 		return nil, err
 	}
 	log.Printf("Found templates %v", paths)
-	return template.ParseFS(templateFS, paths...)
+
+	return template.New("").Funcs(funcMap).ParseFS(templateFS, paths...)
 }

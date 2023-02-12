@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"text/template"
 
 	"github.com/go-chi/chi"
 	"github.com/joshuaschlichting/gocms/config"
@@ -42,8 +43,8 @@ func main() {
 
 	queries := database.New(db)
 	defer db.Close()
-
-	templ, err := parseTemplateDir("templates", templateFS)
+	funcMap := template.FuncMap{}
+	templ, err := parseTemplateDir("templates", templateFS, funcMap)
 	if err != nil {
 		log.Fatalf("Error parsing templates: %v", err)
 	}
@@ -51,7 +52,6 @@ func main() {
 	addr := net.JoinHostPort(*host, *port)
 
 	r := chi.NewRouter()
-
 	// Middleware /////////////////////////////////////////////////////////////
 	// Initialize middlware
 	middleware.InitMiddleware(config)

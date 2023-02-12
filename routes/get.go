@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -117,10 +118,29 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
+			var userMap []map[string]interface{}
+			for _, user := range users {
+				userMap = append(userMap, map[string]interface{}{
+					"ID":    user.ID,
+					"Name":  user.Name,
+					"Email": user.Email,
+				})
+			}
+			var buf strings.Builder
+			err = tmpl.ExecuteTemplate(&buf, "clickable_table", map[string]interface{}{
+				"Table":   userMap,
+				"PostURL": "/edit_user",
+			})
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				log.Printf("Error executing template: %v", err)
+				return
+			}
 			err = tmpl.ExecuteTemplate(w, "edit_user_form", map[string]interface{}{
 				"Token":   r.Context().Value(middleware.JWTEncodedString).(string),
 				"PostURL": "/edit_user",
-				"Users":   users,
+				"Table":   userMap,
+				"TableID": template.JS("user_table"),
 			})
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
