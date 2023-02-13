@@ -4,7 +4,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -14,6 +13,7 @@ import (
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/db"
 	"github.com/joshuaschlichting/gocms/middleware"
+	"github.com/joshuaschlichting/gocms/templates/components"
 )
 
 func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.QueriesInterface, middlewareMap map[string]func(http.Handler) http.Handler) {
@@ -98,20 +98,6 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 		r.Use(middleware.AuthenticateJWT)
 		r.Use(middlewareMap["addUserToCtx"])
 
-		r.Get("/list_users", func(w http.ResponseWriter, r *http.Request) {
-			users, err := queries.ListUsers(r.Context())
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			err = tmpl.ExecuteTemplate(w, "list_users", map[string]interface{}{
-				"Users": users,
-			})
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			}
-		})
-
 		r.Get("/edit_user_form", func(w http.ResponseWriter, r *http.Request) {
 			users, err := queries.ListUsers(r.Context())
 			if err != nil {
@@ -126,21 +112,74 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 					"Email": user.Email,
 				})
 			}
-			var buf strings.Builder
-			err = tmpl.ExecuteTemplate(&buf, "clickable_table", map[string]interface{}{
-				"Table":   userMap,
-				"PostURL": "/edit_user",
-			})
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				log.Printf("Error executing template: %v", err)
-				return
-			}
+
 			err = tmpl.ExecuteTemplate(w, "edit_user_form", map[string]interface{}{
 				"Token":   r.Context().Value(middleware.JWTEncodedString).(string),
 				"PostURL": "/edit_user",
-				"Table":   userMap,
-				"TableID": template.JS("user_table"),
+				"ClickableTable": &components.ClickableTable{
+					TableID:      template.JS("user_table"),
+					Table:        userMap,
+					CallbackFunc: template.JS("setUserInForm"),
+					JavaScript: template.JS(`
+						function getRowData(tableId, columnName, columnValue) {
+							console.log("getRowData-> params: " + tableId  + columnName + columnValue);
+							// Get the table using its ID
+							const table = document.getElementById(tableId);
+						
+							// Get the table headers
+							const headers = table.getElementsByTagName("th");
+						
+							// Get the index of the target column
+							let targetColumnIndex;
+							for (let i = 0; i < headers.length; i++) {
+								if (headers[i].textContent === columnName) {
+									targetColumnIndex = i;
+									break;
+								}
+							}
+						
+							// Get the table rows
+							const rows = table.getElementsByTagName("tr");
+						
+							// Loop through each row
+							for (let i = 0; i < rows.length; i++) {
+							const cells = rows[i].getElementsByTagName("td");
+						
+							// Check if the target column exists in the row
+							if (cells[targetColumnIndex]) {
+								// Check if the value of the target column matches the columnValue
+								if (cells[targetColumnIndex].textContent === columnValue) {
+								// Get the header names
+								const headerNames = Array.from(headers).map(header => header.textContent);
+						
+								// Get the cell values
+								const cellValues = Array.from(cells).map(cell => cell.textContent);
+						
+								// Combine the header names and cell values into an object
+								const rowData = headerNames.reduce((obj, headerName, index) => {
+									obj[headerName] = cellValues[index];
+									return obj;
+								}, {});
+								return rowData;
+							}}}
+							// Return null if the row is not found
+							return null;
+						}
+						function setUserInForm() {
+							console.log("setUserInForm->");
+							// get row data where row id == user_tableSelectedRow
+							let formData = getRowData("user_table", "ID", user_tableSelectedRow);
+							// get the form
+							console.log(formData);
+							// prefill the form with id edit_user_form
+							document.getElementById("editUserFormId").value = formData["ID"];
+							document.getElementById("inputName").value = formData["Name"];
+							document.getElementById("inputEmail").value = formData["Email"];
+							document.getElementById("inputAttributes").value = formData["Attributes"];
+
+							
+						}`),
+				},
 			})
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)

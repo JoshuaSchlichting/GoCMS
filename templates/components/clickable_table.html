@@ -1,7 +1,7 @@
 {{ define "clickable_table" }}
 <div>
-<table id="{{ .TableID }}" class="table table-hover">
-    {{ range $i, $row := .Table }}
+<table id="{{ .ClickableTable.TableID }}" class="table table-hover">
+    {{ range $i, $row := .ClickableTable.Table }}
     <thead>
         {{ if eq $i 0 }}
         <tr>
@@ -20,12 +20,12 @@
     </tbody>
     {{ end }}
 </table>
+<script>
+    {{ .ClickableTable.JavaScript }}
+</script>
 <script type="application/javascript">
-    var {{ .TableID }}SelectedRow = null;
-    function redirectWithPayload(table, url) {
-        if (url === undefined || url === null || url === "") {
-            return;
-        }
+    var {{ .ClickableTable.TableID }}SelectedRow = null;
+    function handleRowClick(table, url, callback=null) {
         // Get all rows in the table
         const rows = table.getElementsByTagName("tr");
         // Add click event listener to each row
@@ -47,30 +47,33 @@
                     payload[key] = val;
                 }
                 const apiEndpoint = "/user/" + payload["ID"];
-                alert("API endpoint: " + apiEndpoint);
                 // set row as "selected"
-                {{ .TableID }}SelectedRow = payload["ID"];
-
-                fetch(apiEndpoint, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(userData)
-                }).then(response => {
-                    if (!response.ok) {
-                        throw new Error("Failed to update user");
-                    }
-                    return response.json();
-                }).then(data => {
-                    console.log("User updated successfully", data);
-                }).catch(error => {
-                    console.error("Error updating user", error);
-                });
+                {{ .ClickableTable.TableID }}SelectedRow = payload["ID"];
+                console.log("Selected row: " + {{ .ClickableTable.TableID }}SelectedRow);
+                // call callback function
+                if (callback != null) {
+                    callback();
+                }
+                // fetch(apiEndpoint, {
+                //     method: "PUT",
+                //     headers: {
+                //         "Content-Type": "application/json"
+                //     },
+                //     body: JSON.stringify(payload)
+                // }).then(response => {
+                //     if (!response.ok) {
+                //         throw new Error("Failed to update user");
+                //     }
+                //     return response.json();
+                // }).then(data => {
+                //     console.log("User updated successfully", data);
+                // }).catch(error => {
+                //     console.error("Error updating user", error);
+                // });
             });
         }
     }
-    redirectWithPayload(document.getElementById("user_table"), "{{ .PostURL }}");
+    handleRowClick(document.getElementById("{{ .ClickableTable.TableID }}"), "{{ .ClickableTable.PostURL }}", {{ .ClickableTable.CallbackFunc }});
 </script>
 </div>
 {{ end }}
