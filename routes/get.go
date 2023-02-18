@@ -107,9 +107,10 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 			var userMap []map[string]interface{}
 			for _, user := range users {
 				userMap = append(userMap, map[string]interface{}{
-					"ID":    user.ID,
-					"Name":  user.Name,
-					"Email": user.Email,
+					"ID":         user.ID,
+					"Name":       user.Name,
+					"Email":      user.Email,
+					"Attributes": string(user.Attributes),
 				})
 			}
 
@@ -172,10 +173,10 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 							// get the form
 							console.log(formData);
 							// prefill the form with id edit_user_form
-							document.getElementById("editUserFormId").value = formData["ID"];
-							document.getElementById("inputName").value = formData["Name"];
-							document.getElementById("inputEmail").value = formData["Email"];
-							document.getElementById("inputAttributes").value = formData["Attributes"];
+							document.getElementById("editUserFormID").value = formData["ID"];
+							document.getElementById("editUserFormName").value = formData["Name"];
+							document.getElementById("editUserFormEmail").value = formData["Email"];
+							document.getElementById("editUserFormAttributes").value = formData["Attributes"];
 
 							
 						}`),
@@ -205,6 +206,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 
 		r.Get("/secure", func(w http.ResponseWriter, r *http.Request) {
 			var username string
+
 			if r.Context().Value(middleware.User) == nil {
 				username = ""
 			} else {
@@ -212,7 +214,8 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 			}
 
 			err := tmpl.ExecuteTemplate(w, "index", map[string]interface{}{
-				"SecureText": username,
+				"SecureText":  username,
+				"sign_in_url": config.Auth.SignInUrl,
 			})
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)

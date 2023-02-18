@@ -1,9 +1,11 @@
 package api
 
 import (
+	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi"
 	"github.com/joshuaschlichting/gocms/config"
@@ -39,6 +41,28 @@ func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, 
 			}
 			log.Printf("file: %v\n\tsize: %v", y.Header, size)
 			// data.UploadFile(payload, y.Filename, "userid")
+		})
+
+		r.Put("/api/user", func(w http.ResponseWriter, r *http.Request) {
+			r.ParseForm()
+			log.Printf("form: %v", r.Form)
+			id, err := strconv.ParseInt(r.FormValue("id"), 10, 64)
+			if err != nil {
+				log.Printf("error parsing id: %v", err)
+			}
+
+			params := db.UpdateUserParams{
+				ID:         id,
+				Name:       r.FormValue("name"),
+				Email:      r.FormValue("email"),
+				Attributes: json.RawMessage([]byte(r.FormValue("attributes"))),
+			}
+
+			newUser, err := data.UpdateUser(r.Context(), params)
+			if err != nil {
+				log.Printf("error updating user: %v", err)
+			}
+			log.Println(newUser)
 		})
 	})
 }

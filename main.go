@@ -13,6 +13,7 @@ import (
 	"text/template"
 
 	"github.com/go-chi/chi"
+	"github.com/joshuaschlichting/gocms/api"
 	"github.com/joshuaschlichting/gocms/config"
 	database "github.com/joshuaschlichting/gocms/db"
 	"github.com/joshuaschlichting/gocms/middleware"
@@ -71,7 +72,7 @@ func main() {
 
 	// Register routes
 	routes.InitGetRoutes(r, templ, config, queries, middlewareMap)
-	routes.InitPostRoutes(r, templ, config, queries)
+	api.InitPostRoutes(r, templ, config, queries)
 
 	if err := listenServe(addr, r); err != nil {
 		log.Fatal(err)

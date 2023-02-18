@@ -1,22 +1,31 @@
 {{ define "edit_user_form" }}
 {{ template "clickable_table" . }}
-
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Modify User</h5>
-        <form id="edit_user_form" class="row g-3">
-            <div class="col-12"> <label for="editUserFormId" class="form-label">ID</label> <input type="text"
-                class="form-control" id="editUserFormId" readonly></div>
-
-            <div class="col-12"> <label for="inputName" class="form-label">Name</label> <input type="text"
-                    class="form-control" id="inputName"></div>
-            <div class="col-12"> <label for="inputEmail" class="form-label">Email</label> <input type="email"
-                    class="form-control" id="inputEmail"></div>
+        <form id="edit_user_form_form" class="row g-3" hx-put="/api/user">
+            <div class="col-12"> <label class="form-label">ID</label>
+                <input type="text"
+                    class="form-control" id="editUserFormID" name="id" readonly>
+            </div>
+            <div class="col-12"> <label class="form-label">Name</label>
+                <input  type="text"
+                    class="form-control" id="editUserFormName" name="name">
+            </div>
+            <div class="col-12"> <label class="form-label">Email</label>
+                <input type="email"
+                    class="form-control" id="editUserFormEmail" name="email">
+            </div>
             <!-- attributes input -->
-            <div class="col-12"> <label for="inputAttributes" class="form-label">attributes</label><input type="text"
-                    class="form-control" id="inputAttributes"></div>
-            <div class="text-center"> <button type="submit" class="btn btn-primary">Submit</button> <button type="reset"
-                    class="btn btn-secondary">Reset</button></div>
+            <div class="col-12"> <label class="form-label">attributes</label>
+                <input type="text"
+                    class="form-control" id="editUserFormAttributes" name="attributes">
+            </div>
+            <div class="text-center">
+                <!-- <button id="btn_edit_user_form_submit" class="btn btn-primary">Submit</button> -->
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="reset" class="btn btn-secondary">Reset</button>
+            </div>
         </form>
     </div>
 </div>
