@@ -45,14 +45,14 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		cognitoAuth, err := auth.New()
+		oauthClient, err := auth.New()
 		if err != nil {
 			log.Println(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		username, email, err := cognitoAuth.GetUserInfo(accessToken)
+		username, email, err := oauthClient.GetUserInfo(accessToken)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
