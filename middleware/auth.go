@@ -32,21 +32,16 @@ func AddURLAccessCodeToCtx(h http.Handler) http.Handler {
 func AddAccessTokenToCtx(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("AddAccessTokenToCtx: %s", r.URL.Path)
-		// get accessCode from context
 		code := r.Context().Value(AccessCode).(string)
 		if code == "" {
-			// log.Println("No access code found in context")
 			h.ServeHTTP(w, r)
 		}
-		// get access token from cognito
 		token, err := auth.GetAccessJWT(code)
 		if err != nil {
 			if strings.Contains(err.Error(), "invalid_grant") {
-				// redirect to login page
 				http.Redirect(w, r, conf.Auth.SignInUrl, http.StatusFound)
 			}
 		}
-		// set access token in context
 		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), AccessToken, token)))
 	})
 }
