@@ -9,13 +9,13 @@
         <span>Dashboard</span>
       </a>
     </li><!-- End Dashboard Nav -->
-    <li class="nav-item" id="upload_form">
+    <li class="nav-item" id="upload_form" hx-get="upload_form" hx-target="#main" hx-swap="innerHTML">
       <a class="nav-link collapsed">
         <i class="bi bi-cloud-upload"></i>
         <span>Upload files</span>
       </a>
     </li>
-    <li class="nav-item" id="edit_user_form">
+    <li class="nav-item" id="edit_user_form" hx-get="edit_user_form" hx-target="#main" hx-swap="innerHTML">
       <a class="nav-link collapsed">
         <i class="bi bi-file-earmark-person"></i>
         <span>Edit User</span>
@@ -247,14 +247,11 @@
 </aside>
 <script type="text/javascript">
 
-    $("#dashboardLink").click(() => {
-      $("#main").load("securedashboard");
-    });
-    $("#upload_form").click(() => {
-      $("#main").load("upload_form");
-    });
-    $("#edit_user_form").click(() => {
-      $("#main").load("edit_user_form");
-    });
+  $("#dashboardLink").click(() => {
+    $("#main").load("securedashboard");
+  });
+  htmx.process(document.getElementById('sidebar'));
+
 </script>
+
 {{end}}

@@ -1,79 +1,64 @@
 {{ define "clickable_table" }}
 <div>
-<table id="{{ .ClickableTable.TableID }}" class="table table-hover">
-    {{ range $i, $row := .ClickableTable.Table }}
-    <thead>
-        {{ if eq $i 0 }}
-        <tr>
-            {{ range $key, $val := $row }}
-            <th scope="col">{{ $key }}</th>
+    <table id="{{ .ClickableTable.TableID }}" class="table table-hover">
+        {{ range $i, $row := .ClickableTable.Table }}
+        <thead>
+            {{ if eq $i 0 }}
+            <tr>
+                {{ range $key, $val := $row }}
+                <th scope="col">{{ $key }}</th>
+                {{ end }}
+            </tr>
             {{ end }}
-        </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {{ range $key, $val := $row }}
+                <td>{{ $val }}</td>
+                {{ end }}
+            </tr>
+        </tbody>
         {{ end }}
-    </thead>
-    <tbody>
-        <tr>
-            {{ range $key, $val := $row }}
-            <td>{{ $val }}</td>
-            {{ end }}
-        </tr>
-    </tbody>
-    {{ end }}
-</table>
-<script>
-    {{ .ClickableTable.JavaScript }}
-</script>
-<script type="application/javascript">
-    var {{ .ClickableTable.TableID }}SelectedRow = null;
-    function handleRowClick(table, url, callback=null) {
-        // Get all rows in the table
-        const rows = table.getElementsByTagName("tr");
-        // Add click event listener to each row
-        for (let i = 0; i < rows.length; i++) {
-            rows[i].addEventListener("click", function () {
-                // Get all columns in the row
-                const cols = this.getElementsByTagName("td");
+    </table>
+    <script>
+        {{ .ClickableTable.JavaScript }}
+    </script>
+    <script type="text/javascript">
+        var {{ .ClickableTable.TableID }}SelectedRow = null;
+        function handleRowClick(table, url, callback=null) {
+            // Get all rows in the table
+            const rows = table.getElementsByTagName("tr");
+            // Add click event listener to each row
+            for (let i = 0; i < rows.length; i++) {
+                rows[i].addEventListener("click", function () {
+                    // Get all columns in the row
+                    const cols = this.getElementsByTagName("td");
 
-                // Create an object to store the data for each column
-                const payload = {};
-                for (let j = 0; j < cols.length; j++) {
-                    // Get the key from the header
-                    const key = table.getElementsByTagName("th")[j].innerHTML;
+                    // Create an object to store the data for each column
+                    const payload = {};
+                    for (let j = 0; j < cols.length; j++) {
+                        // Get the key from the header
+                        const key = table.getElementsByTagName("th")[j].innerHTML;
 
-                    // Get the value from the column
-                    const val = cols[j].innerHTML;
+                        // Get the value from the column
+                        const val = cols[j].innerHTML;
 
-                    // Add the key-value pair to the payload
-                    payload[key] = val;
-                }
-                const apiEndpoint = "/user/" + payload["ID"];
-                // set row as "selected"
-                {{ .ClickableTable.TableID }}SelectedRow = payload["ID"];
-                console.log("Selected row: " + {{ .ClickableTable.TableID }}SelectedRow);
-                // call callback function
-                if (callback != null) {
-                    callback();
-                }
-                // fetch(apiEndpoint, {
-                //     method: "PUT",
-                //     headers: {
-                //         "Content-Type": "application/json"
-                //     },
-                //     body: JSON.stringify(payload)
-                // }).then(response => {
-                //     if (!response.ok) {
-                //         throw new Error("Failed to update user");
-                //     }
-                //     return response.json();
-                // }).then(data => {
-                //     console.log("User updated successfully", data);
-                // }).catch(error => {
-                //     console.error("Error updating user", error);
-                // });
-            });
+                        // Add the key-value pair to the payload
+                        payload[key] = val;
+                    }
+                    const apiEndpoint = "/user/" + payload["ID"];
+                    // set row as "selected"
+                    {{ .ClickableTable.TableID }}SelectedRow = payload["ID"];
+                    console.log("Selected row: " + {{ .ClickableTable.TableID }}SelectedRow);
+                    // call callback function
+                    if (callback != null) {
+                        callback();
+                    }
+
+                });
+            }
         }
-    }
-    handleRowClick(document.getElementById("{{ .ClickableTable.TableID }}"), "{{ .ClickableTable.PostURL }}", {{ .ClickableTable.CallbackFunc }});
-</script>
+        handleRowClick(document.getElementById("{{ .ClickableTable.TableID }}"), "{{ .ClickableTable.PostURL }}", {{ .ClickableTable.CallbackFunc }});
+    </script>
 </div>
 {{ end }}
