@@ -49,17 +49,19 @@ func AddAccessTokenToCtx(h http.Handler) http.Handler {
 func AddClientJWTStringToCtx(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		// extract JWT from request
-		// jwtToken := r.Header.Get("Authorization")
-		// extract JWT from cookie
-		jwtToken, err := r.Cookie("jwt")
+		jwtToken := r.Header.Get("Authorization")
+		if jwtToken == "" {
+			log.Println("No JWT token found in header")
+		}
+		cookieJWTToken, err := r.Cookie("jwt")
 		if err != nil {
 			log.Println("No JWT cookie found")
 			h.ServeHTTP(w, r)
 			return
 		}
+		jwtToken = cookieJWTToken.Value
 
-		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), JWTEncodedString, jwtToken.Value)))
+		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), JWTEncodedString, jwtToken)))
 	})
 }
 
