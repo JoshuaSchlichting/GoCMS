@@ -11,10 +11,9 @@ type Auth struct {
 	endpoint oauth2.Endpoint
 }
 
-func New(endpoint oauth2.Endpoint) (*Auth, error) {
-
+func New() (*Auth, error) {
 	return &Auth{
-		endpoint: endpoint,
+		endpoint: cognitoEndpoint,
 	}, nil
 }
 
