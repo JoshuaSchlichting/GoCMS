@@ -73,7 +73,7 @@ func New() (*Auth, error) {
 	}, nil
 }
 
-func (a *Auth) GetOauthTokenEdnpointPayload(authorizationCode string) (OauthPayload, error) {
+func (a *Auth) GetOauthTokenEndpointPayload(authorizationCode string) (OauthPayload, error) {
 
 	config := &oauth2.Config{
 		ClientID:     clientId,
