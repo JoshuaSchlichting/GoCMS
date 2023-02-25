@@ -32,7 +32,7 @@ func init() {
 	awsSecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
 }
 
-type CognitoPayload struct {
+type OauthPayload struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh"`
 	TokenType    string `json:"token_type"`
@@ -40,12 +40,13 @@ type CognitoPayload struct {
 	IdToken      string `json:"id_token"`
 }
 
-type Cognito struct {
-	session session.Session
-	client  cognito.CognitoIdentityProvider
+type Auth struct {
+	session  session.Session
+	client   cognito.CognitoIdentityProvider
+	endpoint oauth2.Endpoint
 }
 
-func New() (*Cognito, error) {
+func New() (*Auth, error) {
 
 	session, err := session.NewSession(&aws.Config{
 		Region: aws.String(region),
@@ -53,38 +54,40 @@ func New() (*Cognito, error) {
 			awsAccessKeyId, awsSecretAccessKey, ""),
 	})
 	if err != nil {
-		return &Cognito{}, err
+		return &Auth{}, err
 	}
 	var cognitoClient cognito.CognitoIdentityProvider = *cognito.New(session, aws.NewConfig().WithRegion(region))
+	poolDesc, err := cognitoClient.DescribeUserPool(&cognito.DescribeUserPoolInput{UserPoolId: aws.String(poolId)})
+	if err != nil {
+		log.Printf("Error describing user pool: %v\n", err)
+		return &Auth{}, err
+	}
 
-	return &Cognito{
+	return &Auth{
 		session: *session,
 		client:  cognitoClient,
+		endpoint: oauth2.Endpoint{
+			AuthURL:  "https://" + *poolDesc.UserPool.Domain + ".auth." + region + ".amazoncognito.com/oauth2/authorize",
+			TokenURL: "https://" + *poolDesc.UserPool.Domain + ".auth." + region + ".amazoncognito.com/oauth2/token",
+		},
 	}, nil
 }
 
-func (c *Cognito) GetCognitoTokenEndpointPayload(authorizationCode string) (CognitoPayload, error) {
-	poolDesc, err := c.client.DescribeUserPool(&cognito.DescribeUserPoolInput{UserPoolId: aws.String(poolId)})
-	if err != nil {
-		log.Printf("Error describing user pool: %v\n", err)
-		return CognitoPayload{}, err
-	}
+func (a *Auth) GetOauthTokenEdnpointPayload(authorizationCode string) (OauthPayload, error) {
+
 	config := &oauth2.Config{
 		ClientID:     clientId,
 		ClientSecret: clientSecret,
 		RedirectURL:  redirectUri,
 		Scopes:       []string{"openid", "email", "profile"},
-		Endpoint: oauth2.Endpoint{
-			AuthURL:  "https://" + *poolDesc.UserPool.Domain + ".auth." + region + ".amazoncognito.com/oauth2/authorize",
-			TokenURL: "https://" + *poolDesc.UserPool.Domain + ".auth." + region + ".amazoncognito.com/oauth2/token",
-		},
+		Endpoint:     a.endpoint,
 	}
 	token, err := config.Exchange(context.Background(), authorizationCode)
 	if err != nil {
 		log.Printf("Error exchanging code for token: %v\n", err)
-		return CognitoPayload{}, err
+		return OauthPayload{}, err
 	}
-	cognitoPayload := CognitoPayload{
+	cognitoPayload := OauthPayload{
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
 		TokenType:    token.TokenType,
@@ -94,16 +97,13 @@ func (c *Cognito) GetCognitoTokenEndpointPayload(authorizationCode string) (Cogn
 	return cognitoPayload, nil
 }
 
-func (c *Cognito) GetUserInfo(accessToken string) (username, email string, err error) {
-	// use access token to get user info from cognito
-	// return user info
-	output, err := c.client.GetUser(&cognito.GetUserInput{
+func (a *Auth) GetUserInfo(accessToken string) (username, email string, err error) {
+	output, err := a.client.GetUser(&cognito.GetUserInput{
 		AccessToken: aws.String(accessToken),
 	})
 	if err != nil {
 		return "", "", err
 	}
-	// search *output.UserAttributes for email
 	var emailAddress string
 	for _, attribute := range output.UserAttributes {
 		if *attribute.Name == "email" {
@@ -120,7 +120,7 @@ func GetAccessToken(authorizationCode string) (string, error) {
 		return "", errors.New("no authorization code found")
 	}
 	cognitoClient, _ := New()
-	payload, err := cognitoClient.GetCognitoTokenEndpointPayload(authorizationCode)
+	payload, err := cognitoClient.GetOauthTokenEdnpointPayload(authorizationCode)
 	if err != nil {
 		log.Printf("Error getting token endpoint payload: %v\n", err)
 		return "", err
