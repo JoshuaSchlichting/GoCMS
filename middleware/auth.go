@@ -39,7 +39,7 @@ func AddAccessTokenToCtx(h http.Handler) http.Handler {
 			h.ServeHTTP(w, r)
 		}
 		// get access token from cognito
-		token, err := auth.GetAccessToken(code)
+		token, err := auth.GetAccessJWT(code)
 		if err != nil {
 			if strings.Contains(err.Error(), "invalid_grant") {
 				// redirect to login page

@@ -39,7 +39,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 		// get access code from request
 		code := r.URL.Query().Get("code")
 		// get JWT
-		accessToken, err := auth.GetAccessToken(code)
+		accessToken, err := auth.GetAccessJWT(code)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)

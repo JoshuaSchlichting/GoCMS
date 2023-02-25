@@ -114,7 +114,7 @@ func (a *Auth) GetUserInfo(accessToken string) (username, email string, err erro
 
 }
 
-func GetAccessToken(authorizationCode string) (string, error) {
+func GetAccessJWT(authorizationCode string) (string, error) {
 	if authorizationCode == "" {
 		return "", errors.New("no authorization code cannot be empty string")
 	}
