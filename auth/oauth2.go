@@ -23,6 +23,8 @@ var awsSecretAccessKey string
 
 const redirectUri string = "http://localhost:8000/getjwtandlogin"
 
+var cognitoProvider cognito.CognitoIdentityProvider
+
 func init() {
 	poolId = os.Getenv("POOL_ID")
 	region = os.Getenv("REGION")
@@ -30,6 +32,16 @@ func init() {
 	clientSecret = os.Getenv("CLIENT_SECRET")
 	awsAccessKeyId = os.Getenv("AWS_ACCESS_KEY_ID")
 	awsSecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
+
+	session, err := session.NewSession(&aws.Config{
+		Region: aws.String(region),
+		Credentials: credentials.NewStaticCredentials(
+			awsAccessKeyId, awsSecretAccessKey, ""),
+	})
+	if err != nil {
+		log.Printf("Error creating session for cognito: %v\n", err)
+	}
+	cognitoProvider = *cognito.New(session, aws.NewConfig().WithRegion(region))
 }
 
 type OauthPayload struct {
@@ -41,31 +53,18 @@ type OauthPayload struct {
 }
 
 type Auth struct {
-	session  session.Session
-	client   cognito.CognitoIdentityProvider
 	endpoint oauth2.Endpoint
 }
 
 func New() (*Auth, error) {
 
-	session, err := session.NewSession(&aws.Config{
-		Region: aws.String(region),
-		Credentials: credentials.NewStaticCredentials(
-			awsAccessKeyId, awsSecretAccessKey, ""),
-	})
-	if err != nil {
-		return &Auth{}, err
-	}
-	var cognitoClient cognito.CognitoIdentityProvider = *cognito.New(session, aws.NewConfig().WithRegion(region))
-	poolDesc, err := cognitoClient.DescribeUserPool(&cognito.DescribeUserPoolInput{UserPoolId: aws.String(poolId)})
+	poolDesc, err := cognitoProvider.DescribeUserPool(&cognito.DescribeUserPoolInput{UserPoolId: aws.String(poolId)})
 	if err != nil {
 		log.Printf("Error describing user pool: %v\n", err)
 		return &Auth{}, err
 	}
 
 	return &Auth{
-		session: *session,
-		client:  cognitoClient,
 		endpoint: oauth2.Endpoint{
 			AuthURL:  "https://" + *poolDesc.UserPool.Domain + ".auth." + region + ".amazoncognito.com/oauth2/authorize",
 			TokenURL: "https://" + *poolDesc.UserPool.Domain + ".auth." + region + ".amazoncognito.com/oauth2/token",
@@ -98,7 +97,7 @@ func (a *Auth) GetOauthTokenEndpointPayload(authorizationCode string) (OauthPayl
 }
 
 func (a *Auth) GetUserInfo(accessToken string) (username, email string, err error) {
-	output, err := a.client.GetUser(&cognito.GetUserInput{
+	output, err := cognitoProvider.GetUser(&cognito.GetUserInput{
 		AccessToken: aws.String(accessToken),
 	})
 	if err != nil {
