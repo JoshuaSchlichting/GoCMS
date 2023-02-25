@@ -116,7 +116,7 @@ func (a *Auth) GetUserInfo(accessToken string) (username, email string, err erro
 
 func GetAccessToken(authorizationCode string) (string, error) {
 	if authorizationCode == "" {
-		return "", errors.New("no authorization code found")
+		return "", errors.New("no authorization code cannot be empty string")
 	}
 	authClient, _ := New()
 	payload, err := authClient.GetOauthTokenEndpointPayload(authorizationCode)
