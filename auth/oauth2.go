@@ -119,8 +119,8 @@ func GetAccessToken(authorizationCode string) (string, error) {
 	if authorizationCode == "" {
 		return "", errors.New("no authorization code found")
 	}
-	cognitoClient, _ := New()
-	payload, err := cognitoClient.GetOauthTokenEndpointPayload(authorizationCode)
+	authClient, _ := New()
+	payload, err := authClient.GetOauthTokenEndpointPayload(authorizationCode)
 	if err != nil {
 		log.Printf("Error getting token endpoint payload: %v\n", err)
 		return "", err
