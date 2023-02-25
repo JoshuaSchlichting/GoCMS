@@ -45,14 +45,13 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		oauthClient, err := auth.New()
 		if err != nil {
 			log.Println(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		username, email, err := oauthClient.GetUserInfo(accessToken)
+		username, email, err := auth.GetUserInfo(accessToken)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)

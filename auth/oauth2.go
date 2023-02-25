@@ -2,14 +2,14 @@ package auth
 
 import (
 	"context"
-	"errors"
 	"log"
 	"os"
+
+	cognito "github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
-	cognito "github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
 	"golang.org/x/oauth2"
 )
 
@@ -44,35 +44,18 @@ func init() {
 	cognitoProvider = *cognito.New(session, aws.NewConfig().WithRegion(region))
 }
 
-type OauthPayload struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh"`
-	TokenType    string `json:"token_type"`
-	ExpiresIn    int    `json:"expires_in"`
-	IdToken      string `json:"id_token"`
-}
-
 type Auth struct {
 	endpoint oauth2.Endpoint
 }
 
-func New() (*Auth, error) {
-
-	poolDesc, err := cognitoProvider.DescribeUserPool(&cognito.DescribeUserPoolInput{UserPoolId: aws.String(poolId)})
-	if err != nil {
-		log.Printf("Error describing user pool: %v\n", err)
-		return &Auth{}, err
-	}
+func New(endpoint oauth2.Endpoint) (*Auth, error) {
 
 	return &Auth{
-		endpoint: oauth2.Endpoint{
-			AuthURL:  "https://" + *poolDesc.UserPool.Domain + ".auth." + region + ".amazoncognito.com/oauth2/authorize",
-			TokenURL: "https://" + *poolDesc.UserPool.Domain + ".auth." + region + ".amazoncognito.com/oauth2/token",
-		},
+		endpoint: endpoint,
 	}, nil
 }
 
-func (a *Auth) GetOauthTokenEndpointPayload(authorizationCode string) (OauthPayload, error) {
+func (a *Auth) GetOauthTokenFromEndpoint(authorizationCode string) (*oauth2.Token, error) {
 
 	config := &oauth2.Config{
 		ClientID:     clientId,
@@ -84,45 +67,7 @@ func (a *Auth) GetOauthTokenEndpointPayload(authorizationCode string) (OauthPayl
 	token, err := config.Exchange(context.Background(), authorizationCode)
 	if err != nil {
 		log.Printf("Error exchanging code for token: %v\n", err)
-		return OauthPayload{}, err
+		return &oauth2.Token{}, err
 	}
-	cognitoPayload := OauthPayload{
-		AccessToken:  token.AccessToken,
-		RefreshToken: token.RefreshToken,
-		TokenType:    token.TokenType,
-		ExpiresIn:    int(token.Expiry.Unix()),
-		IdToken:      token.Extra("id_token").(string),
-	}
-	return cognitoPayload, nil
-}
-
-func (a *Auth) GetUserInfo(accessToken string) (username, email string, err error) {
-	output, err := cognitoProvider.GetUser(&cognito.GetUserInput{
-		AccessToken: aws.String(accessToken),
-	})
-	if err != nil {
-		return "", "", err
-	}
-	var emailAddress string
-	for _, attribute := range output.UserAttributes {
-		if *attribute.Name == "email" {
-			emailAddress = *attribute.Value
-			break
-		}
-	}
-	return *output.Username, emailAddress, nil
-
-}
-
-func GetAccessJWT(authorizationCode string) (string, error) {
-	if authorizationCode == "" {
-		return "", errors.New("no authorization code cannot be empty string")
-	}
-	authClient, _ := New()
-	payload, err := authClient.GetOauthTokenEndpointPayload(authorizationCode)
-	if err != nil {
-		log.Printf("Error getting token endpoint payload: %v\n", err)
-		return "", err
-	}
-	return payload.AccessToken, nil
+	return token, nil
 }
