@@ -5,21 +5,17 @@
         <h5 class="card-title">Modify User</h5>
         <form id="edit_user_form_form" class="row g-3" hx-put="/api/user">
             <div class="col-12"> <label class="form-label">ID</label>
-                <input type="text"
-                    class="form-control" id="editUserFormID" name="id" readonly>
+                <input type="text" class="form-control" id="editUserFormID" name="id" readonly>
             </div>
             <div class="col-12"> <label class="form-label">Name</label>
-                <input  type="text"
-                    class="form-control" id="editUserFormName" name="name">
+                <input type="text" class="form-control" id="editUserFormName" name="name">
             </div>
             <div class="col-12"> <label class="form-label">Email</label>
-                <input type="email"
-                    class="form-control" id="editUserFormEmail" name="email">
+                <input type="email" class="form-control" id="editUserFormEmail" name="email">
             </div>
             <!-- attributes input -->
             <div class="col-12"> <label class="form-label">attributes</label>
-                <input type="text"
-                    class="form-control" id="editUserFormAttributes" name="attributes">
+                <input type="text" class="form-control" id="editUserFormAttributes" name="attributes">
             </div>
             <div class="text-center">
                 <!-- <button id="btn_edit_user_form_submit" class="btn btn-primary">Submit</button> -->
@@ -31,6 +27,14 @@
 </div>
 <script type="text/javascript">
     htmx.process(document.getElementById('edit_user_form_form'));
+
+    document.addEventListener('htmx:afterRequest', function (event) {
+        if (event.detail.target.id == 'edit_user_form_form') {
+            let url = '/edit_user_form'; // the URL to fetch the new content from
+            let target = document.getElementById('main'); // the element to replace the content of
+            htmx.ajax('GET', url, { target: target });
+        }
+    });
 </script>
 
 {{ end }}
