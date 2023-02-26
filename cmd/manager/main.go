@@ -97,7 +97,7 @@ func readConfigFile() []byte {
 	return configYml
 }
 
-func executeCreateSuperUserViaTerminalInput(queries database.QueriesInterface) {
+func executeCreateSuperUserViaTerminalInput(queries database.Queries) {
 	var username string
 	var email string
 	fmt.Print("Enter username: ")

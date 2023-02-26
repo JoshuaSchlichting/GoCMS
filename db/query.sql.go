@@ -90,6 +90,31 @@ func (q *Queries) GetUserByName(ctx context.Context, name string) (User, error) 
 	return i, err
 }
 
+const getUserIsInGroup = `-- name: GetUserIsInGroup :one
+SELECT
+  CASE
+    WHEN jsonb_column->'groups' @> '["' || $1::text || '"]'
+    THEN TRUE
+    ELSE FALSE
+  END
+FROM public.user
+WHERE id = $2::text
+`
+
+type GetUserIsInGroupParams struct {
+	GroupName string `json:"group_name"`
+	UserID    string `json:"user_id"`
+}
+
+// SELECT TRUE FROM public.user
+// WHERE id = @user_id::text AND attributes->>'groups' LIKE '%' || @group_name::text || '%' LIMIT 1;
+func (q *Queries) GetUserIsInGroup(ctx context.Context, arg GetUserIsInGroupParams) (bool, error) {
+	row := q.db.QueryRowContext(ctx, getUserIsInGroup, arg.GroupName, arg.UserID)
+	var column_1 bool
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const listFiles = `-- name: ListFiles :many
 SELECT id, name, blob, created_at, updated_at, owner_id FROM public.file
 ORDER BY name

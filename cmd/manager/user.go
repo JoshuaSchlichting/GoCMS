@@ -20,7 +20,7 @@ func deleteAllUsers(db *sql.DB) {
 	fmt.Println("All users have been deleted! :(")
 }
 
-func createSuperUser(queries database.QueriesInterface, username, email string) {
+func createSuperUser(queries database.Queries, username, email string) {
 	user := database.CreateUserParams{
 		Name:       username,
 		Email:      email,
@@ -33,7 +33,7 @@ func createSuperUser(queries database.QueriesInterface, username, email string) 
 	fmt.Print("Successfully created user: ", userModel.Name)
 }
 
-func getUsers(queries database.QueriesInterface) {
+func getUsers(queries database.Queries) {
 	users, err := queries.ListUsers(context.Background())
 	if err != nil {
 		log.Fatal(err)

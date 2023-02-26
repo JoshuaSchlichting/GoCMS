@@ -19,6 +19,20 @@ type File struct {
 	OwnerID   int32     `json:"owner_id"`
 }
 
+type FileFilegroup struct {
+	FileID      int32     `json:"file_id"`
+	FilegroupID int32     `json:"filegroup_id"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type Filegroup struct {
+	ID        int64     `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 type Invoice struct {
 	ID             int64     `json:"id"`
 	Amount         float64   `json:"amount"`
@@ -44,6 +58,13 @@ type Organization struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+type PermissionAttribute struct {
+	ID        int64     `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 type User struct {
 	ID             int64           `json:"id"`
 	OrganizationID sql.NullInt32   `json:"organization_id"`
@@ -52,4 +73,39 @@ type User struct {
 	Attributes     json.RawMessage `json:"attributes"`
 	CreatedAt      time.Time       `json:"created_at"`
 	UpdatedAt      time.Time       `json:"updated_at"`
+}
+
+type UserPermissionAttribute struct {
+	UserID                int32     `json:"user_id"`
+	PermissionAttributeID int32     `json:"permission_attribute_id"`
+	CreatedAt             time.Time `json:"created_at"`
+	UpdatedAt             time.Time `json:"updated_at"`
+}
+
+type UserUsergroup struct {
+	UserID      int32     `json:"user_id"`
+	UsergroupID int32     `json:"usergroup_id"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type Usergroup struct {
+	ID        int64     `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type UsergroupOrganization struct {
+	UsergroupID    int32     `json:"usergroup_id"`
+	OrganizationID int32     `json:"organization_id"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+}
+
+type UsergroupPermissionAttribute struct {
+	UsergroupID           int32     `json:"usergroup_id"`
+	PermissionAttributeID int32     `json:"permission_attribute_id"`
+	CreatedAt             time.Time `json:"created_at"`
+	UpdatedAt             time.Time `json:"updated_at"`
 }

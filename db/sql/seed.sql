@@ -56,3 +56,61 @@ values ('admin',
             current_timestamp
         )
     ;
+
+-- seed public.permission_attribute with permissions such as 'create user', 'delete user', 'create organization', 'delete organization', etc.
+insert into public.permission_attribute (name, created_at, updated_at)
+values
+    ('is superuser',
+        current_timestamp,
+        current_timestamp
+    ),
+    ('create user',
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'delete user',
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'create organization',
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'delete organization',
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'create group',
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'delete group',
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'create file',
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'delete file',
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'create permission',
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'delete permission',
+        current_timestamp,
+        current_timestamp
+    )
+;

@@ -16,7 +16,7 @@ import (
 	"github.com/joshuaschlichting/gocms/templates/components"
 )
 
-func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.QueriesInterface, middlewareMap map[string]func(http.Handler) http.Handler) {
+func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.Queries, middlewareMap map[string]func(http.Handler) http.Handler) {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		// if not logged in
 		if r.Context().Value(middleware.User) == nil {

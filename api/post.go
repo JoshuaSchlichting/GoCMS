@@ -12,7 +12,7 @@ import (
 	"github.com/joshuaschlichting/gocms/db"
 )
 
-func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, data db.QueriesInterface) {
+func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, data db.Queries) {
 	r.Group(func(r chi.Router) {
 		r.Post("/upload", func(w http.ResponseWriter, r *http.Request) {
 			// get payload

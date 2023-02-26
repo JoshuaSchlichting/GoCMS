@@ -58,7 +58,7 @@ func main() {
 	middleware.InitMiddleware(config)
 
 	// Register common middleware
-	dbMiddlware := middleware.NewMiddlewareWithDB(queries, config.Auth.JWT.SecretKey)
+	dbMiddlware := middleware.NewMiddlewareWithDB(*queries, config.Auth.JWT.SecretKey)
 	r.Use(middleware.LogAllButStaticRequests)
 
 	middlewareMap := map[string]func(http.Handler) http.Handler{}
@@ -71,8 +71,8 @@ func main() {
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
 
 	// Register routes
-	routes.InitGetRoutes(r, templ, config, queries, middlewareMap)
-	api.InitPostRoutes(r, templ, config, queries)
+	routes.InitGetRoutes(r, templ, config, *queries, middlewareMap)
+	api.InitPostRoutes(r, templ, config, *queries)
 
 	if err := listenServe(addr, r); err != nil {
 		log.Fatal(err)

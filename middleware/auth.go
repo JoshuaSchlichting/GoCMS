@@ -59,6 +59,7 @@ func AddClientJWTStringToCtx(h http.Handler) http.Handler {
 			h.ServeHTTP(w, r)
 			return
 		}
+		log.Println("JWT found in cookie")
 		jwtToken = cookieJWTToken.Value
 
 		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), JWTEncodedString, jwtToken)))
