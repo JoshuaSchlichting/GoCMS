@@ -31,7 +31,6 @@ func GetAccessJWT(authorizationCode string) (string, error) {
 	if authorizationCode == "" {
 		return "", errors.New("no authorization code cannot be empty string")
 	}
-
 	authClient, _ := New()
 	payload, err := authClient.GetOauthTokenFromEndpoint(authorizationCode)
 	if err != nil {
