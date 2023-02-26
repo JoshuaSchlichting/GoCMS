@@ -37,14 +37,14 @@
                         payload[key] = val;
                     }
                     const apiEndpoint = "/user/" + payload["ID"];
-                    { { .ClickableTable.TableID } } SelectedRow = payload["ID"];
+                    {{ .ClickableTable.TableID }}SelectedRow = payload["ID"];
                     console.log("Selected row: " + {{ .ClickableTable.TableID }}SelectedRow);
-                if (callback != null) {
-                    callback();
-                }
+                    if (callback != null) {
+                        callback();
+                    }
 
-            });
-        }
+                });
+            }
         }
         handleRowClick(document.getElementById("{{ .ClickableTable.TableID }}"), "{{ .ClickableTable.PostURL }}", {{ .ClickableTable.CallbackFunc }});
     </script>

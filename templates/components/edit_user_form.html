@@ -27,7 +27,7 @@
     htmx.process(document.getElementById('edit_user_form_form'));
 
     document.addEventListener('htmx:afterRequest', function (event) {
-        if (event.detail.target.id != 'edit_user_form_form') return;
+        if (event.detail.target.id != 'edit_user_form_form') {return;}
         let url = '/edit_user_form';
         let target = document.getElementById('main');
         htmx.ajax('GET', url, { target: target });
