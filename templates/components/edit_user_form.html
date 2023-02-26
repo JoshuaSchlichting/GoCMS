@@ -13,12 +13,10 @@
             <div class="col-12"> <label class="form-label">Email</label>
                 <input type="email" class="form-control" id="editUserFormEmail" name="email">
             </div>
-            <!-- attributes input -->
             <div class="col-12"> <label class="form-label">attributes</label>
                 <input type="text" class="form-control" id="editUserFormAttributes" name="attributes">
             </div>
             <div class="text-center">
-                <!-- <button id="btn_edit_user_form_submit" class="btn btn-primary">Submit</button> -->
                 <button type="submit" class="btn btn-primary">Submit</button>
                 <button type="reset" class="btn btn-secondary">Reset</button>
             </div>
@@ -30,8 +28,8 @@
 
     document.addEventListener('htmx:afterRequest', function (event) {
         if (event.detail.target.id == 'edit_user_form_form') {
-            let url = '/edit_user_form'; // the URL to fetch the new content from
-            let target = document.getElementById('main'); // the element to replace the content of
+            let url = '/edit_user_form';
+            let target = document.getElementById('main');
             htmx.ajax('GET', url, { target: target });
         }
     });
