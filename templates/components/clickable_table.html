@@ -1,5 +1,5 @@
 {{ define "clickable_table" }}
-<div>
+<div style="height: 30vh; overflow-y: scroll;">
     <table id="{{ .ClickableTable.TableID }}" class="table table-hover">
         {{ range $i, $row := .ClickableTable.Table }}
         <thead>
