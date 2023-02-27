@@ -1,0 +1,33 @@
+{{ define "create_user_form" }}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Create New User</h5>
+        <form id="create_user_form_form" class="row g-3" hx-post="/api/user">
+            <div class="col-12"> <label class="form-label">Name</label>
+                <input type="text" class="form-control" id="createUserFormName" name="name">
+            </div>
+            <div class="col-12"> <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="createUserFormEmail" name="email">
+            </div>
+            <div class="col-12"> <label class="form-label">Attributes</label>
+                <input type="text" class="form-control" id="createUserFormAttributes" name="attributes">
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="reset" class="btn btn-secondary">Reset</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    htmx.process(document.getElementById('create_user_form_form'));
+
+    document.addEventListener('htmx:afterRequest', function (event) {
+        if (event.detail.target.id != 'create_user_form_form') {return;}
+        let url = '/edit_user_form';
+        let target = document.getElementById('main');
+        htmx.ajax('GET', url, { target: target });
+    });
+</script>
+
+{{ end }}

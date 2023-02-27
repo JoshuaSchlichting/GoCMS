@@ -91,25 +91,21 @@ func (q *Queries) GetUserByName(ctx context.Context, name string) (User, error) 
 }
 
 const getUserIsInGroup = `-- name: GetUserIsInGroup :one
-SELECT
-  CASE
-    WHEN jsonb_column->'groups' @> '["' || $1::text || '"]'
-    THEN TRUE
-    ELSE FALSE
-  END
-FROM public.user
-WHERE id = $2::text
+select true
+from
+  public.user_usergroup
+  left join public.usergroup
+    on user_usergroup.usergroup_id = usergroup.id
+where user_id = $1::bigserial and usergroup.name = $2::text
 `
 
 type GetUserIsInGroupParams struct {
-	GroupName string `json:"group_name"`
-	UserID    string `json:"user_id"`
+	UserID        int64  `json:"user_id"`
+	UsergroupName string `json:"usergroup_name"`
 }
 
-// SELECT TRUE FROM public.user
-// WHERE id = @user_id::text AND attributes->>'groups' LIKE '%' || @group_name::text || '%' LIMIT 1;
 func (q *Queries) GetUserIsInGroup(ctx context.Context, arg GetUserIsInGroupParams) (bool, error) {
-	row := q.db.QueryRowContext(ctx, getUserIsInGroup, arg.GroupName, arg.UserID)
+	row := q.db.QueryRowContext(ctx, getUserIsInGroup, arg.UserID, arg.UsergroupName)
 	var column_1 bool
 	err := row.Scan(&column_1)
 	return column_1, err

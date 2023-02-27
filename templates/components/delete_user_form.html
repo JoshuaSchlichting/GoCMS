@@ -1,0 +1,36 @@
+{{ define "delete_user_form" }}
+{{ template "clickable_table" . }}
+<div class="card" id="deleteUserFormCard">
+    <div class="card-body">
+        <h5 class="card-title">Delete User</h5>
+        <form id="delete_user_form_form" class="row g-3">
+            <div class="col-12"> <label class="form-label">ID</label>
+                <input type="text" class="form-control" id="deleteUserFormID" name="id" readonly>
+            </div>
+            <div class="col-12"> <label class="form-label">Name</label>
+                <input type="text" class="form-control" id="deleteUserFormName" name="name" readonly>
+            </div>
+            <div class="col-12"> <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="deleteUserFormEmail" name="email" readonly>
+            </div>
+            <div class="col-12"> <label class="form-label">Attributes</label>
+                <input type="text" class="form-control" id="deleteUserFormAttributes" name="attributes" readonly>
+            </div>
+            <div class="text-center">
+                <button id="deleteUserButton" type="button" class="btn btn-danger">Delete</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    htmx.process(document.getElementById('delete_user_form_form'));
+
+    document.addEventListener('htmx:afterRequest', function (event) {
+        if (event.detail.target.id != 'deleteUserButton') {return;}
+        let url = '/delete_user_form';
+        let target = document.getElementById('main');
+        htmx.ajax('GET', url, { target: target });
+    });
+</script>
+
+{{ end }}

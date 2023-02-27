@@ -186,6 +186,106 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 			}
 		})
 
+		r.Get("/create_user_form", func(w http.ResponseWriter, r *http.Request) {
+			err := tmpl.ExecuteTemplate(w, "create_user_form", map[string]interface{}{
+				"Token":   r.Context().Value(middleware.JWTEncodedString).(string),
+				"PostURL": "/create_user",
+			})
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		})
+
+		r.Get("/delete_user_form", func(w http.ResponseWriter, r *http.Request) {
+			users, err := queries.ListUsers(r.Context())
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			var userMap []map[string]interface{}
+			for _, user := range users {
+				userMap = append(userMap, map[string]interface{}{
+					"ID":         user.ID,
+					"Name":       user.Name,
+					"Email":      user.Email,
+					"Attributes": string(user.Attributes),
+				})
+			}
+
+			err = tmpl.ExecuteTemplate(w, "delete_user_form", map[string]interface{}{
+				"Token":   r.Context().Value(middleware.JWTEncodedString).(string),
+				"PostURL": "/delete_user",
+				"ClickableTable": &components.ClickableTable{
+					TableID:      template.JS("user_table"),
+					Table:        userMap,
+					CallbackFunc: template.JS("setUserInForm"),
+					JavaScript: template.JS(`
+						function getRowData(tableId, columnName, columnValue) {
+							console.log("getRowData-> params: " + tableId  + columnName + columnValue);
+							// Get the table using its ID
+							const table = document.getElementById(tableId);
+						
+							// Get the table headers
+							const headers = table.getElementsByTagName("th");
+						
+							// Get the index of the target column
+							let targetColumnIndex;
+							for (let i = 0; i < headers.length; i++) {
+								if (headers[i].textContent === columnName) {
+									targetColumnIndex = i;
+									break;
+								}
+							}
+						
+							// Get the table rows
+							const rows = table.getElementsByTagName("tr");
+						
+							// Loop through each row
+							for (let i = 0; i < rows.length; i++) {
+							const cells = rows[i].getElementsByTagName("td");
+						
+							// Check if the target column exists in the row
+							if (cells[targetColumnIndex]) {
+								// Check if the value of the target column matches the columnValue
+								if (cells[targetColumnIndex].textContent === columnValue) {
+								// Get the header names
+								const headerNames = Array.from(headers).map(header => header.textContent);
+						
+								// Get the cell values
+								const cellValues = Array.from(cells).map(cell => cell.textContent);
+						
+								// Combine the header names and cell values into an object
+								const rowData = headerNames.reduce((obj, headerName, index) => {
+									obj[headerName] = cellValues[index];
+									return obj;
+								}, {});
+								return rowData;
+							}}}
+							// Return null if the row is not found
+							return null;
+						}
+
+						function setUserInForm() {
+							console.log("setUserInForm->");
+							// get row data where row id == user_tableSelectedRow
+							let formData = getRowData("user_table", "ID", user_tableSelectedRow);
+							// get the form
+							console.log(formData);
+							document.getElementById("deleteUserFormID").value = formData["ID"];
+							document.getElementById("deleteUserFormName").value = formData["Name"];
+							document.getElementById("deleteUserFormEmail").value = formData["Email"];
+							document.getElementById("deleteUserFormAttributes").value = formData["Attributes"];
+							document.getElementById("deleteUserButton").setAttribute('hx-delete', '/api/user/' + formData["ID"]);
+						    htmx.process(document.getElementById('deleteUserButton'));
+						}`,
+					),
+				},
+			})
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		})
+
 		r.Get("/upload_form", func(w http.ResponseWriter, r *http.Request) {
 			err := tmpl.ExecuteTemplate(w, "upload_form", map[string]interface{}{
 				"Token":   r.Context().Value(middleware.JWTEncodedString).(string),
@@ -239,6 +339,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
 		})
+
 	})
 
 }

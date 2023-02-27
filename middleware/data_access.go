@@ -61,8 +61,8 @@ func (m DBMiddleware) AuthorizeUserGroup(group string) func(http.Handler) http.H
 				return
 			}
 			userInGroup, err := m.db.GetUserIsInGroup(r.Context(), db.GetUserIsInGroupParams{
-				UserID:    user.Name,
-				GroupName: group,
+				UserID:        user.ID,
+				UsergroupName: group,
 			})
 			if err != nil {
 				log.Printf("Unable to check if user is in group: %s", user.Name)

@@ -51,13 +51,9 @@ WHERE id = $1
 RETURNING *;
 
 -- name: GetUserIsInGroup :one
--- SELECT TRUE FROM public.user
--- WHERE id = @user_id::text AND attributes->>'groups' LIKE '%' || @group_name::text || '%' LIMIT 1;
-SELECT
-  CASE
-    WHEN jsonb_column->'groups' @> '["' || @group_name::text || '"]'
-    THEN TRUE
-    ELSE FALSE
-  END
-FROM public.user
-WHERE id = @user_id::text;
+select true
+from
+  public.user_usergroup
+  left join public.usergroup
+    on user_usergroup.usergroup_id = usergroup.id
+where user_id = @user_id::bigserial and usergroup.name = @usergroup_name::text;

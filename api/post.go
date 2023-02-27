@@ -43,6 +43,22 @@ func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, 
 			// data.UploadFile(payload, y.Filename, "userid")
 		})
 
+		r.Post("/api/user", func(w http.ResponseWriter, r *http.Request) {
+			r.ParseForm()
+			log.Printf("form: %v", r.Form)
+			params := db.CreateUserParams{
+				Name:       r.FormValue("name"),
+				Email:      r.FormValue("email"),
+				Attributes: json.RawMessage([]byte(r.FormValue("attributes"))),
+			}
+
+			newUser, err := data.CreateUser(r.Context(), params)
+			if err != nil {
+				log.Printf("error creating user: %v", err)
+			}
+			log.Println(newUser)
+		})
+
 		r.Put("/api/user", func(w http.ResponseWriter, r *http.Request) {
 			r.ParseForm()
 			log.Printf("form: %v", r.Form)
@@ -63,6 +79,21 @@ func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, 
 				log.Printf("error updating user: %v", err)
 			}
 			log.Println(newUser)
+		})
+
+		r.Delete("/api/user/{id}", func(w http.ResponseWriter, r *http.Request) {
+			// log url params
+			log.Printf("url params: %v", chi.URLParam(r, "id"))
+			// get id from url param
+			id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+			if err != nil {
+				log.Printf("error parsing id: %v", err)
+			}
+
+			err = data.DeleteUser(r.Context(), id)
+			if err != nil {
+				log.Printf("error deleting user: %v", err)
+			}
 		})
 	})
 }
