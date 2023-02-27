@@ -39,6 +39,60 @@
       </ul>
     </li>
     <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#org-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-building"></i>
+          <span>Organization Management</span>
+          <i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="org-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+          <li>
+              <a id="create_org_form" hx-get="create_org_form" hx-target="#main" hx-swap="innerHTML">
+                  <i class="bi bi-circle"></i>
+                  <span>Create Organization</span>
+              </a>
+          </li>
+          <li>
+              <a id="edit_org_form" hx-get="edit_org_form" hx-target="#main" hx-swap="innerHTML">
+                  <i class="bi bi-circle"></i>
+                  <span>Edit Organization</span>
+              </a>
+          </li>
+          <li>
+              <a id="delete_org_form" hx-get="delete_org_form" hx-target="#main" hx-swap="innerHTML">
+                  <i class="bi bi-circle"></i>
+                  <span>Delete Organization</span>
+              </a>
+          </li>
+      </ul>
+  </li>
+  <li class="nav-item" >
+    <a class="nav-link collapsed" data-bs-target="#user-group-nav" data-bs-toggle="collapse" href="#">
+      <i class="bi bi-people"></i>
+      <span>User Group Management</span>
+      <i class="bi bi-chevron-down ms-auto"></i>
+    </a>
+    <ul id="user-group-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+      <li>
+        <a id="create_user_group_form" hx-get="create_user_group_form" hx-target="#main" hx-swap="innerHTML">
+          <i class="bi bi-circle"></i>
+          <span>Create User Group</span>
+        </a>
+      </li>
+      <li>
+        <a id="edit_user_group_form" hx-get="edit_user_group_form" hx-target="#main" hx-swap="innerHTML">
+          <i class="bi bi-circle"></i>
+          <span>Edit User Group</span>
+        </a>
+      </li>
+      <li>
+        <a id="delete_user_group_form" hx-get="delete_user_group_form" hx-target="#main" hx-swap="innerHTML">
+          <i class="bi bi-circle"></i>
+          <span>Delete User Group</span>
+        </a>
+      </li>
+    </ul>
+  </li>
+    <li class="nav-item">
       <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
         <i class="bi bi-menu-button-wide"></i><span>Components</span><i class="bi bi-chevron-down ms-auto"></i>
       </a>
