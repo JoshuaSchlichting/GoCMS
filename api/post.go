@@ -62,8 +62,6 @@ func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, 
 		r.Put("/api/user/{id}", func(w http.ResponseWriter, r *http.Request) {
 			r.ParseForm()
 			log.Printf("form: %v", r.Form)
-			// id, err := strconv.ParseInt(r.FormValue("id"), 10, 64)
-			// get id from url
 			id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 			if err != nil {
 				log.Printf("error parsing id: %v", err)
