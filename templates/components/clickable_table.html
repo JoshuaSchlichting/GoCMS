@@ -20,10 +20,10 @@
         </tbody>
         {{ end }}
     </table>
-    <script>
-        {{ .ClickableTable.JavaScript }}
-    </script>
+
     <script type="text/javascript">
+        {{ .ClickableTable.JavaScript }}
+
         var {{ .ClickableTable.TableID }}SelectedRow = null;
         function handleRowClick(table, url, callback = null) {
             const rows = table.getElementsByTagName("tr");

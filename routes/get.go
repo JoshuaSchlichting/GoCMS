@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -111,16 +112,54 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 					"Email":      user.Email,
 					"Attributes": string(user.Attributes),
 				})
+
+			}
+			formFields := []FormField{
+				{
+					Name:  "ID",
+					Type:  "",
+					Value: "",
+				},
+				{
+					Name:  "Name",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Email",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Attributes",
+					Type:  "text",
+					Value: "",
+				},
+			}
+			jsFormElements := ""
+			for _, field := range formFields {
+				jsFormElements += fmt.Sprintf(`
+					// loop over form fields and add them
+					document.getElementById("editUserForm%[1]s").value = formData["%[1]s"];
+				`, field.Name)
 			}
 
 			err = tmpl.ExecuteTemplate(w, "edit_user_form", map[string]interface{}{
 				"Token":   r.Context().Value(middleware.JWTEncodedString).(string),
 				"PostURL": "/edit_user",
+				"EditUserForm": GenerateForm(
+					"Edit User Form",
+					formFields,
+					"put",
+					"/api/user",
+					"editUserForm",
+				),
+
 				"ClickableTable": &components.ClickableTable{
 					TableID:      template.JS("user_table"),
 					Table:        userMap,
 					CallbackFunc: template.JS("setUserInForm"),
-					JavaScript: template.JS(`
+					JavaScript: template.JS(fmt.Sprintf(`
 						function getRowData(tableId, columnName, columnValue) {
 							console.log("getRowData-> params: " + tableId  + columnName + columnValue);
 							// Get the table using its ID
@@ -172,13 +211,9 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 							// get the form
 							console.log(formData);
 							// prefill the form with id edit_user_form
-							document.getElementById("editUserFormID").value = formData["ID"];
-							document.getElementById("editUserFormName").value = formData["Name"];
-							document.getElementById("editUserFormEmail").value = formData["Email"];
-							document.getElementById("editUserFormAttributes").value = formData["Attributes"];
-
-							
-						}`),
+							%s
+						}
+					`, jsFormElements)),
 				},
 			})
 			if err != nil {

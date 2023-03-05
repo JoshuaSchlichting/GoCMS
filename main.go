@@ -41,9 +41,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	queries := database.New(db)
 	defer db.Close()
+	queries := database.New(db)
 	funcMap := template.FuncMap{}
 	templ, err := parseTemplateDir("templates", templateFS, funcMap)
 	if err != nil {
