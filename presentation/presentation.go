@@ -31,13 +31,13 @@ func NewPresentor(t *template.Template, w io.Writer) *Presentor {
 
 func (p *Presentor) GetCreateItemFormHTML(formID, formTitle, apiEndpoint, refreshURL string, formFields []FormField) error {
 	return p.template.ExecuteTemplate(p.writer, "create_item_form", map[string]interface{}{
-		"CreateItemForm": GenerateForm(
+		"CreateItemForm": generateForm(
 			formTitle,
 			formFields,
 			"post",
 			apiEndpoint,
 			formID,
-			GetSubmitResetButtonDiv(),
+			getSubmitResetButtonDiv(),
 		),
 		"FormID":     formID,
 		"RefreshURL": template.JS(refreshURL),
@@ -59,13 +59,13 @@ func (p *Presentor) GetEditListItemHTML(formID, formTitle, apiEndpoint, apiCallT
 	tableID := formID + "_table"
 
 	err := p.template.ExecuteTemplate(p.writer, "edit_item_form", map[string]interface{}{
-		"EditItemForm": GenerateForm(
+		"EditItemForm": generateForm(
 			"Edit User Form",
 			formFields,
 			"put",
 			apiEndpoint,
 			formID,
-			GetSubmitResetButtonDiv(),
+			getSubmitResetButtonDiv(),
 		),
 		"FormID":     formID,
 		"RefreshURL": template.JS(refreshURL),
@@ -147,7 +147,7 @@ func (p *Presentor) GetDeleteItemFormHTML(formID, formTitle, apiEndpoint, refres
 		htmx.process(document.getElementById("%[1]s_form"));`, formID, apiEndpoint, "delete")
 
 	err := p.template.ExecuteTemplate(p.writer, "delete_item_form", map[string]interface{}{
-		"DeleteItemForm": GenerateForm(
+		"DeleteItemForm": generateForm(
 			formTitle,
 			formFields,
 			"delete",
@@ -222,7 +222,7 @@ func (p *Presentor) GetDeleteItemFormHTML(formID, formTitle, apiEndpoint, refres
 	return err
 }
 
-func GetSubmitResetButtonDiv() string {
+func getSubmitResetButtonDiv() string {
 	return `
 		<div class="text-center">
 		<button type="submit" class="btn btn-primary">Submit</button>
@@ -230,7 +230,7 @@ func GetSubmitResetButtonDiv() string {
 		</div>`
 }
 
-func GenerateForm(title string, fields []FormField, hxMethod, hxURL, idPrefix, buttonDiv string) template.HTML {
+func generateForm(title string, fields []FormField, hxMethod, hxURL, idPrefix, buttonDiv string) template.HTML {
 	tmpl := `
 		<div class="card">
 			<div class="card-body">
