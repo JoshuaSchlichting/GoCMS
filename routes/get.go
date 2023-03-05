@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -14,6 +13,7 @@ import (
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/db"
 	"github.com/joshuaschlichting/gocms/middleware"
+	"github.com/joshuaschlichting/gocms/presentation"
 	"github.com/joshuaschlichting/gocms/templates/components"
 )
 
@@ -114,7 +114,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 				})
 
 			}
-			formFields := []FormField{
+			formFields := []presentation.FormField{
 				{
 					Name:  "ID",
 					Type:  "",
@@ -136,90 +136,8 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 					Value: "",
 				},
 			}
-			formID := "editUserForm"
-			jsSetFormElements := ""
-			for _, field := range formFields {
-				jsSetFormElements += fmt.Sprintf(`
-					// loop over form fields and add them
-					document.getElementById("%[1]s%s").value = formData["%[2]s"];
-				`, formID, field.Name)
-			}
-			jsSetApiUrl := fmt.Sprintf(`
-				document.getElementById("%[1]s_form").setAttribute("hx-%s", "/api/user/" + formData["ID"]);
-				htmx.process(document.getElementById("%[1]s_form"));
-			`, formID, "put")
 
-			err = tmpl.ExecuteTemplate(w, "edit_user_form", map[string]interface{}{
-				"Token": r.Context().Value(middleware.JWTEncodedString).(string),
-				"EditUserForm": GenerateForm(
-					"Edit User Form",
-					formFields,
-					"put",
-					"/api/user",
-					formID,
-				),
-
-				"ClickableTable": &components.ClickableTable{
-					TableID:      template.JS("edit_item_table"),
-					Table:        userMap,
-					CallbackFunc: template.JS("setItemInForm"),
-					JavaScript: template.JS(fmt.Sprintf(`
-						function getRowData(tableId, columnName, columnValue) {
-							console.log("getRowData-> params: " + tableId  + columnName + columnValue);
-							// Get the table using its ID
-							const table = document.getElementById(tableId);
-						
-							// Get the table headers
-							const headers = table.getElementsByTagName("th");
-						
-							// Get the index of the target column
-							let targetColumnIndex;
-							for (let i = 0; i < headers.length; i++) {
-								if (headers[i].textContent === columnName) {
-									targetColumnIndex = i;
-									break;
-								}
-							}
-						
-							// Get the table rows
-							const rows = table.getElementsByTagName("tr");
-						
-							// Loop through each row
-							for (let i = 0; i < rows.length; i++) {
-							const cells = rows[i].getElementsByTagName("td");
-						
-							// Check if the target column exists in the row
-							if (cells[targetColumnIndex]) {
-								// Check if the value of the target column matches the columnValue
-								if (cells[targetColumnIndex].textContent === columnValue) {
-								// Get the header names
-								const headerNames = Array.from(headers).map(header => header.textContent);
-						
-								// Get the cell values
-								const cellValues = Array.from(cells).map(cell => cell.textContent);
-						
-								// Combine the header names and cell values into an object
-								const rowData = headerNames.reduce((obj, headerName, index) => {
-									obj[headerName] = cellValues[index];
-									return obj;
-								}, {});
-								return rowData;
-							}}}
-							// Return null if the row is not found
-							return null;
-						}
-						function setItemInForm() {
-							console.log("setItemInForm->");
-							// get row data where row id == edit_item_tableSelectedRow
-							let formData = getRowData("edit_item_table", "ID", edit_item_tableSelectedRow);
-							// get the form
-							console.log(formData);
-							// prefill the form with id edit_user_form
-							%s
-						}
-					`, jsSetFormElements+jsSetApiUrl)),
-				},
-			})
+			err = presentation.GetEditListItemHTML("edit_user_form", "Edit User Form", "/api/user", "put", "/edit_user_form", formFields, userMap, w, *tmpl, *r)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}

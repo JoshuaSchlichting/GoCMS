@@ -2,11 +2,11 @@
 {{ template "clickable_table" . }}
 {{ .EditUserForm }}
 <script type="text/javascript">
-    htmx.process(document.getElementById('editUserForm_form'));
+    htmx.process(document.getElementById('{{ .FormID }}_form'));
 
     document.addEventListener('htmx:afterRequest', function (event) {
-        if (event.detail.target.id != 'editUserForm_form') {return;}
-        let url = '/edit_user_form';
+        if (event.detail.target.id != '{{ .FormID }}_form') {return;}
+        let url = '{{ .RefreshURL }}';
         let target = document.getElementById('main');
         htmx.ajax('GET', url, { target: target });
     });
