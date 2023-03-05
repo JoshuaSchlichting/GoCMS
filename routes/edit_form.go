@@ -18,7 +18,7 @@ func GenerateForm(title string, fields []FormField, hxMethod, hxURL, idPrefix st
 		<div class="card">
 			<div class="card-body">
 				<h5 class="card-title">{{.Title}}</h5>
-				<form id="{{.FormID}}" class="row g-3" >
+				<form id="{{.FormID}}" class="row g-3" hx-{{.HxMethod}}="{{.HxURL}}">
 					{{range $field := .Fields}}
 						<div class="col-12">
 							<label class="form-label">{{$field.Name}}</label>
@@ -42,14 +42,14 @@ func GenerateForm(title string, fields []FormField, hxMethod, hxURL, idPrefix st
 		Fields   []FormField
 		FormID   string
 		IDPrefix string
-		HxMethod string
+		HxMethod template.JS
 		HxURL    string
 	}{
 		Title:    title,
 		Fields:   fields,
 		FormID:   idPrefix + "_form",
 		IDPrefix: idPrefix,
-		HxMethod: hxMethod,
+		HxMethod: template.JS(hxMethod),
 		HxURL:    hxURL,
 	}
 

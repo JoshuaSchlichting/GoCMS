@@ -136,17 +136,21 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 					Value: "",
 				},
 			}
-			jsFormElements := ""
+			jsSetFormElements := ""
 			for _, field := range formFields {
-				jsFormElements += fmt.Sprintf(`
+				jsSetFormElements += fmt.Sprintf(`
 					// loop over form fields and add them
 					document.getElementById("editUserForm%[1]s").value = formData["%[1]s"];
 				`, field.Name)
 			}
+			// set the hx-post attribute on the form for /api/user/id
+			jsSetApiUrl := `
+				document.getElementById("editUserForm_form").setAttribute("hx-put", "/api/user/" + formData["ID"]);
+				htmx.process(document.getElementById("editUserForm_form"));
+			`
 
 			err = tmpl.ExecuteTemplate(w, "edit_user_form", map[string]interface{}{
-				"Token":   r.Context().Value(middleware.JWTEncodedString).(string),
-				"PostURL": "/edit_user",
+				"Token": r.Context().Value(middleware.JWTEncodedString).(string),
 				"EditUserForm": GenerateForm(
 					"Edit User Form",
 					formFields,
@@ -213,7 +217,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 							// prefill the form with id edit_user_form
 							%s
 						}
-					`, jsFormElements)),
+					`, jsSetFormElements+jsSetApiUrl)),
 				},
 			})
 			if err != nil {
@@ -223,8 +227,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 
 		r.Get("/create_user_form", func(w http.ResponseWriter, r *http.Request) {
 			err := tmpl.ExecuteTemplate(w, "create_user_form", map[string]interface{}{
-				"Token":   r.Context().Value(middleware.JWTEncodedString).(string),
-				"PostURL": "/create_user",
+				"Token": r.Context().Value(middleware.JWTEncodedString).(string),
 			})
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -248,8 +251,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 			}
 
 			err = tmpl.ExecuteTemplate(w, "delete_user_form", map[string]interface{}{
-				"Token":   r.Context().Value(middleware.JWTEncodedString).(string),
-				"PostURL": "/delete_user",
+				"Token": r.Context().Value(middleware.JWTEncodedString).(string),
 				"ClickableTable": &components.ClickableTable{
 					TableID:      template.JS("user_table"),
 					Table:        userMap,
