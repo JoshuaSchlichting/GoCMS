@@ -5,6 +5,8 @@ create table if not exists public.organization
         constraint organization_pk
             primary key,
     name text not null,
+    email text not null,
+    attributes jsonb not null,
     created_at timestamp not null default current_timestamp,
     updated_at timestamp not null default current_timestamp
 );
