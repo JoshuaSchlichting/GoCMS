@@ -57,3 +57,7 @@ from
   left join public.usergroup
     on user_usergroup.usergroup_id = usergroup.id
 where user_id = @user_id::bigserial and usergroup.name = @usergroup_name::text;
+
+-- name: ListOrganizations :many
+SELECT * FROM public.organization
+ORDER BY name;

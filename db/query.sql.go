@@ -146,6 +146,41 @@ func (q *Queries) ListFiles(ctx context.Context) ([]File, error) {
 	return items, nil
 }
 
+const listOrganizations = `-- name: ListOrganizations :many
+SELECT id, name, email, attributes, created_at, updated_at FROM public.organization
+ORDER BY name
+`
+
+func (q *Queries) ListOrganizations(ctx context.Context) ([]Organization, error) {
+	rows, err := q.db.QueryContext(ctx, listOrganizations)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Organization
+	for rows.Next() {
+		var i Organization
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Email,
+			&i.Attributes,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listUsers = `-- name: ListUsers :many
 SELECT id, organization_id, name, email, attributes, created_at, updated_at FROM public.user
 ORDER BY name
@@ -187,7 +222,7 @@ update public.organization
   set name = $2,
     updated_at = current_timestamp
 WHERE id = $1
-RETURNING id, name, created_at, updated_at
+RETURNING id, name, email, attributes, created_at, updated_at
 `
 
 type UpdateOrganizationParams struct {
@@ -201,6 +236,8 @@ func (q *Queries) UpdateOrganization(ctx context.Context, arg UpdateOrganization
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
+		&i.Email,
+		&i.Attributes,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
