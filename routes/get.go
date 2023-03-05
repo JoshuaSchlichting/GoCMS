@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
@@ -96,6 +97,56 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 		r.Use(middleware.AddClientJWTStringToCtx)
 		r.Use(middleware.AuthenticateJWT)
 		r.Use(middlewareMap["addUserToCtx"])
+		r.Get("/edit_org_form", func(w http.ResponseWriter, r *http.Request) {
+			orgs, err := queries.ListOrganizations(r.Context())
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			var orgMap []map[string]interface{}
+			for _, org := range orgs {
+				humanReadableAttributes, err := json.MarshalIndent(org.Attributes, "", "  ")
+				if err != nil {
+					log.Println("error prettifying json:" + err.Error())
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				orgMap = append(orgMap, map[string]interface{}{
+					"ID":         org.ID,
+					"Name":       org.Name,
+					"Email":      org.Email,
+					"Attributes": string(humanReadableAttributes),
+				})
+
+			}
+			formFields := []presentation.FormField{
+				{
+					Name:  "ID",
+					Type:  "",
+					Value: "",
+				},
+				{
+					Name:  "Name",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Email",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Attributes",
+					Type:  "text",
+					Value: "",
+				},
+			}
+			p := presentation.NewPresentor(tmpl, w)
+			err = p.GetEditListItemHTML("edit_org_form", "Edit Organization Form", "/api/organization", "put", "/edit_org_form", formFields, orgMap)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		})
 
 		r.Get("/edit_user_form", func(w http.ResponseWriter, r *http.Request) {
 			users, err := queries.ListUsers(r.Context())
@@ -105,11 +156,17 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 			}
 			var userMap []map[string]interface{}
 			for _, user := range users {
+				humanReadableAttributes, err := json.MarshalIndent(user.Attributes, "", "  ")
+				if err != nil {
+					log.Println("error prettifying json:" + err.Error())
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
 				userMap = append(userMap, map[string]interface{}{
 					"ID":         user.ID,
 					"Name":       user.Name,
 					"Email":      user.Email,
-					"Attributes": string(user.Attributes),
+					"Attributes": string(humanReadableAttributes),
 				})
 
 			}
