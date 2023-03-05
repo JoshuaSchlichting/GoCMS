@@ -136,18 +136,18 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 					Value: "",
 				},
 			}
+			formID := "editUserForm"
 			jsSetFormElements := ""
 			for _, field := range formFields {
 				jsSetFormElements += fmt.Sprintf(`
 					// loop over form fields and add them
-					document.getElementById("editUserForm%[1]s").value = formData["%[1]s"];
-				`, field.Name)
+					document.getElementById("%[1]s%s").value = formData["%[2]s"];
+				`, formID, field.Name)
 			}
-			// set the hx-post attribute on the form for /api/user/id
-			jsSetApiUrl := `
-				document.getElementById("editUserForm_form").setAttribute("hx-put", "/api/user/" + formData["ID"]);
-				htmx.process(document.getElementById("editUserForm_form"));
-			`
+			jsSetApiUrl := fmt.Sprintf(`
+				document.getElementById("%[1]s_form").setAttribute("hx-%s", "/api/user/" + formData["ID"]);
+				htmx.process(document.getElementById("%[1]s_form"));
+			`, formID, "put")
 
 			err = tmpl.ExecuteTemplate(w, "edit_user_form", map[string]interface{}{
 				"Token": r.Context().Value(middleware.JWTEncodedString).(string),
@@ -156,7 +156,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 					formFields,
 					"put",
 					"/api/user",
-					"editUserForm",
+					formID,
 				),
 
 				"ClickableTable": &components.ClickableTable{
