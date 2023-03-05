@@ -160,9 +160,9 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 				),
 
 				"ClickableTable": &components.ClickableTable{
-					TableID:      template.JS("user_table"),
+					TableID:      template.JS("edit_item_table"),
 					Table:        userMap,
-					CallbackFunc: template.JS("setUserInForm"),
+					CallbackFunc: template.JS("setItemInForm"),
 					JavaScript: template.JS(fmt.Sprintf(`
 						function getRowData(tableId, columnName, columnValue) {
 							console.log("getRowData-> params: " + tableId  + columnName + columnValue);
@@ -208,10 +208,10 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 							// Return null if the row is not found
 							return null;
 						}
-						function setUserInForm() {
-							console.log("setUserInForm->");
-							// get row data where row id == user_tableSelectedRow
-							let formData = getRowData("user_table", "ID", user_tableSelectedRow);
+						function setItemInForm() {
+							console.log("setItemInForm->");
+							// get row data where row id == edit_item_tableSelectedRow
+							let formData = getRowData("edit_item_table", "ID", edit_item_tableSelectedRow);
 							// get the form
 							console.log(formData);
 							// prefill the form with id edit_user_form
