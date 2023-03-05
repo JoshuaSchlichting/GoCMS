@@ -37,6 +37,7 @@ func (p *Presentor) GetCreateItemFormHTML(formID, formTitle, apiEndpoint, refres
 			"post",
 			apiEndpoint,
 			formID,
+			GetSubmitResetButtonDiv(),
 		),
 		"FormID":     formID,
 		"RefreshURL": template.JS(refreshURL),
@@ -64,6 +65,7 @@ func (p *Presentor) GetEditListItemHTML(formID, formTitle, apiEndpoint, apiCallT
 			"put",
 			apiEndpoint,
 			formID,
+			GetSubmitResetButtonDiv(),
 		),
 		"FormID":     formID,
 		"RefreshURL": template.JS(refreshURL),
@@ -131,7 +133,104 @@ func (p *Presentor) GetEditListItemHTML(formID, formTitle, apiEndpoint, apiCallT
 	return err
 }
 
-func GenerateForm(title string, fields []FormField, hxMethod, hxURL, idPrefix string) template.HTML {
+func (p *Presentor) GetDeleteItemFormHTML(formID, formTitle, apiEndpoint, refreshURL, setItemAdditionalJS string, formFields []FormField, dataMap []map[string]interface{}) error {
+	tableID := formID + "_table"
+	jsSetFormElements := ""
+	for _, field := range formFields {
+		jsSetFormElements += fmt.Sprintf(`
+			// loop over form fields and add them
+			document.getElementById("%[1]s%s").value = formData["%[2]s"];
+		`, formID, field.Name)
+	}
+	jsSetApiUrl := fmt.Sprintf(`
+		document.getElementById("%[1]s_form").setAttribute("hx-%[3]s", "%[2]s/" + formData["ID"]);
+		htmx.process(document.getElementById("%[1]s_form"));`, formID, apiEndpoint, "delete")
+
+	err := p.template.ExecuteTemplate(p.writer, "delete_item_form", map[string]interface{}{
+		"DeleteItemForm": GenerateForm(
+			formTitle,
+			formFields,
+			"delete",
+			apiEndpoint,
+			formID,
+			`<button id="deleteItemButton" hx-confirm="Are you sure you want to delete this object?" type="button" class="btn btn-danger">Delete</button>`,
+		),
+		"FormID":     formID,
+		"RefreshURL": template.JS(refreshURL),
+		"ClickableTable": &components.ClickableTable{
+			TableID:      template.JS(tableID),
+			Table:        dataMap,
+			CallbackFunc: template.JS("setItemInForm"),
+			JavaScript: template.JS(fmt.Sprintf(`
+				function getRowData(tableId, columnName, columnValue) {
+					console.log("getRowData-> params: " + tableId  + columnName + columnValue);
+					// Get the table using its ID
+					const table = document.getElementById(tableId);
+				
+					// Get the table headers
+					const headers = table.getElementsByTagName("th");
+				
+					// Get the index of the target column
+					let targetColumnIndex;
+					for (let i = 0; i < headers.length; i++) {
+						if (headers[i].textContent === columnName) {
+							targetColumnIndex = i;
+							break;
+						}
+					}
+				
+					// Get the table rows
+					const rows = table.getElementsByTagName("tr");
+				
+					// Loop through each row
+					for (let i = 0; i < rows.length; i++) {
+					const cells = rows[i].getElementsByTagName("td");
+				
+					// Check if the target column exists in the row
+					if (cells[targetColumnIndex]) {
+						// Check if the value of the target column matches the columnValue
+						if (cells[targetColumnIndex].textContent === columnValue) {
+						// Get the header names
+						const headerNames = Array.from(headers).map(header => header.textContent);
+				
+						// Get the cell values
+						const cellValues = Array.from(cells).map(cell => cell.textContent);
+				
+						// Combine the header names and cell values into an object
+						const rowData = headerNames.reduce((obj, headerName, index) => {
+							obj[headerName] = cellValues[index];
+							return obj;
+						}, {});
+						return rowData;
+					}}}
+					// Return null if the row is not found
+					return null;
+				}
+				function setItemInForm() {
+					console.log("setItemInForm->");
+					// get row data where row id == %[2]sSelectedRow
+					let formData = getRowData("%[2]s", "ID", %[2]sSelectedRow);
+					// get the form
+					console.log(formData);
+					// prefill the form with id edit_user_form
+					%[1]s
+					%[3]s
+				}
+			`, jsSetFormElements+jsSetApiUrl, tableID, setItemAdditionalJS)),
+		},
+	})
+	return err
+}
+
+func GetSubmitResetButtonDiv() string {
+	return `
+		<div class="text-center">
+		<button type="submit" class="btn btn-primary">Submit</button>
+		<button type="reset" class="btn btn-secondary">Reset</button>
+		</div>`
+}
+
+func GenerateForm(title string, fields []FormField, hxMethod, hxURL, idPrefix, buttonDiv string) template.HTML {
 	tmpl := `
 		<div class="card">
 			<div class="card-body">
@@ -143,10 +242,7 @@ func GenerateForm(title string, fields []FormField, hxMethod, hxURL, idPrefix st
 							<input type="{{$field.Type}}" class="form-control" id="{{$.IDPrefix}}{{$field.Name}}" name="{{$field.Name}}" value="{{$field.Value}}" {{if eq (ToLower $field.Name) "id"}}readonly{{end}}>
 						</div>
 					{{end}}
-					<div class="text-center">
-						<button type="submit" class="btn btn-primary">Submit</button>
-						<button type="reset" class="btn btn-secondary">Reset</button>
-					</div>
+					{{.ButtonDiv}}
 				</form>
 			</div>
 		</div>
@@ -156,19 +252,21 @@ func GenerateForm(title string, fields []FormField, hxMethod, hxURL, idPrefix st
 
 	// Create a map of parameters to pass to the template
 	data := struct {
-		Title    string
-		Fields   []FormField
-		FormID   string
-		IDPrefix string
-		HxMethod template.JS
-		HxURL    string
+		Title     string
+		Fields    []FormField
+		FormID    string
+		IDPrefix  string
+		HxMethod  template.JS
+		HxURL     string
+		ButtonDiv template.HTML
 	}{
-		Title:    title,
-		Fields:   fields,
-		FormID:   idPrefix + "_form",
-		IDPrefix: idPrefix,
-		HxMethod: template.JS(hxMethod),
-		HxURL:    hxURL,
+		Title:     title,
+		Fields:    fields,
+		FormID:    idPrefix + "_form",
+		IDPrefix:  idPrefix,
+		HxMethod:  template.JS(hxMethod),
+		HxURL:     hxURL,
+		ButtonDiv: template.HTML(buttonDiv),
 	}
 
 	funcMap := template.FuncMap{

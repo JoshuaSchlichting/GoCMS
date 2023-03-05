@@ -14,7 +14,6 @@ import (
 	"github.com/joshuaschlichting/gocms/db"
 	"github.com/joshuaschlichting/gocms/middleware"
 	"github.com/joshuaschlichting/gocms/presentation"
-	"github.com/joshuaschlichting/gocms/templates/components"
 )
 
 func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.Queries, middlewareMap map[string]func(http.Handler) http.Handler) {
@@ -158,7 +157,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 				{
 					Name:  "Attributes",
 					Type:  "text",
-					Value: "",
+					Value: "{}",
 				},
 			}
 			p := presentation.NewPresentor(tmpl, w)
@@ -184,73 +183,34 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 				})
 			}
 
-			err = tmpl.ExecuteTemplate(w, "delete_user_form", map[string]interface{}{
-				"ClickableTable": &components.ClickableTable{
-					TableID:      template.JS("user_table"),
-					Table:        userMap,
-					CallbackFunc: template.JS("setUserInForm"),
-					JavaScript: template.JS(`
-						function getRowData(tableId, columnName, columnValue) {
-							console.log("getRowData-> params: " + tableId  + columnName + columnValue);
-							// Get the table using its ID
-							const table = document.getElementById(tableId);
-						
-							// Get the table headers
-							const headers = table.getElementsByTagName("th");
-						
-							// Get the index of the target column
-							let targetColumnIndex;
-							for (let i = 0; i < headers.length; i++) {
-								if (headers[i].textContent === columnName) {
-									targetColumnIndex = i;
-									break;
-								}
-							}
-						
-							// Get the table rows
-							const rows = table.getElementsByTagName("tr");
-						
-							// Loop through each row
-							for (let i = 0; i < rows.length; i++) {
-							const cells = rows[i].getElementsByTagName("td");
-						
-							// Check if the target column exists in the row
-							if (cells[targetColumnIndex]) {
-								// Check if the value of the target column matches the columnValue
-								if (cells[targetColumnIndex].textContent === columnValue) {
-								// Get the header names
-								const headerNames = Array.from(headers).map(header => header.textContent);
-						
-								// Get the cell values
-								const cellValues = Array.from(cells).map(cell => cell.textContent);
-						
-								// Combine the header names and cell values into an object
-								const rowData = headerNames.reduce((obj, headerName, index) => {
-									obj[headerName] = cellValues[index];
-									return obj;
-								}, {});
-								return rowData;
-							}}}
-							// Return null if the row is not found
-							return null;
-						}
-
-						function setUserInForm() {
-							console.log("setUserInForm->");
-							// get row data where row id == user_tableSelectedRow
-							let formData = getRowData("user_table", "ID", user_tableSelectedRow);
-							// get the form
-							console.log(formData);
-							document.getElementById("deleteUserFormID").value = formData["ID"];
-							document.getElementById("deleteUserFormName").value = formData["Name"];
-							document.getElementById("deleteUserFormEmail").value = formData["Email"];
-							document.getElementById("deleteUserFormAttributes").value = formData["Attributes"];
-							document.getElementById("deleteUserButton").setAttribute('hx-delete', '/api/user/' + formData["ID"]);
-						    htmx.process(document.getElementById('deleteUserButton'));
-						}`,
-					),
+			p := presentation.NewPresentor(tmpl, w)
+			formFields := []presentation.FormField{
+				{
+					Name:  "ID",
+					Type:  "text",
+					Value: "",
 				},
-			})
+				{
+					Name:  "Name",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Email",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Attributes",
+					Type:  "text",
+					Value: "",
+				},
+			}
+			additionalJS := `
+				document.getElementById("deleteItemButton").setAttribute('hx-delete', '/api/user/' + formData["ID"]);
+				htmx.process(document.getElementById('deleteItemButton'));			
+			`
+			err = p.GetDeleteItemFormHTML("delete_user_form", "Delete User Form", "/api/user", "/edit_user_form", additionalJS, formFields, userMap)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
