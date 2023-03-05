@@ -47,9 +47,9 @@ func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, 
 			r.ParseForm()
 			log.Printf("form: %v", r.Form)
 			params := db.CreateUserParams{
-				Name:       r.FormValue("name"),
-				Email:      r.FormValue("email"),
-				Attributes: json.RawMessage([]byte(r.FormValue("attributes"))),
+				Name:       r.FormValue("Name"),
+				Email:      r.FormValue("Email"),
+				Attributes: json.RawMessage([]byte(r.FormValue("Attributes"))),
 			}
 
 			newUser, err := data.CreateUser(r.Context(), params)
