@@ -136,17 +136,15 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 					Value: "",
 				},
 			}
-
-			err = presentation.GetEditListItemHTML("edit_user_form", "Edit User Form", "/api/user", "put", "/edit_user_form", formFields, userMap, w, *tmpl, *r)
+			p := presentation.NewPresentor(tmpl, w)
+			err = p.GetEditListItemHTML("edit_user_form", "Edit User Form", "/api/user", "put", "/edit_user_form", formFields, userMap)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
 		})
 
 		r.Get("/create_user_form", func(w http.ResponseWriter, r *http.Request) {
-			err := tmpl.ExecuteTemplate(w, "create_user_form", map[string]interface{}{
-				"Token": r.Context().Value(middleware.JWTEncodedString).(string),
-			})
+			err := tmpl.ExecuteTemplate(w, "create_user_form", map[string]interface{}{})
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
@@ -169,7 +167,6 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 			}
 
 			err = tmpl.ExecuteTemplate(w, "delete_user_form", map[string]interface{}{
-				"Token": r.Context().Value(middleware.JWTEncodedString).(string),
 				"ClickableTable": &components.ClickableTable{
 					TableID:      template.JS("user_table"),
 					Table:        userMap,

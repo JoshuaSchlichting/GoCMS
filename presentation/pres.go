@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"net/http"
 
-	"github.com/joshuaschlichting/gocms/middleware"
 	"github.com/joshuaschlichting/gocms/templates/components"
 
 	"bytes"
@@ -19,7 +17,19 @@ type FormField struct {
 	Value string
 }
 
-func GetEditListItemHTML(formID, formTitle, apiEndpoint, apiCallType, refreshURL string, formFields []FormField, dataMap []map[string]interface{}, w io.Writer, tmpl template.Template, r http.Request) error {
+type Presentor struct {
+	template *template.Template
+	writer   io.Writer
+}
+
+func NewPresentor(t *template.Template, w io.Writer) *Presentor {
+	return &Presentor{
+		template: t,
+		writer:   w,
+	}
+}
+
+func (p *Presentor) GetEditListItemHTML(formID, formTitle, apiEndpoint, apiCallType, refreshURL string, formFields []FormField, dataMap []map[string]interface{}) error {
 
 	jsSetFormElements := ""
 	for _, field := range formFields {
@@ -33,8 +43,7 @@ func GetEditListItemHTML(formID, formTitle, apiEndpoint, apiCallType, refreshURL
 		htmx.process(document.getElementById("%[1]s_form"));`, formID, apiEndpoint, apiCallType)
 	tableID := formID + "_table"
 
-	err := tmpl.ExecuteTemplate(w, "edit_user_form", map[string]interface{}{
-		"Token": r.Context().Value(middleware.JWTEncodedString).(string),
+	err := p.template.ExecuteTemplate(p.writer, "edit_item_form", map[string]interface{}{
 		"EditUserForm": GenerateForm(
 			"Edit User Form",
 			formFields,
