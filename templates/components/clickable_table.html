@@ -25,7 +25,7 @@
         {{ .ClickableTable.JavaScript }}
 
         var {{ .ClickableTable.TableID }}SelectedRow = null;
-        function handleRowClick(table, url, callback = null) {
+        function handleRowClick(table, callback = null) {
             const rows = table.getElementsByTagName("tr");
             for (let i = 0; i < rows.length; i++) {
                 rows[i].addEventListener("click", function () {
@@ -46,7 +46,7 @@
                 });
             }
         }
-        handleRowClick(document.getElementById("{{ .ClickableTable.TableID }}"), "{{ .ClickableTable.PostURL }}", {{ .ClickableTable.CallbackFunc }});
+        handleRowClick(document.getElementById("{{ .ClickableTable.TableID }}"), {{ .ClickableTable.CallbackFunc }});
     </script>
 </div>
 {{ end }}
