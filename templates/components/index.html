@@ -54,7 +54,13 @@
     });
 
     $("#sidebar").load("sidebar");
-
+    htmx.on('htmx:responseError', function(event) { 
+      console.log(event.detail.xhr.status);
+      alert("ERROR: " + event.detail.xhr.status);
+      if (event.detail.xhr.status == 401) {
+        window.location.href = {{ .sign_in_url }};
+      }
+    });
   </script>
 
 </body>
