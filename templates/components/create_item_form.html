@@ -1,4 +1,4 @@
-{{ define "create_user_form" }}
+{{ define "create_item_form" }}
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Create New User</h5>
@@ -20,14 +20,14 @@
     </div>
 </div>
 <script type="text/javascript">
-    htmx.process(document.getElementById('create_user_form_form'));
+    htmx.process(document.getElementById('{{ .FormID }}_form'));
 
-    document.addEventListener('htmx:afterRequest', function (event) {
-        if (event.detail.target.id != 'create_user_form_form') {return;}
-        let url = '/edit_user_form';
-        let target = document.getElementById('main');
-        htmx.ajax('GET', url, { target: target });
-    });
+document.addEventListener('htmx:afterRequest', function (event) {
+    if (event.detail.target.id != '{{ .FormID }}_form') {return;}
+    let url = '{{ .RefreshURL }}';
+    let target = document.getElementById('main');
+    htmx.ajax('GET', url, { target: target });
+});
 </script>
 
 {{ end }}

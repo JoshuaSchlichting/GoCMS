@@ -29,6 +29,20 @@ func NewPresentor(t *template.Template, w io.Writer) *Presentor {
 	}
 }
 
+func (p *Presentor) GetCreateItemFormHTML(formID, formTitle, apiEndpoint, refreshURL string, formFields []FormField) error {
+	return p.template.ExecuteTemplate(p.writer, "create_item_form", map[string]interface{}{
+		"CreateItemForm": GenerateForm(
+			formTitle,
+			formFields,
+			"post",
+			apiEndpoint,
+			formID,
+		),
+		"FormID":     formID,
+		"RefreshURL": template.JS(refreshURL),
+	})
+}
+
 func (p *Presentor) GetEditListItemHTML(formID, formTitle, apiEndpoint, apiCallType, refreshURL string, formFields []FormField, dataMap []map[string]interface{}) error {
 
 	jsSetFormElements := ""
@@ -44,7 +58,7 @@ func (p *Presentor) GetEditListItemHTML(formID, formTitle, apiEndpoint, apiCallT
 	tableID := formID + "_table"
 
 	err := p.template.ExecuteTemplate(p.writer, "edit_item_form", map[string]interface{}{
-		"EditUserForm": GenerateForm(
+		"EditItemForm": GenerateForm(
 			"Edit User Form",
 			formFields,
 			"put",

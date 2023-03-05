@@ -144,7 +144,25 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 		})
 
 		r.Get("/create_user_form", func(w http.ResponseWriter, r *http.Request) {
-			err := tmpl.ExecuteTemplate(w, "create_user_form", map[string]interface{}{})
+			formFields := []presentation.FormField{
+				{
+					Name:  "Name",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Email",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Attributes",
+					Type:  "text",
+					Value: "",
+				},
+			}
+			p := presentation.NewPresentor(tmpl, w)
+			err := p.GetCreateItemFormHTML("create_user_form", "Create User Form", "/api/user", "/edit_user_form", formFields)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
