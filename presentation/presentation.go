@@ -60,7 +60,7 @@ func (p *Presentor) GetEditListItemHTML(formID, formTitle, apiEndpoint, apiCallT
 
 	err := p.template.ExecuteTemplate(p.writer, "edit_item_form", map[string]interface{}{
 		"EditItemForm": generateForm(
-			"Edit User Form",
+			formTitle,
 			formFields,
 			"put",
 			apiEndpoint,
