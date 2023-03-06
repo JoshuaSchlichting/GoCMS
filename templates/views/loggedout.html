@@ -1,0 +1,58 @@
+{{ define "logged_out" }}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Logged Out</title>
+	<style>
+		body {
+			background-color: #f2f2f2;
+			font-family: Arial, sans-serif;
+			color: #333;
+			text-align: center;
+		}
+		
+		h1 {
+			font-size: 2em;
+			margin-top: 50px;
+		}
+		
+		p {
+			font-size: 1.2em;
+			margin-top: 30px;
+			margin-bottom: 50px;
+		}
+		
+		.ascii-art {
+			margin-top: 100px;
+			font-family: monospace;
+			font-size: 2em;
+		}
+	</style>
+</head>
+<body>
+	<!-- <h1>You have been logged out</h1> -->
+	<p></p>
+	<div class="ascii-art">
+        <pre>
+        _nnnn_                                   
+        dGGGGMMb     ,""""""""""""""""""""""""""".
+       @p~qp~~qMb    | You have been logged out! |
+       M|@||@) M|   _;...........................'
+       @,----.JM| -'                             
+      JS^\__/  qKL                               
+     dZP        qKRb                             
+    dZP          qKKb                            
+   fZP            SMMb                           
+   HZM            MMMM                           
+   FqM            MMMM                           
+ __| ".        |\dS"qML                          
+ |    `.       | `' \Zq                          
+_)      \.___.,|     .'                          
+\____   )MMMMMM|   .'                            
+     `-'       `--' hjm                          
+        </pre>	
+    </div>
+</body>
+</html>
+{{ end }}
