@@ -12,7 +12,12 @@ import (
 	"github.com/joshuaschlichting/gocms/db"
 )
 
-func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, data db.Queries) {
+type filesystem interface {
+	GetFileContents(path string) ([]byte, error)
+	WriteFileContents(path string, contents []byte) error
+}
+
+func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, data db.Queries, fs filesystem) {
 	r.Group(func(r chi.Router) {
 		r.Post("/upload", func(w http.ResponseWriter, r *http.Request) {
 			// get payload
@@ -93,6 +98,24 @@ func InitPostRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, 
 			err = data.DeleteUser(r.Context(), id)
 			if err != nil {
 				log.Printf("error deleting user: %v", err)
+			}
+		})
+
+		r.Post("/api/upload_file", func(w http.ResponseWriter, r *http.Request) {
+			// get payload
+			file, y, _ := r.FormFile("file")
+			header := y.Header
+			log.Printf("header: %v", header)
+			// convert file to []byte
+			payload := make([]byte, y.Size)
+			size, err := file.Read(payload)
+			if err != nil {
+				log.Printf("error reading file: %v", err)
+			}
+			log.Printf("file: %v\n\tsize: %v", y.Header, size)
+			err = fs.WriteFileContents(y.Filename, payload)
+			if err != nil {
+				log.Printf("error writing file: %v", err)
 			}
 		})
 	})

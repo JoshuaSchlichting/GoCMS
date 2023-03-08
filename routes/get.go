@@ -280,7 +280,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 		r.Get("/upload_form", func(w http.ResponseWriter, r *http.Request) {
 			err := tmpl.ExecuteTemplate(w, "upload_form", map[string]interface{}{
 				"Token":   r.Context().Value(middleware.JWTEncodedString).(string),
-				"PostURL": "/upload",
+				"PostURL": "/api/upload_file",
 			})
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)

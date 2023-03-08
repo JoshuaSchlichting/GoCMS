@@ -16,6 +16,7 @@ import (
 	"github.com/joshuaschlichting/gocms/api"
 	"github.com/joshuaschlichting/gocms/config"
 	database "github.com/joshuaschlichting/gocms/db"
+	"github.com/joshuaschlichting/gocms/filesystem"
 	"github.com/joshuaschlichting/gocms/middleware"
 	"github.com/joshuaschlichting/gocms/routes"
 	_ "github.com/lib/pq"
@@ -69,9 +70,12 @@ func main() {
 	staticFS, _ := fs.Sub(fileSystem, "static")
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
 
+	// Create file system for content delivery
+	fs := filesystem.NewLocalFilesystem("~/.gocms/")
+
 	// Register routes
 	routes.InitGetRoutes(r, templ, config, *queries, middlewareMap)
-	api.InitPostRoutes(r, templ, config, *queries)
+	api.InitPostRoutes(r, templ, config, *queries, fs)
 
 	if err := listenServe(addr, r); err != nil {
 		log.Fatal(err)
