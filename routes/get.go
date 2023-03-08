@@ -36,6 +36,10 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 		}
 	})
 
+	r.Get("/loggedout", func(w http.ResponseWriter, r *http.Request) {
+		tmpl.ExecuteTemplate(w, "logged_out", nil)
+	})
+
 	r.Get("/getjwtandlogin", func(w http.ResponseWriter, r *http.Request) {
 		// get access code from request
 		code := r.URL.Query().Get("code")
