@@ -75,7 +75,8 @@ func main() {
 
 	// Register routes
 	routes.InitGetRoutes(r, templ, config, *queries, middlewareMap)
-	api.InitPostRoutes(r, templ, config, *queries, fs)
+	api := api.NewAPI(r, templ, config, *queries, fs)
+	api.InitPostRoutes()
 
 	if err := listenServe(addr, r); err != nil {
 		log.Fatal(err)
