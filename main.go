@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path"
 	"text/template"
 
 	"github.com/go-chi/chi"
@@ -71,12 +72,12 @@ func main() {
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
 
 	// Create file system for content delivery
-	fs := filesystem.NewLocalFilesystem("~/.gocms/")
+	homeDir, _ := os.UserHomeDir()
+	fs := filesystem.NewLocalFilesystem(path.Join(homeDir, "gocms"))
 
 	// Register routes
 	routes.InitGetRoutes(r, templ, config, *queries, middlewareMap)
-	api := api.NewAPI(r, templ, config, *queries, fs)
-	api.InitPostRoutes()
+	api.InitAPI(r, templ, config, *queries, fs)
 
 	if err := listenServe(addr, r); err != nil {
 		log.Fatal(err)
