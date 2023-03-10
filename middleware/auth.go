@@ -100,12 +100,12 @@ func AddNewJwtToCtxCookie(h http.Handler) http.Handler {
 	})
 }
 
+// AuthenticateJWT checks if the JWT is valid via the secret key and expiration date
 func AuthenticateJWT(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// get JWT in context
 		if r.Context().Value(JWTEncodedString) == nil {
-			// log.Println("no JWT to authenticate")
-			// error
+			log.Println("unauthorized: no JWT to authenticate")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
@@ -119,20 +119,27 @@ func AuthenticateJWT(h http.Handler) http.Handler {
 		tokenAuth := jwtauth.New("HS256", []byte(conf.Auth.JWT.SecretKey), nil)
 		jwtToken, err := tokenAuth.Decode(token)
 		if err != nil {
+			log.Println("unauthorized: invalid JWT token (perhaps the secret key has changed?)")
 			http.Error(w, err.Error(), http.StatusUnauthorized)
-			return
-		}
-		if jwtToken.Expiration().Before(time.Now()) || jwt.Validate(jwtToken) != nil {
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-			// cancel context
 			r.Context().Done()
 			return
 		}
-		// jwt claims
+		if jwtToken.Expiration().Before(time.Now()) {
+			log.Println("unauthorized: JWT token has expired")
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			r.Context().Done()
+			return
+		}
+		if jwt.Validate(jwtToken) != nil {
+			log.Println("unauthorized: JWT claims are invalid")
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			r.Context().Done()
+			return
+		}
+
 		claims, _ := jwtToken.AsMap(r.Context())
 
 		log.Printf("claims: %v", claims)
-		// Token is authenticated, pass it through
 		h.ServeHTTP(w, r)
 	})
 }
