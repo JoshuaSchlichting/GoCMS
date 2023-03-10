@@ -2,41 +2,16 @@ package api
 
 import (
 	"encoding/json"
-	"html/template"
 	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/go-chi/chi"
-	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/db"
 )
 
-type filesystem interface {
-	GetFileContents(path string) ([]byte, error)
-	WriteFileContents(path string, contents []byte) error
-}
-
-type API struct {
-	tmpl   *template.Template
-	config *config.Config
-	data   db.Queries
-	fs     filesystem
-	router *chi.Mux
-}
-
-func NewAPI(r *chi.Mux, tmpl *template.Template, config *config.Config, data db.Queries, fs filesystem) *API {
-	return &API{
-		tmpl:   tmpl,
-		config: config,
-		data:   data,
-		fs:     fs,
-		router: r,
-	}
-}
-
-func (a *API) InitPostRoutes() {
-	a.router.Group(func(r chi.Router) {
+func (a *API) initPostRoutes() {
+	a.router.Route("/api", func(r chi.Router) {
 		r.Post("/upload", func(w http.ResponseWriter, r *http.Request) {
 			// get payload
 			file, y, _ := r.FormFile("file")
@@ -66,7 +41,7 @@ func (a *API) InitPostRoutes() {
 			// data.UploadFile(payload, y.Filename, "userid")
 		})
 
-		r.Post("/api/user", func(w http.ResponseWriter, r *http.Request) {
+		r.Post("/user", func(w http.ResponseWriter, r *http.Request) {
 			r.ParseForm()
 			log.Printf("form: %v", r.Form)
 			params := db.CreateUserParams{
@@ -82,7 +57,7 @@ func (a *API) InitPostRoutes() {
 			log.Println(newUser)
 		})
 
-		r.Put("/api/user/{id}", func(w http.ResponseWriter, r *http.Request) {
+		r.Put("/user/{id}", func(w http.ResponseWriter, r *http.Request) {
 			r.ParseForm()
 			log.Printf("form: %v", r.Form)
 			id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
@@ -104,7 +79,7 @@ func (a *API) InitPostRoutes() {
 			log.Println(newUser)
 		})
 
-		r.Delete("/api/user/{id}", func(w http.ResponseWriter, r *http.Request) {
+		r.Delete("/user/{id}", func(w http.ResponseWriter, r *http.Request) {
 			// log url params
 			log.Printf("url params: %v", chi.URLParam(r, "id"))
 			// get id from url param
@@ -119,7 +94,7 @@ func (a *API) InitPostRoutes() {
 			}
 		})
 
-		r.Post("/api/upload_file", a.UploadFileHandler)
+		r.Post("/upload_file", a.UploadFileHandler)
 	})
 }
 
