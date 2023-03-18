@@ -1,61 +1,12 @@
--- seed users for
--- create table if not exists public.user
--- (
---     id uuid not null
---         constraint user_pk
---             primary key,
---     organization_id uuid
---         constraint user_organization_id_fk
---             references public.organization,
---     name text not null unique,
---     email text not null,
---     attributes jsonb not null,
---     created_at timestamp not null default current_timestamp,
---     updated_at timestamp not null default current_timestamp
--- );
+insert into public.user (id, name, email, attributes, created_at, updated_at)
+values 
+    ('5a0e233a-6b11-4d47-8820-1f0b8ca630a2', 'admin', 'admin@localhost', '{"role": "admin"}', current_timestamp, current_timestamp),
+    ('1e0f875a-2ab3-4d9f-8b5a-4e4d4b4f4b7c', 'user', 'user@localhost', '{"role": "user"}', current_timestamp, current_timestamp),
+    ('d846fcbf-2dc2-4d31-99d9-18b9f1faa138', 'guest', 'guest@localhost', '{"role": "guest"}', current_timestamp, current_timestamp),
+    ('1dfe9b46-ecb8-478d-9d11-68c2b06dcf77', 'test', 'test@localhost', '{"role": "test"}', current_timestamp, current_timestamp),
+    ('3ed55756-25e8-44e9-9d67-c17a68de94e5', 'test2', 'test2@localhost', '{"role": "test2"}', current_timestamp, current_timestamp),
+    ('ca7e719e-8d4f-4f26-84b7-0f6a28f7d193', 'test3', 'test3@localhost', '{"role": "test3"}', current_timestamp, current_timestamp);
 
-insert into public.user (name, email, attributes, created_at, updated_at)
-values ('admin',
-        'admin@localhost',
-        '{"role": "admin"}',
-        current_timestamp,
-        current_timestamp),
-        (
-            'user',
-            'user@localhost',
-            '{"role": "user"}',
-            current_timestamp,
-            current_timestamp
-        ),
-        (
-            'guest',
-            'guest@localhost',
-            '{"role": "guest"}',
-            current_timestamp,
-            current_timestamp
-        ),
-        (
-            'test',
-            'test@localhost',
-            '{"role": "test"}',
-            current_timestamp,
-            current_timestamp
-        ),
-        (
-            'test2',
-            'test2@localhost',
-            '{"role": "test2"}',
-            current_timestamp,
-            current_timestamp
-        ),
-        (
-            'test3',
-            'test3@localhost',
-            '{"role": "test3"}',
-            current_timestamp,
-            current_timestamp
-        )
-    ;
 
 -- seed public.permission_attribute with permissions such as 'create user', 'delete user', 'create organization', 'delete organization', etc.
 insert into public.permission_attribute (name, created_at, updated_at)
