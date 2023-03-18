@@ -37,7 +37,6 @@ func main() {
 	flag.Parse()
 
 	config := config.LoadConfig(readConfigFile())
-	log.Print("connection string: ", config.Database.ConnectionString)
 
 	db, err := sql.Open("postgres", config.Database.ConnectionString)
 	if err != nil {
