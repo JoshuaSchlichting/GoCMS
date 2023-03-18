@@ -10,5 +10,8 @@ GoCMS is in early stages of development and is not even close to being ready for
 
 - The `db` package is genereated using [sqlc](https://docs.sqlc.dev/en/latest/index.html)  (`db/sql/sqlc.yaml`).
 
+### Using the manager
+The manager is a CLI tool that is used to manage the CMS. It is embedded in the project as a go workspace. You can run it using the command `go run ./cmd/manager <params>`.
+
 ### Design
 As of now, the CMS is relying on free templates from BootStrapMade.com.
