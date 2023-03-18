@@ -23,7 +23,6 @@ func InitMiddleware(config *config.Config) {
 
 func AddURLAccessCodeToCtx(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// get code from query string
 		code := r.URL.Query().Get("code")
 		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), AccessCode, code)))
 	})
