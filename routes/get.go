@@ -18,7 +18,7 @@ import (
 )
 
 func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.Queries, middlewareMap map[string]func(http.Handler) http.Handler) {
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+	r.Get("/admin", func(w http.ResponseWriter, r *http.Request) {
 		// if not logged in
 		if r.Context().Value(middleware.User) == nil {
 			// redirect to login
