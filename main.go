@@ -5,13 +5,13 @@ import (
 	"embed"
 	"flag"
 	"fmt"
+	"html/template"
 	"io/fs"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"path"
-	"text/template"
 
 	"github.com/go-chi/chi"
 	"github.com/joshuaschlichting/gocms/api"
@@ -46,6 +46,7 @@ func main() {
 	defer db.Close()
 	queries := database.New(db)
 	funcMap := template.FuncMap{}
+
 	templ, err := parseTemplateDir("templates", templateFS, funcMap)
 	if err != nil {
 		log.Fatalf("Error parsing templates: %v", err)
