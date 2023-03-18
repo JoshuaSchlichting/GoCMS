@@ -1,10 +1,10 @@
 -- seed users for
 -- create table if not exists public.user
 -- (
---     id bigserial not null
+--     id uuid not null
 --         constraint user_pk
 --             primary key,
---     organization_id integer
+--     organization_id uuid
 --         constraint user_organization_id_fk
 --             references public.organization,
 --     name text not null unique,

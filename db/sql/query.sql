@@ -12,9 +12,9 @@ ORDER BY name;
 
 -- name: CreateUser :one
 INSERT INTO public.user (
-    name, email, attributes, created_at, updated_at
+    id, name, email, attributes, created_at, updated_at
 ) VALUES (
-  $1, $2, $3, current_timestamp, current_timestamp
+  $1, $2, $3, $4, current_timestamp, current_timestamp
 )
 RETURNING *;
 
@@ -46,9 +46,48 @@ RETURNING *;
 -- name: UpdateOrganization :one
 update public.organization
   set name = $2,
+    email = $3,
+    attributes = $4,
     updated_at = current_timestamp
 WHERE id = $1
-RETURNING *;
+returning *;
+
+-- name: CreateOrganization :one
+insert into public.organization (
+    id, name, email, attributes, created_at, updated_at
+) values (
+  $1, $2, $3, $4, current_timestamp, current_timestamp
+)
+returning *;
+
+-- name: DeleteOrganization :exec
+delete from public.organization
+where id = $1;
+
+-- name: CreateUserGroup :one
+insert into public.usergroup (
+  id, name, email, attributes, created_at, updated_at
+) values (
+  $1, $2, $3, $4, current_timestamp, current_timestamp
+)
+returning *;
+
+-- name: UpdateUserGroup :one
+update public.usergroup
+  set name = $2,
+    email = $3,
+    attributes = $4,
+    updated_at = current_timestamp
+where id = $1
+returning *;
+
+-- name: DeleteUserGroup :exec
+delete from public.usergroup
+where id = $1;
+
+-- name: ListUserGroups :many
+select * from public.usergroup
+order by name;
 
 -- name: GetUserIsInGroup :one
 select true
@@ -56,7 +95,7 @@ from
   public.user_usergroup
   left join public.usergroup
     on user_usergroup.usergroup_id = usergroup.id
-where user_id = @user_id::bigserial and usergroup.name = @usergroup_name::text;
+where user_id = @user_id::uuid and usergroup.name = @usergroup_name::text;
 
 -- name: ListOrganizations :many
 SELECT * FROM public.organization

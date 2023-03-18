@@ -8,25 +8,68 @@ package db
 import (
 	"context"
 	"encoding/json"
+
+	"github.com/google/uuid"
 )
+
+const createOrganization = `-- name: CreateOrganization :one
+insert into public.organization (
+    id, name, email, attributes, created_at, updated_at
+) values (
+  $1, $2, $3, $4, current_timestamp, current_timestamp
+)
+returning id, name, email, attributes, created_at, updated_at
+`
+
+type CreateOrganizationParams struct {
+	ID         uuid.UUID       `json:"id"`
+	Name       string          `json:"name"`
+	Email      string          `json:"email"`
+	Attributes json.RawMessage `json:"attributes"`
+}
+
+func (q *Queries) CreateOrganization(ctx context.Context, arg CreateOrganizationParams) (Organization, error) {
+	row := q.db.QueryRowContext(ctx, createOrganization,
+		arg.ID,
+		arg.Name,
+		arg.Email,
+		arg.Attributes,
+	)
+	var i Organization
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.Attributes,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO public.user (
-    name, email, attributes, created_at, updated_at
+    id, name, email, attributes, created_at, updated_at
 ) VALUES (
-  $1, $2, $3, current_timestamp, current_timestamp
+  $1, $2, $3, $4, current_timestamp, current_timestamp
 )
 RETURNING id, organization_id, name, email, attributes, created_at, updated_at
 `
 
 type CreateUserParams struct {
+	ID         uuid.UUID       `json:"id"`
 	Name       string          `json:"name"`
 	Email      string          `json:"email"`
 	Attributes json.RawMessage `json:"attributes"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser, arg.Name, arg.Email, arg.Attributes)
+	row := q.db.QueryRowContext(ctx, createUser,
+		arg.ID,
+		arg.Name,
+		arg.Email,
+		arg.Attributes,
+	)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -40,13 +83,68 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const createUserGroup = `-- name: CreateUserGroup :one
+insert into public.usergroup (
+  id, name, email, attributes, created_at, updated_at
+) values (
+  $1, $2, $3, $4, current_timestamp, current_timestamp
+)
+returning id, name, email, attributes, created_at, updated_at
+`
+
+type CreateUserGroupParams struct {
+	ID         uuid.UUID       `json:"id"`
+	Name       string          `json:"name"`
+	Email      string          `json:"email"`
+	Attributes json.RawMessage `json:"attributes"`
+}
+
+func (q *Queries) CreateUserGroup(ctx context.Context, arg CreateUserGroupParams) (Usergroup, error) {
+	row := q.db.QueryRowContext(ctx, createUserGroup,
+		arg.ID,
+		arg.Name,
+		arg.Email,
+		arg.Attributes,
+	)
+	var i Usergroup
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.Attributes,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const deleteOrganization = `-- name: DeleteOrganization :exec
+delete from public.organization
+where id = $1
+`
+
+func (q *Queries) DeleteOrganization(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteOrganization, id)
+	return err
+}
+
 const deleteUser = `-- name: DeleteUser :exec
 DELETE FROM public.user
 WHERE id = $1
 `
 
-func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
+func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.ExecContext(ctx, deleteUser, id)
+	return err
+}
+
+const deleteUserGroup = `-- name: DeleteUserGroup :exec
+delete from public.usergroup
+where id = $1
+`
+
+func (q *Queries) DeleteUserGroup(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteUserGroup, id)
 	return err
 }
 
@@ -55,7 +153,7 @@ SELECT id, organization_id, name, email, attributes, created_at, updated_at FROM
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
+func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUser, id)
 	var i User
 	err := row.Scan(
@@ -96,12 +194,12 @@ from
   public.user_usergroup
   left join public.usergroup
     on user_usergroup.usergroup_id = usergroup.id
-where user_id = $1::bigserial and usergroup.name = $2::text
+where user_id = $1::uuid and usergroup.name = $2::text
 `
 
 type GetUserIsInGroupParams struct {
-	UserID        int64  `json:"user_id"`
-	UsergroupName string `json:"usergroup_name"`
+	UserID        uuid.UUID `json:"user_id"`
+	UsergroupName string    `json:"usergroup_name"`
 }
 
 func (q *Queries) GetUserIsInGroup(ctx context.Context, arg GetUserIsInGroupParams) (bool, error) {
@@ -181,6 +279,41 @@ func (q *Queries) ListOrganizations(ctx context.Context) ([]Organization, error)
 	return items, nil
 }
 
+const listUserGroups = `-- name: ListUserGroups :many
+select id, name, email, attributes, created_at, updated_at from public.usergroup
+order by name
+`
+
+func (q *Queries) ListUserGroups(ctx context.Context) ([]Usergroup, error) {
+	rows, err := q.db.QueryContext(ctx, listUserGroups)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Usergroup
+	for rows.Next() {
+		var i Usergroup
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Email,
+			&i.Attributes,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listUsers = `-- name: ListUsers :many
 SELECT id, organization_id, name, email, attributes, created_at, updated_at FROM public.user
 ORDER BY name
@@ -220,18 +353,27 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 const updateOrganization = `-- name: UpdateOrganization :one
 update public.organization
   set name = $2,
+    email = $3,
+    attributes = $4,
     updated_at = current_timestamp
 WHERE id = $1
-RETURNING id, name, email, attributes, created_at, updated_at
+returning id, name, email, attributes, created_at, updated_at
 `
 
 type UpdateOrganizationParams struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
+	ID         uuid.UUID       `json:"id"`
+	Name       string          `json:"name"`
+	Email      string          `json:"email"`
+	Attributes json.RawMessage `json:"attributes"`
 }
 
 func (q *Queries) UpdateOrganization(ctx context.Context, arg UpdateOrganizationParams) (Organization, error) {
-	row := q.db.QueryRowContext(ctx, updateOrganization, arg.ID, arg.Name)
+	row := q.db.QueryRowContext(ctx, updateOrganization,
+		arg.ID,
+		arg.Name,
+		arg.Email,
+		arg.Attributes,
+	)
 	var i Organization
 	err := row.Scan(
 		&i.ID,
@@ -255,7 +397,7 @@ RETURNING id, organization_id, name, email, attributes, created_at, updated_at
 `
 
 type UpdateUserParams struct {
-	ID         int64           `json:"id"`
+	ID         uuid.UUID       `json:"id"`
 	Name       string          `json:"name"`
 	Email      string          `json:"email"`
 	Attributes json.RawMessage `json:"attributes"`
@@ -281,6 +423,42 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 	return i, err
 }
 
+const updateUserGroup = `-- name: UpdateUserGroup :one
+update public.usergroup
+  set name = $2,
+    email = $3,
+    attributes = $4,
+    updated_at = current_timestamp
+where id = $1
+returning id, name, email, attributes, created_at, updated_at
+`
+
+type UpdateUserGroupParams struct {
+	ID         uuid.UUID       `json:"id"`
+	Name       string          `json:"name"`
+	Email      string          `json:"email"`
+	Attributes json.RawMessage `json:"attributes"`
+}
+
+func (q *Queries) UpdateUserGroup(ctx context.Context, arg UpdateUserGroupParams) (Usergroup, error) {
+	row := q.db.QueryRowContext(ctx, updateUserGroup,
+		arg.ID,
+		arg.Name,
+		arg.Email,
+		arg.Attributes,
+	)
+	var i Usergroup
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.Attributes,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const uploadFile = `-- name: UploadFile :one
 INSERT INTO public.file (
     name, blob, created_at, updated_at, owner_id
@@ -291,9 +469,9 @@ RETURNING id, name, blob, created_at, updated_at, owner_id
 `
 
 type UploadFileParams struct {
-	Name    string `json:"name"`
-	Blob    []byte `json:"blob"`
-	OwnerID int32  `json:"owner_id"`
+	Name    string    `json:"name"`
+	Blob    []byte    `json:"blob"`
+	OwnerID uuid.UUID `json:"owner_id"`
 }
 
 func (q *Queries) UploadFile(ctx context.Context, arg UploadFileParams) (File, error) {

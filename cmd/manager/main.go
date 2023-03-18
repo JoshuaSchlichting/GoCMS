@@ -48,11 +48,11 @@ func main() {
 	flag.Parse()
 	switch {
 	case createSuperUserFlag:
-		executeCreateSuperUserViaTerminalInput(queries)
+		executeCreateSuperUserViaTerminalInput(*queries)
 	case initFlag:
 		CreateSchema(db)
 	case listUsersFlag:
-		getUsers(queries)
+		getUsers(*queries)
 	case deleteAllUsersFlag:
 		deleteAllUsers(db)
 	case executeRawSqlFlag != "":
@@ -74,6 +74,7 @@ func main() {
 		}
 		// iterate over results and print them
 	case DestroySchemaFlag:
+		log.Println("Destroying schema")
 		DestroySchema(db)
 	default:
 		fmt.Println("No flags set")

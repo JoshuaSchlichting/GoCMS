@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/go-chi/chi"
+	"github.com/google/uuid"
 	"github.com/joshuaschlichting/gocms/db"
 )
 
@@ -45,6 +45,7 @@ func (a *API) initPostRoutes() {
 			r.ParseForm()
 			log.Printf("form: %v", r.Form)
 			params := db.CreateUserParams{
+				ID:         uuid.New(),
 				Name:       r.FormValue("Name"),
 				Email:      r.FormValue("Email"),
 				Attributes: json.RawMessage([]byte(r.FormValue("Attributes"))),
@@ -60,7 +61,7 @@ func (a *API) initPostRoutes() {
 		r.Put("/user/{id}", func(w http.ResponseWriter, r *http.Request) {
 			r.ParseForm()
 			log.Printf("form: %v", r.Form)
-			id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+			id, err := uuid.Parse(chi.URLParam(r, "id"))
 			if err != nil {
 				log.Printf("error parsing id: %v", err)
 			}
@@ -83,7 +84,7 @@ func (a *API) initPostRoutes() {
 			// log url params
 			log.Printf("url params: %v", chi.URLParam(r, "id"))
 			// get id from url param
-			id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+			id, err := uuid.Parse(chi.URLParam(r, "id"))
 			if err != nil {
 				log.Printf("error parsing id: %v", err)
 			}
@@ -91,6 +92,112 @@ func (a *API) initPostRoutes() {
 			err = a.data.DeleteUser(r.Context(), id)
 			if err != nil {
 				log.Printf("error deleting user: %v", err)
+			}
+		})
+
+		r.Post("/organization", func(w http.ResponseWriter, r *http.Request) {
+			r.ParseForm()
+			log.Printf("form: %v", r.Form)
+			params := db.CreateOrganizationParams{
+				ID:         uuid.New(),
+				Name:       r.FormValue("Name"),
+				Email:      r.FormValue("Email"),
+				Attributes: json.RawMessage([]byte(r.FormValue("Attributes"))),
+			}
+
+			newOrganization, err := a.data.CreateOrganization(r.Context(), params)
+			if err != nil {
+				log.Printf("error creating organization: %v", err)
+			}
+			log.Println(newOrganization)
+		})
+
+		r.Put("/organization/{id}", func(w http.ResponseWriter, r *http.Request) {
+			r.ParseForm()
+			log.Printf("form: %v", r.Form)
+			id, err := uuid.Parse(chi.URLParam(r, "id"))
+			if err != nil {
+				log.Printf("error parsing id: %v", err)
+			}
+
+			params := db.UpdateOrganizationParams{
+				ID:         id,
+				Name:       r.FormValue("Name"),
+				Email:      r.FormValue("Email"),
+				Attributes: json.RawMessage([]byte(r.FormValue("Attributes"))),
+			}
+
+			newOrganization, err := a.data.UpdateOrganization(r.Context(), params)
+			if err != nil {
+				log.Printf("error updating organization: %v", err)
+			}
+			log.Println(newOrganization)
+		})
+
+		r.Delete("/organization/{id}", func(w http.ResponseWriter, r *http.Request) {
+			// log url params
+			log.Printf("url params: %v", chi.URLParam(r, "id"))
+			// get id from url param
+			id, err := uuid.Parse((chi.URLParam(r, "id")))
+			if err != nil {
+				log.Printf("error parsing id: %v", err)
+			}
+
+			err = a.data.DeleteOrganization(r.Context(), id)
+			if err != nil {
+				log.Printf("error deleting organization: %v", err)
+			}
+		})
+		r.Post("/usergroup", func(w http.ResponseWriter, r *http.Request) {
+			r.ParseForm()
+			log.Printf("form: %v", r.Form)
+			params := db.CreateUserGroupParams{
+				ID:         uuid.New(),
+				Name:       r.FormValue("Name"),
+				Email:      r.FormValue("Email"),
+				Attributes: json.RawMessage([]byte(r.FormValue("Attributes"))),
+			}
+
+			newUserGroup, err := a.data.CreateUserGroup(r.Context(), params)
+			if err != nil {
+				log.Printf("error creating user group: %v", err)
+			}
+			log.Println(newUserGroup)
+		})
+
+		r.Put("/usergroup/{id}", func(w http.ResponseWriter, r *http.Request) {
+			r.ParseForm()
+			log.Printf("form: %v", r.Form)
+			id, err := uuid.Parse(chi.URLParam(r, "id"))
+			if err != nil {
+				log.Printf("error parsing id: %v", err)
+			}
+
+			params := db.UpdateUserGroupParams{
+				ID:         id,
+				Name:       r.FormValue("Name"),
+				Email:      r.FormValue("Email"),
+				Attributes: json.RawMessage([]byte(r.FormValue("Attributes"))),
+			}
+
+			newUserGroup, err := a.data.UpdateUserGroup(r.Context(), params)
+			if err != nil {
+				log.Printf("error updating user group: %v", err)
+			}
+			log.Println(newUserGroup)
+		})
+		r.Delete("/usergroup/{id}", func(w http.ResponseWriter, r *http.Request) {
+			// log url params
+			log.Printf("url params: %v", chi.URLParam(r, "id"))
+			// get id from url param
+			id, err := uuid.Parse(chi.URLParam(r, "id"))
+			if err != nil {
+				log.Printf("error parsing id: %v", err)
+			}
+
+			err = a.data.DeleteUserGroup(r.Context(), id)
+			if err != nil {
+				log.Printf("error deleting user group: %v", err)
 			}
 		})
 

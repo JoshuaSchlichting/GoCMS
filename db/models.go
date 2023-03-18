@@ -5,54 +5,55 @@
 package db
 
 import (
-	"database/sql"
 	"encoding/json"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type File struct {
-	ID        int64     `json:"id"`
+	ID        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`
 	Blob      []byte    `json:"blob"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	OwnerID   int32     `json:"owner_id"`
+	OwnerID   uuid.UUID `json:"owner_id"`
 }
 
 type FileFilegroup struct {
-	FileID      int32     `json:"file_id"`
-	FilegroupID int32     `json:"filegroup_id"`
+	FileID      uuid.UUID `json:"file_id"`
+	FilegroupID uuid.UUID `json:"filegroup_id"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type Filegroup struct {
-	ID        int64     `json:"id"`
+	ID        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type Invoice struct {
-	ID             int64     `json:"id"`
+	ID             uuid.UUID `json:"id"`
 	Amount         float64   `json:"amount"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
-	UserID         int32     `json:"user_id"`
-	OrgnaizationID int32     `json:"orgnaization_id"`
+	UserID         uuid.UUID `json:"user_id"`
+	OrgnaizationID uuid.UUID `json:"orgnaization_id"`
 }
 
 type Message struct {
-	ID        int64     `json:"id"`
-	ToID      int32     `json:"to_id"`
+	ID        uuid.UUID `json:"id"`
+	ToID      uuid.UUID `json:"to_id"`
 	Message   string    `json:"message"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	FromID    int32     `json:"from_id"`
+	FromID    uuid.UUID `json:"from_id"`
 }
 
 type Organization struct {
-	ID         int64           `json:"id"`
+	ID         uuid.UUID       `json:"id"`
 	Name       string          `json:"name"`
 	Email      string          `json:"email"`
 	Attributes json.RawMessage `json:"attributes"`
@@ -61,15 +62,15 @@ type Organization struct {
 }
 
 type PermissionAttribute struct {
-	ID        int64     `json:"id"`
+	ID        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type User struct {
-	ID             int64           `json:"id"`
-	OrganizationID sql.NullInt32   `json:"organization_id"`
+	ID             uuid.UUID       `json:"id"`
+	OrganizationID uuid.NullUUID   `json:"organization_id"`
 	Name           string          `json:"name"`
 	Email          string          `json:"email"`
 	Attributes     json.RawMessage `json:"attributes"`
@@ -78,36 +79,38 @@ type User struct {
 }
 
 type UserPermissionAttribute struct {
-	UserID                int32     `json:"user_id"`
-	PermissionAttributeID int32     `json:"permission_attribute_id"`
+	UserID                uuid.UUID `json:"user_id"`
+	PermissionAttributeID uuid.UUID `json:"permission_attribute_id"`
 	CreatedAt             time.Time `json:"created_at"`
 	UpdatedAt             time.Time `json:"updated_at"`
 }
 
 type UserUsergroup struct {
-	UserID      int32     `json:"user_id"`
-	UsergroupID int32     `json:"usergroup_id"`
+	UserID      uuid.UUID `json:"user_id"`
+	UsergroupID uuid.UUID `json:"usergroup_id"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type Usergroup struct {
-	ID        int64     `json:"id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID         uuid.UUID       `json:"id"`
+	Name       string          `json:"name"`
+	Email      string          `json:"email"`
+	Attributes json.RawMessage `json:"attributes"`
+	CreatedAt  time.Time       `json:"created_at"`
+	UpdatedAt  time.Time       `json:"updated_at"`
 }
 
 type UsergroupOrganization struct {
-	UsergroupID    int32     `json:"usergroup_id"`
-	OrganizationID int32     `json:"organization_id"`
+	UsergroupID    uuid.UUID `json:"usergroup_id"`
+	OrganizationID uuid.UUID `json:"organization_id"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
 
 type UsergroupPermissionAttribute struct {
-	UsergroupID           int32     `json:"usergroup_id"`
-	PermissionAttributeID int32     `json:"permission_attribute_id"`
+	UsergroupID           uuid.UUID `json:"usergroup_id"`
+	PermissionAttributeID uuid.UUID `json:"permission_attribute_id"`
 	CreatedAt             time.Time `json:"created_at"`
 	UpdatedAt             time.Time `json:"updated_at"`
 }

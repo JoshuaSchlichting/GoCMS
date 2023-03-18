@@ -146,7 +146,81 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 				},
 			}
 			p := presentation.NewPresentor(tmpl, w)
-			err = p.GetEditListItemHTML("edit_org_form", "Edit Organization Form", "/api/organization", "put", "/edit_org_form", formFields, orgMap)
+			err = p.EditListItemHTML("edit_org_form", "Edit Organization Form", "/api/organization", "put", "/edit_org_form", formFields, orgMap)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		})
+
+		r.Get("/create_org_form", func(w http.ResponseWriter, r *http.Request) {
+			formFields := []presentation.FormField{
+				{
+					Name:  "Name",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Email",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Attributes",
+					Type:  "text",
+					Value: "{}",
+				},
+			}
+			p := presentation.NewPresentor(tmpl, w)
+			err := p.CreateItemFormHTML("create_org_form", "Create Organization Form", "/api/organization", "/edit_org_form", formFields)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		})
+
+		r.Get("/delete_org_form", func(w http.ResponseWriter, r *http.Request) {
+			orgs, err := queries.ListOrganizations(r.Context())
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			var orgMap []map[string]interface{}
+			for _, org := range orgs {
+				orgMap = append(orgMap, map[string]interface{}{
+					"ID":         org.ID,
+					"Name":       org.Name,
+					"Email":      org.Email,
+					"Attributes": string(org.Attributes),
+				})
+			}
+
+			p := presentation.NewPresentor(tmpl, w)
+			formFields := []presentation.FormField{
+				{
+					Name:  "ID",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Name",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Email",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Attributes",
+					Type:  "text",
+					Value: "",
+				},
+			}
+			additionalJS := `
+					document.getElementById("deleteItemButton").setAttribute('hx-delete', '/api/organization/' + formData["ID"]);
+					htmx.process(document.getElementById('deleteItemButton'));			
+				`
+			err = p.DeleteItemFormHTML("delete_org_form", "Delete Organization Form", "/api/organization", "/edit_org_form", additionalJS, formFields, orgMap)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
@@ -197,7 +271,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 				},
 			}
 			p := presentation.NewPresentor(tmpl, w)
-			err = p.GetEditListItemHTML("edit_user_form", "Edit User Form", "/api/user", "put", "/edit_user_form", formFields, userMap)
+			err = p.EditListItemHTML("edit_user_form", "Edit User Form", "/api/user", "put", "/edit_user_form", formFields, userMap)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
@@ -222,7 +296,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 				},
 			}
 			p := presentation.NewPresentor(tmpl, w)
-			err := p.GetCreateItemFormHTML("create_user_form", "Create User Form", "/api/user", "/edit_user_form", formFields)
+			err := p.CreateItemFormHTML("create_user_form", "Create User Form", "/api/user", "/edit_user_form", formFields)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
@@ -271,7 +345,119 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 				document.getElementById("deleteItemButton").setAttribute('hx-delete', '/api/user/' + formData["ID"]);
 				htmx.process(document.getElementById('deleteItemButton'));			
 			`
-			err = p.GetDeleteItemFormHTML("delete_user_form", "Delete User Form", "/api/user", "/edit_user_form", additionalJS, formFields, userMap)
+			err = p.DeleteItemFormHTML("delete_user_form", "Delete User Form", "/api/user", "/edit_user_form", additionalJS, formFields, userMap)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		})
+
+		r.Get("/edit_usergroup_form", func(w http.ResponseWriter, r *http.Request) {
+			usergroups, err := queries.ListUserGroups(r.Context())
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			var usergroupMap []map[string]interface{}
+			for _, usergroup := range usergroups {
+				humanReadableAttributes, err := json.MarshalIndent(usergroup.Attributes, "", "  ")
+				if err != nil {
+					log.Println("error prettifying json:" + err.Error())
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				usergroupMap = append(usergroupMap, map[string]interface{}{
+					"ID":         usergroup.ID,
+					"Name":       usergroup.Name,
+					"Attributes": string(humanReadableAttributes),
+				})
+			}
+
+			formFields := []presentation.FormField{
+				{
+					Name:  "ID",
+					Type:  "",
+					Value: "",
+				},
+				{
+					Name:  "Name",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Attributes",
+					Type:  "text",
+					Value: "",
+				},
+			}
+			p := presentation.NewPresentor(tmpl, w)
+			err = p.EditListItemHTML("edit_usergroup_form", "Edit User Group Form", "/api/usergroup", "put", "/edit_usergroup_form", formFields, usergroupMap)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		})
+
+		r.Get("/create_usergroup_form", func(w http.ResponseWriter, r *http.Request) {
+			formFields := []presentation.FormField{
+				{
+					Name:  "Name",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Attributes",
+					Type:  "text",
+					Value: "{}",
+				},
+			}
+			p := presentation.NewPresentor(tmpl, w)
+			err := p.CreateItemFormHTML("create_usergroup_form", "Create User Group Form", "/api/usergroup", "/edit_usergroup_form", formFields)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		})
+
+		r.Get("/delete_usergroup_form", func(w http.ResponseWriter, r *http.Request) {
+			groups, err := queries.ListUserGroups(r.Context())
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			var groupMap []map[string]interface{}
+			for _, group := range groups {
+				groupMap = append(groupMap, map[string]interface{}{
+					"ID":         group.ID,
+					"Name":       group.Name,
+					"Email":      group.Email,
+					"Attributes": string(group.Attributes),
+				})
+			}
+
+			p := presentation.NewPresentor(tmpl, w)
+			formFields := []presentation.FormField{
+				{
+					Name:  "ID",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Name",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Description",
+					Type:  "text",
+					Value: "",
+				},
+			}
+
+			additionalJS := `
+				document.getElementById("deleteItemButton").setAttribute('hx-delete', '/api/usergroup/' + formData["ID"]);
+				htmx.process(document.getElementById('deleteItemButton'));			
+			`
+
+			err = p.DeleteItemFormHTML("delete_usergroup_form", "Delete Usergroup Form", "/api/usergroup", "/edit_usergroup_form", additionalJS, formFields, groupMap)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}

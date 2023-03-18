@@ -29,7 +29,7 @@ func NewPresentor(t *template.Template, w io.Writer) *Presentor {
 	}
 }
 
-func (p *Presentor) GetCreateItemFormHTML(formID, formTitle, apiEndpoint, refreshURL string, formFields []FormField) error {
+func (p *Presentor) CreateItemFormHTML(formID, formTitle, apiEndpoint, refreshURL string, formFields []FormField) error {
 	return p.template.ExecuteTemplate(p.writer, "create_item_form", map[string]interface{}{
 		"CreateItemForm": generateForm(
 			formTitle,
@@ -44,7 +44,7 @@ func (p *Presentor) GetCreateItemFormHTML(formID, formTitle, apiEndpoint, refres
 	})
 }
 
-func (p *Presentor) GetEditListItemHTML(formID, formTitle, apiEndpoint, apiCallType, refreshURL string, formFields []FormField, dataMap []map[string]interface{}) error {
+func (p *Presentor) EditListItemHTML(formID, formTitle, apiEndpoint, apiCallType, refreshURL string, formFields []FormField, dataMap []map[string]interface{}) error {
 
 	jsSetFormElements := ""
 	for _, field := range formFields {
@@ -133,7 +133,7 @@ func (p *Presentor) GetEditListItemHTML(formID, formTitle, apiEndpoint, apiCallT
 	return err
 }
 
-func (p *Presentor) GetDeleteItemFormHTML(formID, formTitle, apiEndpoint, refreshURL, setItemAdditionalJS string, formFields []FormField, dataMap []map[string]interface{}) error {
+func (p *Presentor) DeleteItemFormHTML(formID, formTitle, apiEndpoint, refreshURL, setItemAdditionalJS string, formFields []FormField, dataMap []map[string]interface{}) error {
 	tableID := formID + "_table"
 	jsSetFormElements := ""
 	for _, field := range formFields {
