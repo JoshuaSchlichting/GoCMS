@@ -23,7 +23,7 @@ func GetUserInfo(accessToken string) (username, email string, err error) {
 			break
 		}
 	}
-	return *output.Username, emailAddress, nil
+	return *output.Username, emailAddress, err
 
 }
 
