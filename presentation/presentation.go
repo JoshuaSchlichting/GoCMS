@@ -25,6 +25,8 @@ type Presentor struct {
 	writer   io.Writer
 }
 
+// NewPresentor returns a new Presentor struct who's methods will write directly
+// to the http.ResponseWriter passed to this constructor.
 func NewPresentor(t *template.Template, w io.Writer) *Presentor {
 	return &Presentor{
 		template: t,
