@@ -1,3 +1,6 @@
+// Package presentation provides the presentation layer for the gocms application.
+// The Presentor struct is used to render the templates, writing them directly to
+// the http.ResponseWriter passed to NewPresentor.
 package presentation
 
 import (
