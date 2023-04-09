@@ -6,13 +6,13 @@ import (
 	"path/filepath"
 )
 
-// Filesystem is a wrapper around the os package
-type Filesystem struct {
+// LocalFilesystem is a wrapper around the os package
+type LocalFilesystem struct {
 	path string
 }
 
 // NewLocalFilesystem returns a new Filesystem
-func NewLocalFilesystem(rootDir string) *Filesystem {
+func NewLocalFilesystem(rootDir string) *LocalFilesystem {
 	_, err := os.Stat(rootDir)
 	if os.IsNotExist(err) {
 		err := os.MkdirAll(rootDir, os.ModePerm)
@@ -23,13 +23,13 @@ func NewLocalFilesystem(rootDir string) *Filesystem {
 		log.Println(err)
 	}
 
-	return &Filesystem{
+	return &LocalFilesystem{
 		path: rootDir,
 	}
 }
 
 // GetFileContents returns the contents of a file
-func (f *Filesystem) GetFileContents(path string) ([]byte, error) {
+func (f *LocalFilesystem) GetFileContents(path string) ([]byte, error) {
 	// Read the file
 	file, err := os.Open(filepath.Join(f.path, path))
 	if err != nil {
@@ -54,7 +54,7 @@ func (f *Filesystem) GetFileContents(path string) ([]byte, error) {
 }
 
 // WriteFileContents writes the contents to a file
-func (f *Filesystem) WriteFileContents(path string, contents []byte) error {
+func (f *LocalFilesystem) WriteFileContents(path string, contents []byte) error {
 	// Write the file
 	file, err := os.Create(filepath.Join(f.path, path))
 	if err != nil {
@@ -70,10 +70,10 @@ func (f *Filesystem) WriteFileContents(path string, contents []byte) error {
 	return nil
 }
 
-func (f *Filesystem) DeleteFile(path string) error {
+func (f *LocalFilesystem) DeleteFile(path string) error {
 	return os.Remove(filepath.Join(f.path, path))
 }
 
-func (f *Filesystem) ListDir(path string) ([]os.DirEntry, error) {
+func (f *LocalFilesystem) ListDir(path string) ([]os.DirEntry, error) {
 	return os.ReadDir(filepath.Join(f.path, path))
 }
