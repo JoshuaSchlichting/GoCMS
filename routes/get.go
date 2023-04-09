@@ -28,12 +28,8 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 			return
 		}
 
-		err := tmpl.ExecuteTemplate(w, "index", map[string]interface{}{
-			"sign_in_url": config.Auth.SignInUrl,
-		})
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		http.Redirect(w, r, "/secure", http.StatusFound)
+
 	})
 
 	r.Get("/loggedout", func(w http.ResponseWriter, r *http.Request) {
@@ -501,6 +497,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 			err := tmpl.ExecuteTemplate(w, "index", map[string]interface{}{
 				"SecureText":  username,
 				"sign_in_url": config.Auth.SignInUrl,
+				"username":    r.Context().Value(middleware.User).(db.User).Name,
 			})
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
