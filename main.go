@@ -73,7 +73,9 @@ func main() {
 
 	// Create file system for content delivery
 	homeDir, _ := os.UserHomeDir()
-	fs := filesystem.NewLocalFilesystem(path.Join(homeDir, "gocms"))
+	gocmsPath := path.Join(homeDir, "gocms")
+	log.Println("Using the following gocmsPath for local filesystem: ", gocmsPath)
+	fs := filesystem.NewLocalFilesystem(gocmsPath)
 
 	// Register routes
 	routes.InitGetRoutes(r, templ, config, *queries, middlewareMap)
