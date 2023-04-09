@@ -95,6 +95,15 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 		http.Redirect(w, r, "/secure", http.StatusFound)
 	})
 
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		err := tmpl.ExecuteTemplate(w, "public_index", map[string]interface{}{
+			"sign_in_url": config.Auth.SignInUrl,
+		})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
+
 	r.Group(func(r chi.Router) {
 		jwtAuth := jwtauth.New("HS256", []byte(config.Auth.JWT.SecretKey), nil)
 		r.Use(jwtauth.Verifier(jwtAuth))
