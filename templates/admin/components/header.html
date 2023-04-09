@@ -18,7 +18,7 @@
 
   <a id="loginButton" type="button" class="btn btn-primary" href="{{ .sign_in_url }}">Login</a>
   <a id="logOutButton" type="button" class="btn btn-primary">Log out</a>
-  {{/*
+
   <nav id="loggedInHeader" class="header-nav ms-auto">
     <ul class="d-flex align-items-center">
 
@@ -173,12 +173,12 @@
 
         <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
           <img src="static/assets/admin/img/profile-img.jpg" alt="Profile" class="rounded-circle">
-          <span class="d-none d-md-block dropdown-toggle ps-2">K. Anderson</span>
-        </a><!-- End Profile Iamge Icon -->
+          <span class="d-none d-md-block dropdown-toggle ps-2">{{ .username }}</span>
+        </a><!-- End Profile Image Icon -->
 
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
           <li class="dropdown-header">
-            <h6>Kevin Anderson</h6>
+            <h6>{{ .username }}</h6>
             <span>Web Designer</span>
           </li>
           <li>
@@ -227,7 +227,7 @@
 
     </ul>
   </nav> <!-- End Icons Navigation -->
-  */}}
+
 
   <script type="application/javascript">
     $(document.getElementById("logOutButton").addEventListener("click", () => {
