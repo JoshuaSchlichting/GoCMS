@@ -17,7 +17,6 @@
   </div><!-- End Search Bar -->
 
   <a id="loginButton" type="button" class="btn btn-primary" href="{{ .sign_in_url }}">Login</a>
-  <a id="logOutButton" type="button" class="btn btn-primary">Log out</a>
 
   <nav id="loggedInHeader" class="header-nav ms-auto">
     <ul class="d-flex align-items-center">
@@ -172,7 +171,7 @@
       <li class="nav-item dropdown pe-3">
 
         <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-          <img src="static/assets/admin/img/profile-img.jpg" alt="Profile" class="rounded-circle">
+          {{/* <img src="static/assets/admin/img/profile-img.jpg" alt="Profile" class="rounded-circle"> */}}
           <span class="d-none d-md-block dropdown-toggle ps-2">{{ .username }}</span>
         </a><!-- End Profile Image Icon -->
 
@@ -215,7 +214,7 @@
             <hr class="dropdown-divider">
           </li>
 
-          <li>
+          <li id="signOutBtn">
             <a class="dropdown-item d-flex align-items-center" href="#">
               <i class="bi bi-box-arrow-right"></i>
               <span>Sign Out</span>
@@ -230,7 +229,7 @@
 
 
   <script type="application/javascript">
-    $(document.getElementById("logOutButton").addEventListener("click", () => {
+    $(document.getElementById("signOutBtn").addEventListener("click", () => {
       deleteCookie("jwt");
       window.location.href = "/loggedout";
     }));
