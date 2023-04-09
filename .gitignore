@@ -3,3 +3,4 @@ __debug_bin
 .DS_Store
 launch.sh
 .vscode/
+config.yml
