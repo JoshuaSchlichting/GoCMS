@@ -8,7 +8,7 @@ import (
 	"html/template"
 	"io"
 
-	"github.com/joshuaschlichting/gocms/templates/components"
+	"github.com/joshuaschlichting/gocms/templates/admin/components"
 
 	"bytes"
 	"strings"
