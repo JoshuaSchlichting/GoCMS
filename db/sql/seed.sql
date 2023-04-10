@@ -65,3 +65,9 @@ values
         current_timestamp
     )
 ;
+
+INSERT INTO public.message (id, to_id, subject, message, created_at, updated_at, from_id)
+VALUES
+('123e4567-e89b-12d3-a456-426655440000', '123e4567-e89b-12d3-a456-426655440001', 'Sample Subject 1', 'This is a sample message 1', current_timestamp, current_timestamp, '123e4567-e89b-12d3-a456-426655440002'),
+('123e4567-e89b-12d3-a456-426655440003', '123e4567-e89b-12d3-a456-426655440004', 'Sample Subject 2', 'This is a sample message 2', current_timestamp, current_timestamp, '123e4567-e89b-12d3-a456-426655440005'),
+('123e4567-e89b-12d3-a456-426655440006', '123e4567-e89b-12d3-a456-426655440007', 'Sample Subject 3', 'This is a sample message 3', current_timestamp, current_timestamp, '123e4567-e89b-12d3-a456-426655440008');

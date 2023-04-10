@@ -513,13 +513,65 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 			}
 		})
 
-		r.Get("/messages", func(w http.ResponseWriter, r *http.Request) {
+		r.Get("/inbox", func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
-			err := tmpl.ExecuteTemplate(w, "index", map[string]interface{}{
-				"SecureText": "messages",
-			})
+			messages, err := queries.ListMessages(r.Context(), r.Context().Value(middleware.User).(db.User).ID)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			tmpl, err := template.New("messages").Parse(`
+			<!DOCTYPE html>
+			<html>
+			  <head>
+				<meta charset="utf-8">
+				<title>Messages</title>
+				<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+			  </head>
+			  <body>
+				<div class="container">
+				  <h1>Messages</h1>
+				  <table class="table">
+					<thead>
+					  <tr>
+						<th>ID</th>
+						<th>ToID</th>
+						<th>Subject</th>
+						<th>Message</th>
+						<th>CreatedAt</th>
+						<th>UpdatedAt</th>
+						<th>FromID</th>
+					  </tr>
+					</thead>
+					<tbody>
+					  {{range .}}
+					  <tr>
+						<td>{{.ID}}</td>
+						<td>{{.ToID}}</td>
+						<td>{{.Subject}}</td>
+						<td>{{.Message}}</td>
+						<td>{{.CreatedAt}}</td>
+						<td>{{.UpdatedAt}}</td>
+						<td>{{.FromID}}</td>
+					  </tr>
+					  {{end}}
+					</tbody>
+				  </table>
+				</div>
+			  </body>
+			</html>
+			`)
+
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			err = tmpl.Execute(w, messages)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
 			}
 		})
 

@@ -8,6 +8,7 @@ package db
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -230,6 +231,57 @@ func (q *Queries) ListFiles(ctx context.Context) ([]File, error) {
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.OwnerID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listMessages = `-- name: ListMessages :many
+select
+  id,
+  from_id,
+  subject,
+  message,
+  created_at,
+  updated_at
+from public.message
+where to_id = $1
+`
+
+type ListMessagesRow struct {
+	ID        uuid.UUID `json:"id"`
+	FromID    uuid.UUID `json:"from_id"`
+	Subject   string    `json:"subject"`
+	Message   string    `json:"message"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+func (q *Queries) ListMessages(ctx context.Context, toID uuid.UUID) ([]ListMessagesRow, error) {
+	rows, err := q.db.QueryContext(ctx, listMessages, toID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListMessagesRow
+	for rows.Next() {
+		var i ListMessagesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.FromID,
+			&i.Subject,
+			&i.Message,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
