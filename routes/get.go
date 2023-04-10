@@ -536,24 +536,22 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 					<thead>
 					  <tr>
 						<th>ID</th>
-						<th>ToID</th>
+						<th>FromID</th>
 						<th>Subject</th>
 						<th>Message</th>
 						<th>CreatedAt</th>
 						<th>UpdatedAt</th>
-						<th>FromID</th>
 					  </tr>
 					</thead>
 					<tbody>
 					  {{range .}}
 					  <tr>
 						<td>{{.ID}}</td>
-						<td>{{.ToID}}</td>
+						<td>{{.FromID}}</td>
 						<td>{{.Subject}}</td>
 						<td>{{.Message}}</td>
 						<td>{{.CreatedAt}}</td>
 						<td>{{.UpdatedAt}}</td>
-						<td>{{.FromID}}</td>
 					  </tr>
 					  {{end}}
 					</tbody>
