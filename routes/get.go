@@ -572,7 +572,53 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 				return
 			}
 		})
+		r.Get("/compose_msg", func(w http.ResponseWriter, r *http.Request) {
+			// Define a template string for the message form
+			const formTemplate = `
+				<!DOCTYPE html>
+				<html>
+				  <head>
+					<meta charset="utf-8">
+					<title>Compose Message</title>
+					<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+				  </head>
+				  <body>
+					<div class="container">
+					  <h1>Compose Message</h1>
+					  <form method="POST" action="/send_message">
+						<div class="form-group">
+						  <label for="to_id">To:</label>
+						  <input type="text" class="form-control" id="to_id" name="to_id" placeholder="Enter recipient's ID">
+						</div>
+						<div class="form-group">
+						  <label for="subject">Subject:</label>
+						  <input type="text" class="form-control" id="subject" name="subject" placeholder="Enter subject">
+						</div>
+						<div class="form-group">
+						  <label for="message">Message:</label>
+						  <textarea class="form-control" id="message" name="message" rows="5" placeholder="Enter message"></textarea>
+						</div>
+						<button type="submit" class="btn btn-primary">Send</button>
+					  </form>
+					</div>
+				  </body>
+				</html>
+			`
 
+			// Parse the template string
+			tmpl, err := template.New("composeMessage").Parse(formTemplate)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			// Execute the template to render the form
+			err = tmpl.Execute(w, nil)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		})
 	})
 
 }
