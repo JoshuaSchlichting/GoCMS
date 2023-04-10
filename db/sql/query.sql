@@ -102,6 +102,12 @@ SELECT * FROM public.organization
 ORDER BY name;
 
 -- name: ListMessages :many
-select *
+select
+  id,
+  from_id,
+  subject,
+  message,
+  created_at,
+  updated_at
 from public.message
 where to_id = $1;

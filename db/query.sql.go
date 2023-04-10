@@ -8,6 +8,7 @@ package db
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -245,28 +246,42 @@ func (q *Queries) ListFiles(ctx context.Context) ([]File, error) {
 }
 
 const listMessages = `-- name: ListMessages :many
-select id, to_id, subject, message, created_at, updated_at, from_id
+select
+  id,
+  from_id,
+  subject,
+  message,
+  created_at,
+  updated_at
 from public.message
 where to_id = $1
 `
 
-func (q *Queries) ListMessages(ctx context.Context, toID uuid.UUID) ([]Message, error) {
+type ListMessagesRow struct {
+	ID        uuid.UUID `json:"id"`
+	FromID    uuid.UUID `json:"from_id"`
+	Subject   string    `json:"subject"`
+	Message   string    `json:"message"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+func (q *Queries) ListMessages(ctx context.Context, toID uuid.UUID) ([]ListMessagesRow, error) {
 	rows, err := q.db.QueryContext(ctx, listMessages, toID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Message
+	var items []ListMessagesRow
 	for rows.Next() {
-		var i Message
+		var i ListMessagesRow
 		if err := rows.Scan(
 			&i.ID,
-			&i.ToID,
+			&i.FromID,
 			&i.Subject,
 			&i.Message,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.FromID,
 		); err != nil {
 			return nil, err
 		}

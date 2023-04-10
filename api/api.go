@@ -2,6 +2,7 @@ package api
 
 import (
 	"html/template"
+	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/joshuaschlichting/gocms/config"
@@ -14,11 +15,12 @@ type filesystem interface {
 }
 
 type API struct {
-	tmpl   *template.Template
-	config *config.Config
-	data   db.Queries
-	fs     filesystem
-	router *chi.Mux
+	tmpl       *template.Template
+	config     *config.Config
+	data       db.Queries
+	fs         filesystem
+	router     *chi.Mux
+	middleware map[string]func(http.Handler) http.Handler
 }
 
 func InitAPI(r *chi.Mux, tmpl *template.Template, config *config.Config, data db.Queries, fs filesystem) *API {
@@ -30,5 +32,6 @@ func InitAPI(r *chi.Mux, tmpl *template.Template, config *config.Config, data db
 		router: r,
 	}
 	api.initPostRoutes()
+	api.initGetRoutes()
 	return api
 }
