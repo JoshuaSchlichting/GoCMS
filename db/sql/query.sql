@@ -100,3 +100,8 @@ where user_id = @user_id::uuid and usergroup.name = @usergroup_name::text;
 -- name: ListOrganizations :many
 SELECT * FROM public.organization
 ORDER BY name;
+
+-- name: ListMessages :many
+select *
+from public.message
+where to_id = $1;

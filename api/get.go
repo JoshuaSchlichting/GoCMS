@@ -20,6 +20,17 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 		r.Use(middleware.AuthenticateJWT)
 		r.Use(middlewareMap["addUserToCtx"])
 
+		r.Get("/messages", func(w http.ResponseWriter, r *http.Request) {
+			user := r.Context().Value(middleware.User).(db.User)
+
+			messages, err := queries.ListMessages(r.Context(), user.ID)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			tmpl.ExecuteTemplate(w, "messages.html", messages)
+		})
+
 	})
 
 }

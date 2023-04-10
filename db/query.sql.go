@@ -244,6 +244,43 @@ func (q *Queries) ListFiles(ctx context.Context) ([]File, error) {
 	return items, nil
 }
 
+const listMessages = `-- name: ListMessages :many
+select id, to_id, subject, message, created_at, updated_at, from_id
+from public.message
+where to_id = $1
+`
+
+func (q *Queries) ListMessages(ctx context.Context, toID uuid.UUID) ([]Message, error) {
+	rows, err := q.db.QueryContext(ctx, listMessages, toID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Message
+	for rows.Next() {
+		var i Message
+		if err := rows.Scan(
+			&i.ID,
+			&i.ToID,
+			&i.Subject,
+			&i.Message,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.FromID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listOrganizations = `-- name: ListOrganizations :many
 SELECT id, name, email, attributes, created_at, updated_at FROM public.organization
 ORDER BY name
