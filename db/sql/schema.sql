@@ -1,9 +1,7 @@
 
 create table if not exists public.organization
 (
-    id uuid not null
-        constraint organization_pk
-            primary key,
+    id uuid not null primary key,
     name text not null,
     email text not null,
     attributes jsonb not null,
@@ -13,12 +11,8 @@ create table if not exists public.organization
 
 create table if not exists public.user
 (
-    id uuid not null
-        constraint user_pk
-            primary key,
-    organization_id uuid
-        constraint user_organization_id_fk
-            references public.organization,
+    id uuid not null primary key,
+    organization_id uuid,
     name text not null unique,
     email text not null,
     attributes jsonb not null,
@@ -42,42 +36,28 @@ create table if not exists public.file
 
 create table if not exists public.message
 (
-    id uuid not null
-        constraint messages_pk
-            primary key,
-    to_id uuid not null
-        constraint messages_to_fk
-            references public.user,
+    id uuid not null primary key,
+    to_id uuid not null,
     subject text not null,
     message text not null,
     created_at timestamp not null default current_timestamp,
     updated_at timestamp not null default current_timestamp,
     from_id uuid not null
-        constraint messages_user_id_fk
-            references public.user
 );
 
 create table if not exists public.invoice
 (
-    id uuid not null
-        constraint invoice_pk
-            primary key,
+    id uuid not null primary key,
     amount float not null,
     created_at timestamp not null default current_timestamp,
     updated_at timestamp not null default current_timestamp,
-    user_id uuid not null
-        constraint invoice_user_id_fk
-            references public.user,
+    user_id uuid not null,
     orgnaization_id uuid not null
-        constraint invoice_orgnaization_id_fk
-            references public.organization
 );
 
 create table if not exists public.usergroup
 (
-    id uuid not null
-        constraint usergroup_pk
-            primary key,
+    id uuid not null primary key,
     name text not null,
     email text not null,
     attributes jsonb not null,
@@ -87,37 +67,25 @@ create table if not exists public.usergroup
 
 create table if not exists public.user_usergroup
 (
-    user_id uuid not null
-        constraint user_usergroup_user_id_fk
-            references public.user,
-    usergroup_id uuid not null
-        constraint user_usergroup_usergroup_id_fk
-            references public.usergroup,
+    user_id uuid not null,
+    usergroup_id uuid not null,
     created_at timestamp not null default current_timestamp,
     updated_at timestamp not null default current_timestamp,
-    constraint user_usergroup_pk
-        primary key (user_id, usergroup_id)
+    primary key (user_id, usergroup_id)
 );
 
 create table if not exists public.usergroup_organization
 (
-    usergroup_id uuid not null
-        constraint usergroup_organization_usergroup_id_fk
-            references public.usergroup,
-    organization_id uuid not null
-        constraint usergroup_organization_organization_id_fk
-            references public.organization,
+    usergroup_id uuid not null,
+    organization_id uuid not null,
     created_at timestamp not null default current_timestamp,
     updated_at timestamp not null default current_timestamp,
-    constraint usergroup_organization_pk
-        primary key (usergroup_id, organization_id)
+    primary key (usergroup_id, organization_id)
 );
 
 create table if not exists public.permission_attribute
 (
-    id uuid not null
-        constraint permission_attribute_pk
-            primary key,
+    id uuid not null primary key,
     name text not null,
     created_at timestamp not null default current_timestamp,
     updated_at timestamp not null default current_timestamp
@@ -125,37 +93,25 @@ create table if not exists public.permission_attribute
 
 create table if not exists public.usergroup_permission_attribute
 (
-    usergroup_id uuid not null
-        constraint usergroup_permission_attribute_usergroup_id_fk
-            references public.usergroup,
-    permission_attribute_id uuid not null
-        constraint usergroup_permission_attribute_permission_attribute_id_fk
-            references public.permission_attribute,
+    usergroup_id uuid not null,
+    permission_attribute_id uuid not null,
     created_at timestamp not null default current_timestamp,
     updated_at timestamp not null default current_timestamp,
-    constraint usergroup_permission_attribute_pk
-        primary key (usergroup_id, permission_attribute_id)
+    primary key (usergroup_id, permission_attribute_id)
 );
 
 create table if not exists public.user_permission_attribute
 (
-    user_id uuid not null
-        constraint user_permission_attribute_user_id_fk
-            references public.user,
-    permission_attribute_id uuid not null
-        constraint user_permission_attribute_permission_attribute_id_fk
-            references public.permission_attribute,
+    user_id uuid not null,
+    permission_attribute_id uuid not null,
     created_at timestamp not null default current_timestamp,
     updated_at timestamp not null default current_timestamp,
-    constraint user_permission_attribute_pk
-        primary key (user_id, permission_attribute_id)
+    primary key (user_id, permission_attribute_id)
 );
 
 create table if not exists public.filegroup
 (
-    id uuid not null
-        constraint file_group_pk
-            primary key,
+    id uuid not null primary key,
     name text not null,
     created_at timestamp not null default current_timestamp,
     updated_at timestamp not null default current_timestamp
@@ -163,14 +119,9 @@ create table if not exists public.filegroup
 
 create table if not exists public.file_filegroup
 (
-    file_id uuid not null
-        constraint file_filegroup_file_id_fk
-            references public.file,
-    filegroup_id uuid not null
-        constraint file_filegroup_filegroup_id_fk
-            references public.filegroup,
+    file_id uuid not null,
+    filegroup_id uuid not null,
     created_at timestamp not null default current_timestamp,
     updated_at timestamp not null default current_timestamp,
-    constraint file_filegroup_pk
-        primary key (file_id, filegroup_id)
+    primary key (file_id, filegroup_id)
 );
