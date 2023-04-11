@@ -498,6 +498,7 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 				"SecureText":  username,
 				"sign_in_url": config.Auth.SignInUrl,
 				"username":    r.Context().Value(middleware.User).(db.User).Name,
+				"user_id":     r.Context().Value(middleware.User).(db.User).ID.String(),
 			})
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
