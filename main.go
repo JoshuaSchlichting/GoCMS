@@ -19,7 +19,6 @@ import (
 	database "github.com/joshuaschlichting/gocms/db"
 	"github.com/joshuaschlichting/gocms/filesystem"
 	"github.com/joshuaschlichting/gocms/middleware"
-	"github.com/joshuaschlichting/gocms/routes"
 	_ "github.com/lib/pq"
 )
 
@@ -78,7 +77,7 @@ func main() {
 	fs := filesystem.NewLocalFilesystem(gocmsPath)
 
 	// Register routes
-	routes.InitGetRoutes(r, templ, config, *queries, middlewareMap)
+	initRoutes(r, templ, config, *queries, middlewareMap)
 	api.InitAPI(r, templ, config, *queries, fs)
 
 	if err := listenServe(addr, r); err != nil {
