@@ -8,7 +8,6 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 	"github.com/joshuaschlichting/gocms/db"
-	"github.com/joshuaschlichting/gocms/middleware"
 )
 
 func (a *API) initPostRoutes() {
@@ -201,24 +200,7 @@ func (a *API) initPostRoutes() {
 				log.Printf("error deleting user group: %v", err)
 			}
 		})
-		r.Post("/message", func(w http.ResponseWriter, r *http.Request) {
-			r.ParseForm()
-			// get user id
-			log.Printf("form: %v", r.Form)
-			params := db.CreateMessageParams{
-				ID:         uuid.New(),
-				FromID:     r.Context().Value(middleware.User).(db.User).ID,
-				Subject:    r.FormValue("Subject"),
-				ToUsername: r.FormValue("ToUsername"),
-				Message:    r.FormValue("Message"),
-			}
 
-			newMessage, err := a.data.CreateMessage(r.Context(), params)
-			if err != nil {
-				log.Printf("error creating message: %v", err)
-			}
-			log.Println(newMessage)
-		})
 	})
 }
 

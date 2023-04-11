@@ -577,7 +577,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 			// Define a template string for the message form
 
 			presentor := presentation.NewPresentor(tmpl, w)
-			presentor.CreateItemFormHTML("compose_msg_form", "Compose Message", "/api/message", "/inbox", []presentation.FormField{
+			presentor.CreateItemFormHTML("compose_msg_form", "Compose Message", "/message", "/inbox", []presentation.FormField{
 				{
 					Name:  "ToUsername",
 					Type:  "text",
@@ -611,7 +611,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 					<thead>
 					  <tr>
 						<th>ID</th>
-						<th>ToID</th>
+						<th>To</th>
 						<th>Subject</th>
 						<th>Message</th>
 						<th>CreatedAt</th>
@@ -622,7 +622,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 					  {{range .}}
 					  <tr>
 						<td>{{.ID}}</td>
-						<td>{{.ToID}}</td>
+						<td>{{.ToUsername}}</td>
 						<td>{{.Subject}}</td>
 						<td>{{.Message}}</td>
 						<td>{{.CreatedAt}}</td>
@@ -646,6 +646,29 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
+		})
+
+		r.Post("/message", func(w http.ResponseWriter, r *http.Request) {
+			r.ParseForm()
+			// get user id
+			log.Printf("form: %v", r.Form)
+			userID := r.Context().Value(middleware.User).(db.User).ID
+			if userID == uuid.Nil {
+				log.Printf("error getting user id")
+			}
+			params := db.CreateMessageParams{
+				ID:         uuid.New(),
+				FromID:     userID,
+				Subject:    r.FormValue("Subject"),
+				ToUsername: r.FormValue("ToUsername"),
+				Message:    r.FormValue("Message"),
+			}
+
+			newMessage, err := queries.CreateMessage(r.Context(), params)
+			if err != nil {
+				log.Printf("error creating message: %v", err)
+			}
+			log.Println(newMessage)
 		})
 	})
 }
