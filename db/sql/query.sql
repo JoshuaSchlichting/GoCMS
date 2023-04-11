@@ -101,7 +101,7 @@ where user_id = @user_id::uuid and usergroup.name = @usergroup_name::text;
 SELECT * FROM public.organization
 ORDER BY name;
 
--- name: ListMessages :many
+-- name: ListMessagesTo :many
 select
   id,
   from_id,
@@ -110,4 +110,23 @@ select
   created_at,
   updated_at
 from public.message
-where to_id = $1;
+where to_username = $1;
+
+-- name: ListMessagesFrom :many
+select
+  id,
+  to_username,
+  subject,
+  message,
+  created_at,
+  updated_at
+from public.message
+where from_id = $1;
+
+-- name: CreateMessage :one
+insert into public.message (
+  id, to_username, subject, message, created_at, updated_at, from_id
+) values (
+  $1, $2, $3, $4, current_timestamp, current_timestamp, $5
+)
+returning *;

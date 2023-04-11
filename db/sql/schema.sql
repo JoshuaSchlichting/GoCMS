@@ -37,7 +37,7 @@ create table if not exists public.file
 create table if not exists public.message
 (
     id uuid not null primary key,
-    to_id uuid not null,
+    to_username text not null,
     subject text not null,
     message text not null,
     created_at timestamp not null default current_timestamp,

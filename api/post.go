@@ -201,7 +201,6 @@ func (a *API) initPostRoutes() {
 			}
 		})
 
-		r.Post("/upload_file", a.UploadFileHandler)
 	})
 }
 

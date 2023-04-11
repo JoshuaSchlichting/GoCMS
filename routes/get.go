@@ -515,7 +515,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 
 		r.Get("/inbox", func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
-			messages, err := queries.ListMessages(r.Context(), r.Context().Value(middleware.User).(db.User).ID)
+			messages, err := queries.ListMessagesTo(r.Context(), r.Context().Value(middleware.User).(db.User).Name)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
@@ -573,8 +573,104 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 			}
 		})
 
-	})
+		r.Get("/compose_msg", func(w http.ResponseWriter, r *http.Request) {
+			// Define a template string for the message form
 
+			presentor := presentation.NewPresentor(tmpl, w)
+			presentor.CreateItemFormHTML("compose_msg_form", "Compose Message", "/message", "/inbox", []presentation.FormField{
+				{
+					Name:  "ToUsername",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Subject",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Message",
+					Type:  "text",
+					Value: "",
+				},
+			})
+		})
+
+		r.Get("/sent_messages", func(w http.ResponseWriter, r *http.Request) {
+			userID := r.Context().Value(middleware.User).(db.User).ID
+			messages, err := queries.ListMessagesFrom(r.Context(), userID)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			tmpl, err := template.New("messages").Parse(`
+				<div class="container">
+				  <h1>Sent Messages</h1>
+				  <table class="table">
+					<thead>
+					  <tr>
+						<th>ID</th>
+						<th>To</th>
+						<th>Subject</th>
+						<th>Message</th>
+						<th>CreatedAt</th>
+						<th>UpdatedAt</th>
+					  </tr>
+					</thead>
+					<tbody>
+					  {{range .}}
+					  <tr>
+						<td>{{.ID}}</td>
+						<td>{{.ToUsername}}</td>
+						<td>{{.Subject}}</td>
+						<td>{{.Message}}</td>
+						<td>{{.CreatedAt}}</td>
+						<td>{{.UpdatedAt}}</td>
+					  </tr>
+					  {{end}}
+					</tbody>
+				  </table>
+				</div>
+			  </body>
+			</html>
+			`)
+
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			err = tmpl.Execute(w, messages)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		})
+
+		r.Post("/message", func(w http.ResponseWriter, r *http.Request) {
+			r.ParseForm()
+			// get user id
+			log.Printf("form: %v", r.Form)
+			userID := r.Context().Value(middleware.User).(db.User).ID
+			if userID == uuid.Nil {
+				log.Printf("error getting user id")
+			}
+			params := db.CreateMessageParams{
+				ID:         uuid.New(),
+				FromID:     userID,
+				Subject:    r.FormValue("Subject"),
+				ToUsername: r.FormValue("ToUsername"),
+				Message:    r.FormValue("Message"),
+			}
+
+			newMessage, err := queries.CreateMessage(r.Context(), params)
+			if err != nil {
+				log.Printf("error creating message: %v", err)
+			}
+			log.Println(newMessage)
+		})
+	})
 }
 
 var mainHtml = template.HTML(`

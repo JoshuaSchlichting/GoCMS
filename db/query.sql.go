@@ -13,6 +13,44 @@ import (
 	"github.com/google/uuid"
 )
 
+const createMessage = `-- name: CreateMessage :one
+insert into public.message (
+  id, to_username, subject, message, created_at, updated_at, from_id
+) values (
+  $1, $2, $3, $4, current_timestamp, current_timestamp, $5
+)
+returning id, to_username, subject, message, created_at, updated_at, from_id
+`
+
+type CreateMessageParams struct {
+	ID         uuid.UUID `json:"id"`
+	ToUsername string    `json:"to_username"`
+	Subject    string    `json:"subject"`
+	Message    string    `json:"message"`
+	FromID     uuid.UUID `json:"from_id"`
+}
+
+func (q *Queries) CreateMessage(ctx context.Context, arg CreateMessageParams) (Message, error) {
+	row := q.db.QueryRowContext(ctx, createMessage,
+		arg.ID,
+		arg.ToUsername,
+		arg.Subject,
+		arg.Message,
+		arg.FromID,
+	)
+	var i Message
+	err := row.Scan(
+		&i.ID,
+		&i.ToUsername,
+		&i.Subject,
+		&i.Message,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.FromID,
+	)
+	return i, err
+}
+
 const createOrganization = `-- name: CreateOrganization :one
 insert into public.organization (
     id, name, email, attributes, created_at, updated_at
@@ -245,7 +283,58 @@ func (q *Queries) ListFiles(ctx context.Context) ([]File, error) {
 	return items, nil
 }
 
-const listMessages = `-- name: ListMessages :many
+const listMessagesFrom = `-- name: ListMessagesFrom :many
+select
+  id,
+  to_username,
+  subject,
+  message,
+  created_at,
+  updated_at
+from public.message
+where from_id = $1
+`
+
+type ListMessagesFromRow struct {
+	ID         uuid.UUID `json:"id"`
+	ToUsername string    `json:"to_username"`
+	Subject    string    `json:"subject"`
+	Message    string    `json:"message"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
+}
+
+func (q *Queries) ListMessagesFrom(ctx context.Context, fromID uuid.UUID) ([]ListMessagesFromRow, error) {
+	rows, err := q.db.QueryContext(ctx, listMessagesFrom, fromID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListMessagesFromRow
+	for rows.Next() {
+		var i ListMessagesFromRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ToUsername,
+			&i.Subject,
+			&i.Message,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listMessagesTo = `-- name: ListMessagesTo :many
 select
   id,
   from_id,
@@ -254,10 +343,10 @@ select
   created_at,
   updated_at
 from public.message
-where to_id = $1
+where to_username = $1
 `
 
-type ListMessagesRow struct {
+type ListMessagesToRow struct {
 	ID        uuid.UUID `json:"id"`
 	FromID    uuid.UUID `json:"from_id"`
 	Subject   string    `json:"subject"`
@@ -266,15 +355,15 @@ type ListMessagesRow struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func (q *Queries) ListMessages(ctx context.Context, toID uuid.UUID) ([]ListMessagesRow, error) {
-	rows, err := q.db.QueryContext(ctx, listMessages, toID)
+func (q *Queries) ListMessagesTo(ctx context.Context, toUsername string) ([]ListMessagesToRow, error) {
+	rows, err := q.db.QueryContext(ctx, listMessagesTo, toUsername)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListMessagesRow
+	var items []ListMessagesToRow
 	for rows.Next() {
-		var i ListMessagesRow
+		var i ListMessagesToRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.FromID,
