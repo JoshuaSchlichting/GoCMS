@@ -515,7 +515,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 
 		r.Get("/inbox", func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
-			messages, err := queries.ListMessages(r.Context(), r.Context().Value(middleware.User).(db.User).ID)
+			messages, err := queries.ListMessagesTo(r.Context(), r.Context().Value(middleware.User).(db.User).Name)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
@@ -572,89 +572,82 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 				return
 			}
 		})
+
 		r.Get("/compose_msg", func(w http.ResponseWriter, r *http.Request) {
 			// Define a template string for the message form
-			const formTemplate = `
-				<!DOCTYPE html>
-				<html>
-				  <head>
-					<meta charset="utf-8">
-					<title>Compose Message</title>
-					<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-				  </head>
-				  <body>
-					<div class="container">
-					  <h1>Compose Message</h1>
-					  <form method="POST" action="/send_message">
-						<div class="form-group">
-						  <label for="to_username">To:</label>
-						  <input type="text" class="form-control" id="to_username" name="to_username" placeholder="Enter recipient's username">
-						</div>
-						<div class="form-group">
-						  <label for="subject">Subject:</label>
-						  <input type="text" class="form-control" id="subject" name="subject" placeholder="Enter subject">
-						</div>
-						<div class="form-group">
-						  <label for="message">Message:</label>
-						  <textarea class="form-control" id="message" name="message" rows="5" placeholder="Enter message"></textarea>
-						</div>
-						<button type="submit" class="btn btn-primary">Send</button>
-					  </form>
-					</div>
-				  </body>
-				</html>
-			`
 
-			// Parse the template string
-			tmpl, err := template.New("composeMessage").Parse(formTemplate)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-
-			// Execute the template to render the form
-			err = tmpl.Execute(w, nil)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
+			presentor := presentation.NewPresentor(tmpl, w)
+			presentor.CreateItemFormHTML("compose_msg_form", "Compose Message", "/api/message", "/inbox", []presentation.FormField{
+				{
+					Name:  "ToUsername",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Subject",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "Message",
+					Type:  "text",
+					Value: "",
+				},
+			})
 		})
 
-		r.Post("/send_message", func(w http.ResponseWriter, r *http.Request) {
-			// Parse the form values
-			err := r.ParseForm()
+		r.Get("/sent_messages", func(w http.ResponseWriter, r *http.Request) {
+			userID := r.Context().Value(middleware.User).(db.User).ID
+			messages, err := queries.ListMessagesFrom(r.Context(), userID)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
 
-			// Get the recipient's username from the form values
-			toUsername := r.PostFormValue("to_username")
+			tmpl, err := template.New("messages").Parse(`
+				<div class="container">
+				  <h1>Messages</h1>
+				  <table class="table">
+					<thead>
+					  <tr>
+						<th>ID</th>
+						<th>ToID</th>
+						<th>Subject</th>
+						<th>Message</th>
+						<th>CreatedAt</th>
+						<th>UpdatedAt</th>
+					  </tr>
+					</thead>
+					<tbody>
+					  {{range .}}
+					  <tr>
+						<td>{{.ID}}</td>
+						<td>{{.ToID}}</td>
+						<td>{{.Subject}}</td>
+						<td>{{.Message}}</td>
+						<td>{{.CreatedAt}}</td>
+						<td>{{.UpdatedAt}}</td>
+					  </tr>
+					  {{end}}
+					</tbody>
+				  </table>
+				</div>
+			  </body>
+			</html>
+			`)
 
-			// Get the user ID of the sender
-			fromUserID := r.Context().Value(middleware.User).(db.User).ID
-
-			// Get the subject and message from the form values
-			subject := r.PostFormValue("subject")
-			message := r.PostFormValue("message")
-
-			// Create a new message
-			_, err = queries.CreateMessage(r.Context(), db.CreateMessageParams{
-				FromID:     fromUserID,
-				ToUsername: toUsername,
-				Subject:    subject,
-				Message:    message,
-			})
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
 
-			// Redirect the user to the inbox page
-			http.Redirect(w, r, "/inbox", http.StatusSeeOther)
+			err = tmpl.Execute(w, messages)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 		})
 	})
-
 }
 
 var mainHtml = template.HTML(`

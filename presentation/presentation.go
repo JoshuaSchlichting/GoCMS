@@ -227,6 +227,7 @@ func (p *Presentor) DeleteItemFormHTML(formID, formTitle, apiEndpoint, refreshUR
 	return err
 }
 
+
 func getSubmitResetButtonDiv() string {
 	return `
 		<div class="text-center">
