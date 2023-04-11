@@ -606,7 +606,7 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 
 			tmpl, err := template.New("messages").Parse(`
 				<div class="container">
-				  <h1>Messages</h1>
+				  <h1>Sent Messages</h1>
 				  <table class="table">
 					<thead>
 					  <tr>
