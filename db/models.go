@@ -44,13 +44,13 @@ type Invoice struct {
 }
 
 type Message struct {
-	ID        uuid.UUID `json:"id"`
-	ToID      uuid.UUID `json:"to_id"`
-	Subject   string    `json:"subject"`
-	Message   string    `json:"message"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	FromID    uuid.UUID `json:"from_id"`
+	ID         uuid.UUID `json:"id"`
+	ToUsername string    `json:"to_username"`
+	Subject    string    `json:"subject"`
+	Message    string    `json:"message"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
+	FromID     uuid.UUID `json:"from_id"`
 }
 
 type Organization struct {

@@ -13,6 +13,44 @@ import (
 	"github.com/google/uuid"
 )
 
+const createMessage = `-- name: CreateMessage :one
+insert into public.message (
+  id, to_username, subject, message, created_at, updated_at, from_id
+) values (
+  $1, $2, $3, $4, current_timestamp, current_timestamp, $5
+)
+returning id, to_username, subject, message, created_at, updated_at, from_id
+`
+
+type CreateMessageParams struct {
+	ID         uuid.UUID `json:"id"`
+	ToUsername string    `json:"to_username"`
+	Subject    string    `json:"subject"`
+	Message    string    `json:"message"`
+	FromID     uuid.UUID `json:"from_id"`
+}
+
+func (q *Queries) CreateMessage(ctx context.Context, arg CreateMessageParams) (Message, error) {
+	row := q.db.QueryRowContext(ctx, createMessage,
+		arg.ID,
+		arg.ToUsername,
+		arg.Subject,
+		arg.Message,
+		arg.FromID,
+	)
+	var i Message
+	err := row.Scan(
+		&i.ID,
+		&i.ToUsername,
+		&i.Subject,
+		&i.Message,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.FromID,
+	)
+	return i, err
+}
+
 const createOrganization = `-- name: CreateOrganization :one
 insert into public.organization (
     id, name, email, attributes, created_at, updated_at
@@ -254,7 +292,7 @@ select
   created_at,
   updated_at
 from public.message
-where to_id = $1
+where to_username = $1
 `
 
 type ListMessagesRow struct {
@@ -266,8 +304,8 @@ type ListMessagesRow struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func (q *Queries) ListMessages(ctx context.Context, toID uuid.UUID) ([]ListMessagesRow, error) {
-	rows, err := q.db.QueryContext(ctx, listMessages, toID)
+func (q *Queries) ListMessages(ctx context.Context, toUsername string) ([]ListMessagesRow, error) {
+	rows, err := q.db.QueryContext(ctx, listMessages, toUsername)
 	if err != nil {
 		return nil, err
 	}

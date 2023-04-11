@@ -587,8 +587,8 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 					  <h1>Compose Message</h1>
 					  <form method="POST" action="/send_message">
 						<div class="form-group">
-						  <label for="to_id">To:</label>
-						  <input type="text" class="form-control" id="to_id" name="to_id" placeholder="Enter recipient's ID">
+						  <label for="to_username">To:</label>
+						  <input type="text" class="form-control" id="to_username" name="to_username" placeholder="Enter recipient's username">
 						</div>
 						<div class="form-group">
 						  <label for="subject">Subject:</label>
@@ -618,6 +618,40 @@ func InitGetRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, q
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
+		})
+
+		r.Post("/send_message", func(w http.ResponseWriter, r *http.Request) {
+			// Parse the form values
+			err := r.ParseForm()
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			// Get the recipient's username from the form values
+			toUsername := r.PostFormValue("to_username")
+
+			// Get the user ID of the sender
+			fromUserID := r.Context().Value(middleware.User).(db.User).ID
+
+			// Get the subject and message from the form values
+			subject := r.PostFormValue("subject")
+			message := r.PostFormValue("message")
+
+			// Create a new message
+			_, err = queries.CreateMessage(r.Context(), db.CreateMessageParams{
+				FromID:     fromUserID,
+				ToUsername: toUsername,
+				Subject:    subject,
+				Message:    message,
+			})
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			// Redirect the user to the inbox page
+			http.Redirect(w, r, "/inbox", http.StatusSeeOther)
 		})
 	})
 
