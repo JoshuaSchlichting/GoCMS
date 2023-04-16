@@ -1,7 +1,6 @@
 package filesystem
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -39,10 +38,7 @@ func TestLocalFilesystem_GetFileContents(t *testing.T) {
 
 func TestLocalFilesystem_ListDir(t *testing.T) {
 	// Create a temporary directory
-	tempDir, err := ioutil.TempDir("", "test")
-	if err != nil {
-		t.Fatalf("failed to create temp dir: %v", err)
-	}
+	tempDir := path.Join(os.TempDir(), "test")
 	defer os.RemoveAll(tempDir)
 
 	// Create some subdirectories and files
