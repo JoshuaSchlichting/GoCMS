@@ -37,13 +37,6 @@ func LoadQueriesFromFile(filename string) []string {
 }
 
 func DestroySchema(db *sql.DB) {
-	// drop all tables
-	// db.Exec("drop table public.file;")
-	// db.Exec("drop table public.user;")
-	// db.Exec("drop table public.message;")
-	// db.Exec("drop table public.invoice;")
-	// db.Exec("drop table public.organization;")
-	// db.Exec("drop table public.usergroup;")
 	dropTablesFromSQLFile(filepath.Join(getProjectDir(), "db", "sql", "schema.sql"), db)
 }
 
