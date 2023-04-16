@@ -1,5 +1,5 @@
 # GoCMS
-##### GoCMS is intended to be the boiler plate code you need to build a CMS without having too many dependencies outside of the Go standard library.
+##### GoCMS is intended to be the boiler plate code you need to build a CMS.
 ___
 
 ### Current state of development
