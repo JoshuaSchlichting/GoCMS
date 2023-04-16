@@ -3,7 +3,11 @@
 ___
 
 ### Current state of development
-GoCMS is in early stages of development and is not even close to being ready for production use. The code in this repository is not stable and will change rapidly over time.
+What is working:
+- Admin panel auth is working with AWS Cogntio.
+- `filesystem` package provides a working local filesystem and s3 filesystem of the same interface.
+- Dynamic HTML tables and forms are working.
+- Basic CRUD functionality is working with GUI interfaces, currently impelmented for the `user`, `organization`, and `user_group` tables.
 
 ### Dependencies
 - While the idea is to not have many dependencies, some things are still being imported. At the time of writing this, routing and JWT are handled by [Chi](https://github.com/go-chi/chi) (and they probably always will be).
