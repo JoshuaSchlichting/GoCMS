@@ -78,7 +78,7 @@ func (p *Presentor) EditListItemHTML(formID, formTitle, apiEndpoint, apiCallType
 		),
 		"FormID":     formID,
 		"RefreshURL": template.JS(refreshURL),
-		"ClickableTable": &components.ClickableTable{
+		"ClickableTable": &ClickableTable{
 			TableID:      template.JS(tableID),
 			Table:        dataMap,
 			CallbackFunc: template.JS("setItemInForm"),
@@ -166,7 +166,7 @@ func (p *Presentor) DeleteItemFormHTML(formID, formTitle, apiEndpoint, refreshUR
 		),
 		"FormID":     formID,
 		"RefreshURL": template.JS(refreshURL),
-		"ClickableTable": &components.ClickableTable{
+		"ClickableTable": &ClickableTable{
 			TableID:      template.JS(tableID),
 			Table:        dataMap,
 			CallbackFunc: template.JS("setItemInForm"),

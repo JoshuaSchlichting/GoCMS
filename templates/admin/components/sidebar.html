@@ -16,6 +16,33 @@
       </a>
     </li>
     <li class="nav-item">
+      <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#blog-post-center-nav" aria-expanded="false">
+        <i class="bi bi-file-post"></i>
+        <span>Blog Post Center</span>
+        <i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="blog-post-center-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="#" hx-get="published_posts" hx-target="#main" hx-swap="innerHTML">
+            <i class="bi bi-circle"></i>
+            <span>Published Posts</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" hx-get="draft_posts" hx-target="#main" hx-swap="innerHTML">
+            <i class="bi bi-circle"></i>
+            <span>Draft Posts</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" hx-get="new_post" hx-target="#main" hx-swap="innerHTML">
+            <i class="bi bi-circle"></i>
+            <span>New Post</span>
+          </a>
+        </li>
+      </ul>
+    </li>    
+    <li class="nav-item">
       <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#message-center-nav" aria-expanded="false">
         <i class="bi bi-chat-left-dots"></i>
         <span>Message Center</span>
