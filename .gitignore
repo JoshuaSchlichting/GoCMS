@@ -1,6 +1,7 @@
 bin/
 __debug_bin
 .DS_Store
+# A local launch script containing secrets
 launch.sh
 .vscode/
 config.yml
