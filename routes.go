@@ -649,6 +649,11 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 			}
 		})
 
+		r.Get("/new_blog_post", func(w http.ResponseWriter, r *http.Request) {
+			presentor := presentation.NewPresentor(tmpl, w)
+			presentor.CreateBlogHTML()
+		})
+
 		r.Post("/message", func(w http.ResponseWriter, r *http.Request) {
 			r.ParseForm()
 			// get user id

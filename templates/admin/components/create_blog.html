@@ -1,0 +1,44 @@
+{{ define "create_blog" }}
+<div class="container mt-5">
+    <h1 class="mb-4">Create New Blog Post</h1>
+    <form>
+        <div class="mb-3">
+            <label for="markdown-input" class="form-label">Blog Post Title:</label>
+            <textarea class="form-control" id="title-input" name="markdown-input" rows="1" cols="25"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="markdown-input" class="form-label">Blog Post Subtitle:</label>
+            <textarea class="form-control" id="subtitle-input" name="markdown-input" rows="2" cols="25"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="markdown-input" class="form-label">Enter Markdown:</label>
+            <textarea class="form-control" id="markdown-input" name="markdown-input" rows="10" cols="50"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="image-upload" class="form-label">Upload Image:</label>
+            <input class="form-control" type="file" id="image-upload" name="image-upload">
+        </div>
+        <button type="button" class="btn btn-primary mb-3" onclick="previewMarkdown()">Preview</button>
+    </form>
+    <div class="mb-3">
+        <label for="html-output" class="form-label">HTML Output:</label>
+        <div class="border rounded p-3" id="html-output"></div>
+    </div>
+    <div class="mb-3">
+        <label for="image-preview" class="form-label">Image Preview:</label>
+        <img class="img-thumbnail" id="image-preview" src="https://picsum.photos/300">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script type="text/javascript">
+    function previewMarkdown() {
+        const markdownInput = document.getElementById("markdown-input").value;
+        const htmlOutput = marked.parse(markdownInput);
+        document.getElementById("html-output").innerHTML = htmlOutput;
+    }
+    // add event listener to markdown-input for previewMarkdown()
+    document.getElementById("markdown-input").addEventListener("input", previewMarkdown);
+</script>
+
+{{ end }}
