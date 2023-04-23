@@ -11,23 +11,78 @@
             <textarea class="form-control" id="subtitle-input" name="markdown-input" rows="2" cols="25"></textarea>
         </div>
         <div class="mb-3">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Image Gallery</h5>
+                                <div class="scrollable-gallery">
+                                    <div class="row">
+                                        {{range .ImageURLs}}
+                                        <div class="col-md-4 mb-3">
+                                            <div class="image-wrapper">
+                                                <img class="img-fluid" src="{{.}}" onclick="showMarkdownCode('{{.}}')" />
+                                            </div>
+                                        </div>
+                                        {{end}}
+                                    </div>
+                                </div>
+                                <form enctype="multipart/form-data" action="/upload" method="POST">
+                                    <div class="form-group">
+                                        <label for="fileInput">Upload Images</label>
+                                        <input type="file" class="form-control-file" id="fileInput" name="file" multiple />
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Upload</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
             <label for="markdown-input" class="form-label">Enter Markdown:</label>
             <textarea class="form-control" id="markdown-input" name="markdown-input" rows="10" cols="50"></textarea>
         </div>
-        <div class="mb-3">
-            <label for="image-upload" class="form-label">Upload Image:</label>
-            <input class="form-control" type="file" id="image-upload" name="image-upload">
-        </div>
-        <button type="button" class="btn btn-primary mb-3" onclick="previewMarkdown()">Preview</button>
     </form>
     <div class="mb-3">
         <label for="html-output" class="form-label">HTML Output:</label>
         <div class="border rounded p-3" id="html-output"></div>
     </div>
-    <div class="mb-3">
-        <label for="image-preview" class="form-label">Image Preview:</label>
-        <img class="img-thumbnail" id="image-preview" src="https://picsum.photos/300">
+
+
+    <!-- Modal to show markdown code -->
+    <div class="modal fade" id="markdownModal" tabindex="-1" role="dialog" aria-labelledby="markdownModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="markdownModalLabel">Markdown Code</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input class="form-control" id="markdownCode" rows="1" readonly></input>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="copyMarkdown()">Copy to Clipboard</button>
+                </div>
+            </div>
+        </div>
     </div>
+    
+    <style>
+        .image-wrapper {
+            max-width: 90%;
+            height: auto;
+        }
+        
+        .scrollable-gallery {
+            height: 200px;
+            overflow-y: scroll;
+        }
+    </style>
     <button type="submit" class="btn btn-primary">Submit</button>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -39,6 +94,20 @@
     }
     // add event listener to markdown-input for previewMarkdown()
     document.getElementById("markdown-input").addEventListener("input", previewMarkdown);
+</script>
+<script type="text/javascript">
+    function showMarkdownCode(imageURL) {
+        const markdownCode = `![alt text](${imageURL})`;
+        document.getElementById("markdownCode").value = markdownCode;
+        $('#markdownModal').modal('show');
+    }
+
+    function copyMarkdown() {
+        const markdownCode = document.getElementById("markdownCode");
+        markdownCode.select();
+        markdownCode.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+    }
 </script>
 
 {{ end }}
