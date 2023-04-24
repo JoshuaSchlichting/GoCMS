@@ -698,6 +698,7 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 				log.Printf("error creating blog post: %v", err)
 			}
 			log.Println(newBlogPost)
+			w.Write([]byte("Blog post created! ID: " + newBlogPost.ID.String()))
 		})
 	})
 }
