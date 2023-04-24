@@ -95,10 +95,10 @@
         const htmlOutput = marked.parse(markdownInput);
         document.getElementById("html-output").innerHTML = htmlOutput;
     }
+
     // add event listener to markdown-input for previewMarkdown()
     document.getElementById("markdown-input").addEventListener("input", previewMarkdown);
-</script>
-<script type="text/javascript">
+
     function showMarkdownCode(imageURL) {
         const markdownCode = `![alt text](${imageURL})`;
         document.getElementById("markdownCode").value = markdownCode;
