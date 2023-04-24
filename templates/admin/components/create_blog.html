@@ -1,14 +1,14 @@
 {{ define "create_blog" }}
 <div class="container mt-5">
     <h1 class="mb-4">Create New Blog Post</h1>
-    <form>
+    <form hx-post="/create_blog_post">
         <div class="mb-3">
             <label for="markdown-input" class="form-label">Blog Post Title:</label>
-            <textarea class="form-control" id="title-input" name="markdown-input" rows="1" cols="25"></textarea>
+            <textarea class="form-control" id="title-input" name="Title" rows="1" cols="25" style="resize:none;"></textarea>
         </div>
         <div class="mb-3">
             <label for="markdown-input" class="form-label">Blog Post Subtitle:</label>
-            <textarea class="form-control" id="subtitle-input" name="markdown-input" rows="2" cols="25"></textarea>
+            <textarea class="form-control" id="subtitle-input" name="Subtitle" rows="2" cols="25" style="resize:none;"></textarea>
         </div>
         <div class="mb-3">
             <div class="container">
@@ -28,13 +28,7 @@
                                         {{end}}
                                     </div>
                                 </div>
-                                <form enctype="multipart/form-data" action="/upload" method="POST">
-                                    <div class="form-group">
-                                        <label for="fileInput">Upload Images</label>
-                                        <input type="file" class="form-control-file" id="fileInput" name="file" multiple />
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Upload</button>
-                                </form>
+
                             </div>
                         </div>
                     </div>
@@ -43,48 +37,60 @@
         </div>
         <div class="mb-3">
             <label for="markdown-input" class="form-label">Enter Markdown:</label>
-            <textarea class="form-control" id="markdown-input" name="markdown-input" rows="10" cols="50"></textarea>
+            <textarea class="form-control" id="markdown-input" name="Markdown" rows="10" cols="50"></textarea>
         </div>
+        <div class="mb-3">
+            <label for="html-output" class="form-label">Markdown Preview:</label>
+            <div class="border rounded p-3" id="html-output"></div>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Blog Post</button>    
     </form>
-    <div class="mb-3">
-        <label for="html-output" class="form-label">HTML Output:</label>
-        <div class="border rounded p-3" id="html-output"></div>
-    </div>
 
 
-    <!-- Modal to show markdown code -->
-    <div class="modal fade" id="markdownModal" tabindex="-1" role="dialog" aria-labelledby="markdownModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="markdownModalLabel">Markdown Code</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <input class="form-control" id="markdownCode" rows="1" readonly></input>
+    
+    <form enctype="multipart/form-data" action="/upload" method="POST">
+        <div class="form-group">
+            <label for="fileInput">Upload Images</label>
+            <input type="file" class="form-control-file" id="fileInput" name="File" multiple />
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+
+
+
+
+
+        <!-- Modal to show markdown code -->
+        <div class="modal fade" id="markdownModal" tabindex="-1" role="dialog" aria-labelledby="markdownModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="markdownModalLabel">Markdown Code</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                    <button type="button" class="btn btn-primary" onclick="copyMarkdown()" data-bs-dismiss="modal">Copy to Clipboard</button>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input class="form-control" id="markdownCode" rows="1" readonly></input>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="copyMarkdown()" data-bs-dismiss="modal">Copy to Clipboard</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <style>
-        .image-wrapper {
-            max-width: 90%;
-            height: auto;
-        }
-        
-        .scrollable-gallery {
-            height: 200px;
-            overflow-y: scroll;
-        }
-    </style>
-    <button type="submit" class="btn btn-primary">Submit</button>
 </div>
+<style>
+    .image-wrapper {
+        max-width: 90%;
+        height: auto;
+    }
+    
+    .scrollable-gallery {
+        height: 200px;
+        overflow-y: scroll;
+    }
+</style>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script type="text/javascript">
     function previewMarkdown() {
