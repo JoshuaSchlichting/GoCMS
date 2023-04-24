@@ -1,7 +1,7 @@
 {{ define "create_blog" }}
 <div class="container mt-5">
     <h1 class="mb-4">Create New Blog Post</h1>
-    <form hx-post="/create_blog_post">
+    <form hx-post="/blog_post">
         <div class="mb-3">
             <label for="markdown-input" class="form-label">Blog Post Title:</label>
             <textarea class="form-control" id="title-input" name="Title" rows="1" cols="25" style="resize:none;"></textarea>
@@ -37,7 +37,7 @@
         </div>
         <div class="mb-3">
             <label for="markdown-input" class="form-label">Enter Markdown:</label>
-            <textarea class="form-control" id="markdown-input" name="Markdown" rows="10" cols="50"></textarea>
+            <textarea class="form-control" id="markdown-input" name="Body" rows="10" cols="50"></textarea>
         </div>
         <div class="mb-3">
             <label for="html-output" class="form-label">Markdown Preview:</label>

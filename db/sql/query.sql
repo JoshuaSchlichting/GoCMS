@@ -130,3 +130,11 @@ insert into public.message (
   $1, $2, $3, $4, current_timestamp, current_timestamp, $5
 )
 returning *;
+
+-- name: CreateBlogPost :one
+insert into public.blog_post (
+  id, title, subtitle, body, author_id, created_at, updated_at
+) values (
+  $1, $2, $3, $4, $5, current_timestamp, current_timestamp
+)
+returning *;

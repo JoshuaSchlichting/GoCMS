@@ -676,5 +676,28 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 			}
 			log.Println(newMessage)
 		})
+
+		r.Post("/blog_post", func(w http.ResponseWriter, r *http.Request) {
+			r.ParseForm()
+			// get user id
+			log.Printf("form: %v", r.Form)
+			userID := r.Context().Value(middleware.User).(db.User).ID
+			if userID == uuid.Nil {
+				log.Printf("error getting user id")
+			}
+			params := db.CreateBlogPostParams{
+				ID:       uuid.New(),
+				Title:    r.FormValue("Title"),
+				Subtitle: r.FormValue("Subtitle"),
+				Body:     r.FormValue("Body"),
+				AuthorID: userID,
+			}
+
+			newBlogPost, err := queries.CreateBlogPost(r.Context(), params)
+			if err != nil {
+				log.Printf("error creating blog post: %v", err)
+			}
+			log.Println(newBlogPost)
+		})
 	})
 }
