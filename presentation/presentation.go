@@ -254,10 +254,7 @@ func generateForm(title string, fields []FormField, hxMethod, hxURL, idPrefix, b
 					{{.ButtonDiv}}
 				</form>
 			</div>
-		</div>
-		<script type="text/javascript">
-
-		</script>`
+		</div>`
 
 	// Create a map of parameters to pass to the template
 	data := struct {
