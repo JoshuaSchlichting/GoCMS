@@ -4,11 +4,13 @@
     <form hx-post="/blog_post">
         <div class="mb-3">
             <label for="markdown-input" class="form-label">Blog Post Title:</label>
-            <textarea class="form-control" id="title-input" name="Title" rows="1" cols="25" style="resize:none;"></textarea>
+            <textarea class="form-control" id="title-input" name="Title" rows="1" cols="25"
+                style="resize:none;"></textarea>
         </div>
         <div class="mb-3">
             <label for="markdown-input" class="form-label">Blog Post Subtitle:</label>
-            <textarea class="form-control" id="subtitle-input" name="Subtitle" rows="2" cols="25" style="resize:none;"></textarea>
+            <textarea class="form-control" id="subtitle-input" name="Subtitle" rows="2" cols="25"
+                style="resize:none;"></textarea>
         </div>
         <div class="mb-3">
             <div class="container">
@@ -22,7 +24,8 @@
                                         {{range .ImageURLs}}
                                         <div class="col-md-4 mb-3">
                                             <div class="image-wrapper">
-                                                <img class="img-fluid" src="{{.}}" onclick="showMarkdownCode('{{.}}')" />
+                                                <img class="img-fluid" src="{{.}}"
+                                                    onclick="showMarkdownCode('{{.}}')" />
                                             </div>
                                         </div>
                                         {{end}}
@@ -43,11 +46,11 @@
             <label for="html-output" class="form-label">Markdown Preview:</label>
             <div class="border rounded p-3" id="html-output"></div>
         </div>
-        <button type="submit" class="btn btn-primary">Create Blog Post</button>    
+        <button type="submit" class="btn btn-primary">Create Blog Post</button>
     </form>
 
 
-    
+
     <form enctype="multipart/form-data" action="/upload" method="POST">
         <div class="form-group">
             <label for="fileInput">Upload Images</label>
@@ -60,32 +63,34 @@
 
 
 
-        <!-- Modal to show markdown code -->
-        <div class="modal fade" id="markdownModal" tabindex="-1" role="dialog" aria-labelledby="markdownModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="markdownModalLabel">Markdown Code</h5>
-                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+    <!-- Modal to show markdown code -->
+    <div class="modal fade" id="markdownModal" tabindex="-1" role="dialog" aria-labelledby="markdownModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="markdownModalLabel">Markdown Code</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input class="form-control" id="markdownCode" rows="1" readonly></input>
                     </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <input class="form-control" id="markdownCode" rows="1" readonly></input>
-                        </div>
-                        <button type="button" class="btn btn-primary" onclick="copyMarkdown()" data-bs-dismiss="modal">Copy to Clipboard</button>
-                    </div>
+                    <button type="button" class="btn btn-primary" onclick="copyMarkdown()" data-bs-dismiss="modal">Copy
+                        to Clipboard</button>
                 </div>
             </div>
         </div>
+    </div>
 </div>
 <style>
     .image-wrapper {
         max-width: 90%;
         height: auto;
     }
-    
+
     .scrollable-gallery {
         height: 200px;
         overflow-y: scroll;
