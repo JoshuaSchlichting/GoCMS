@@ -649,6 +649,11 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 			}
 		})
 
+		r.Get("/new_blog_post", func(w http.ResponseWriter, r *http.Request) {
+			presentor := presentation.NewPresentor(tmpl, w)
+			presentor.CreateBlogHTML()
+		})
+
 		r.Post("/message", func(w http.ResponseWriter, r *http.Request) {
 			r.ParseForm()
 			// get user id
@@ -670,6 +675,94 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 				log.Printf("error creating message: %v", err)
 			}
 			log.Println(newMessage)
+		})
+
+		r.Post("/blog_post", func(w http.ResponseWriter, r *http.Request) {
+			r.ParseForm()
+			// get user id
+			log.Printf("form: %v", r.Form)
+			userID := r.Context().Value(middleware.User).(db.User).ID
+			if userID == uuid.Nil {
+				log.Printf("error getting user id")
+			}
+			params := db.CreateBlogPostParams{
+				ID:       uuid.New(),
+				Title:    r.FormValue("Title"),
+				Subtitle: r.FormValue("Subtitle"),
+				Body:     r.FormValue("Body"),
+				AuthorID: userID,
+			}
+
+			newBlogPost, err := queries.CreateBlogPost(r.Context(), params)
+			if err != nil {
+				log.Printf("error creating blog post: %v", err)
+			}
+
+			templateText := `
+				<div class="container mt-5">
+					<div class="alert alert-success" role="alert">
+						<h4 class="alert-heading">New Blog Post Created!</h4>
+						<p>Blog Post Name: <strong>{{ .Title }}</strong></p>
+						<p>Subtitle: <strong>{{ .Subtitle }}</strong></p>
+						<p>ID: <strong>{{ .ID }}</strong></p>
+						<hr>
+						<p class="mb-0">Blog posts can be viewed in the published posts center or the public page.</p>
+					</div>
+				</div>
+			`
+
+			tmpl, err := template.New("").Parse(templateText)
+			if err != nil {
+				log.Printf("error parsing template: %v", err)
+			}
+
+			err = tmpl.Execute(w, newBlogPost)
+			if err != nil {
+				log.Printf("error executing template: %v", err)
+			}
+		})
+
+		r.Get("/my_blog_posts", func(w http.ResponseWriter, r *http.Request) {
+			userID := r.Context().Value(middleware.User).(db.User).ID
+			blogPosts, err := queries.ListBlogPostsByUser(r.Context(), userID)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			templateText := `
+				<div class="container">
+				  <h1>Blog Posts</h1>
+				  <table class="table">
+					<thead>
+					  <tr>
+					  	<th>ID</th>
+						<th>Title</th>
+						<th>Subtitle</th>
+						<th>Body</th>
+						<th>CreatedAt</th>
+						<th>UpdatedAt</th>
+					  </tr>
+					</thead>
+					<tbody>
+					  {{range .}}
+					  <tr>
+					  	<td>{{.ID}}</td>
+						<td>{{.Title}}</td>
+						<td>{{.Subtitle}}</td>
+						<td>{{.Body}}</td>
+						<td>{{.CreatedAt}}</td>
+						<td>{{.UpdatedAt}}</td>
+					  </tr>
+					  {{end}}
+					</tbody>
+				  </table>
+				</div>`
+			tmpl, err := template.New("").Parse(templateText)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			tmpl.Execute(w, blogPosts)
 		})
 	})
 }

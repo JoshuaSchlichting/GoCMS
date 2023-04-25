@@ -125,3 +125,14 @@ create table if not exists public.file_filegroup
     updated_at timestamp not null default current_timestamp,
     primary key (file_id, filegroup_id)
 );
+
+create table blog_post
+(
+    id uuid not null primary key,
+    title text not null,
+    subtitle text not null,
+    body text not null,
+    author_id uuid not null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp not null default current_timestamp
+);

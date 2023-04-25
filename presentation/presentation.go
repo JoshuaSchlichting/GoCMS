@@ -4,15 +4,19 @@
 package presentation
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"io"
-
-	"github.com/joshuaschlichting/gocms/templates/admin/components"
-
-	"bytes"
 	"strings"
 )
+
+type ClickableTable struct {
+	TableID      template.JS
+	Table        []map[string]interface{}
+	CallbackFunc template.JS
+	JavaScript   template.JS
+}
 
 type FormField struct {
 	Name  string
@@ -74,7 +78,7 @@ func (p *Presentor) EditListItemHTML(formID, formTitle, apiEndpoint, apiCallType
 		),
 		"FormID":     formID,
 		"RefreshURL": template.JS(refreshURL),
-		"ClickableTable": &components.ClickableTable{
+		"ClickableTable": &ClickableTable{
 			TableID:      template.JS(tableID),
 			Table:        dataMap,
 			CallbackFunc: template.JS("setItemInForm"),
@@ -162,7 +166,7 @@ func (p *Presentor) DeleteItemFormHTML(formID, formTitle, apiEndpoint, refreshUR
 		),
 		"FormID":     formID,
 		"RefreshURL": template.JS(refreshURL),
-		"ClickableTable": &components.ClickableTable{
+		"ClickableTable": &ClickableTable{
 			TableID:      template.JS(tableID),
 			Table:        dataMap,
 			CallbackFunc: template.JS("setItemInForm"),
@@ -227,7 +231,6 @@ func (p *Presentor) DeleteItemFormHTML(formID, formTitle, apiEndpoint, refreshUR
 	return err
 }
 
-
 func getSubmitResetButtonDiv() string {
 	return `
 		<div class="text-center">
@@ -251,10 +254,7 @@ func generateForm(title string, fields []FormField, hxMethod, hxURL, idPrefix, b
 					{{.ButtonDiv}}
 				</form>
 			</div>
-		</div>
-		<script type="text/javascript">
-
-		</script>`
+		</div>`
 
 	// Create a map of parameters to pass to the template
 	data := struct {
