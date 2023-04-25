@@ -286,6 +286,95 @@ func (q *Queries) GetUserIsInGroup(ctx context.Context, arg GetUserIsInGroupPara
 	return column_1, err
 }
 
+const listBlogPosts = `-- name: ListBlogPosts :many
+select
+  id,
+  title,
+  subtitle,
+  body,
+  author_id,
+  created_at,
+  updated_at
+from public.blog_post
+order by created_at desc
+`
+
+func (q *Queries) ListBlogPosts(ctx context.Context) ([]BlogPost, error) {
+	rows, err := q.db.QueryContext(ctx, listBlogPosts)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []BlogPost
+	for rows.Next() {
+		var i BlogPost
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Subtitle,
+			&i.Body,
+			&i.AuthorID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listBlogPostsByUser = `-- name: ListBlogPostsByUser :many
+select
+  id,
+  title,
+  subtitle,
+  body,
+  author_id,
+  created_at,
+  updated_at
+from public.blog_post
+where author_id = $1
+order by created_at desc
+`
+
+func (q *Queries) ListBlogPostsByUser(ctx context.Context, authorID uuid.UUID) ([]BlogPost, error) {
+	rows, err := q.db.QueryContext(ctx, listBlogPostsByUser, authorID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []BlogPost
+	for rows.Next() {
+		var i BlogPost
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Subtitle,
+			&i.Body,
+			&i.AuthorID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listFiles = `-- name: ListFiles :many
 SELECT id, name, blob, created_at, updated_at, owner_id FROM public.file
 ORDER BY name

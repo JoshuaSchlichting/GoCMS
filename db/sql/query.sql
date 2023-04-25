@@ -138,3 +138,28 @@ insert into public.blog_post (
   $1, $2, $3, $4, $5, current_timestamp, current_timestamp
 )
 returning *;
+
+-- name: ListBlogPosts :many
+select
+  id,
+  title,
+  subtitle,
+  body,
+  author_id,
+  created_at,
+  updated_at
+from public.blog_post
+order by created_at desc;
+
+-- name: ListBlogPostsByUser :many
+select
+  id,
+  title,
+  subtitle,
+  body,
+  author_id,
+  created_at,
+  updated_at
+from public.blog_post
+where author_id = $1
+order by created_at desc;
