@@ -6,3 +6,6 @@ various management tasks, such as first time startup and initialization of the c
 
 
 You can run it from the repo's root directory using the command `go run ./cmd/manager <params>`.
+
+## Params
+This module is under development and subject to frequent change. Instead of listing the params here, please see [flags.go](flags.go) for the most up-to-date list of params.

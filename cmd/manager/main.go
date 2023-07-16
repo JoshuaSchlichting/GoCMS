@@ -28,24 +28,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var listUsersFlag bool
-	flag.BoolVar(&listUsersFlag, "list-users", false, "List users")
-
-	var createSuperUserFlag bool
-	flag.BoolVar(&createSuperUserFlag, "create-superuser", false, "Create super user")
-
-	var deleteAllUsersFlag bool
-	flag.BoolVar(&deleteAllUsersFlag, "delete-all-users", false, "Delete all users")
-
-	var initFlag bool
-	flag.BoolVar(&initFlag, "init", false, "Initialize database schema")
-
-	var executeRawSqlFlag string
-	flag.StringVar(&executeRawSqlFlag, "exec-sql", "", "Execute raw sql")
-
-	var DestroySchemaFlag bool
-	flag.BoolVar(&DestroySchemaFlag, "destroy-schema", false, "Destroy database schema")
 	flag.Parse()
+
 	switch {
 	case createSuperUserFlag:
 		executeCreateSuperUserViaTerminalInput(*queries)
@@ -73,7 +57,7 @@ func main() {
 			fmt.Println(result)
 		}
 		// iterate over results and print them
-	case DestroySchemaFlag:
+	case destroySchemaFlag:
 		log.Println("Destroying schema")
 		DestroySchema(db)
 	default:
