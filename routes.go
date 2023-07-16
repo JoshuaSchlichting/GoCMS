@@ -39,6 +39,12 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 	r.Get("/getjwtandlogin", func(w http.ResponseWriter, r *http.Request) {
 		// get access code from request
 		code := r.URL.Query().Get("code")
+		if code == "" {
+			log.Println("No access code found in request URL params")
+			http.Error(w, "No access code found in request URL params", http.StatusBadRequest)
+			return
+		}
+
 		// get JWT
 		accessToken, err := auth.GetAccessJWT(code)
 		if err != nil {
