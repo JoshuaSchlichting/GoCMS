@@ -56,7 +56,6 @@ func main() {
 			}
 			fmt.Println(result)
 		}
-		// iterate over results and print them
 	case destroySchemaFlag:
 		log.Println("Destroying schema")
 		DestroySchema(db)
