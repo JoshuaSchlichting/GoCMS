@@ -22,5 +22,4 @@ clean:
 	rm -rf ./out
 
 run:
-	go build -o $(BUILD_PATH)/$(BINARY_NAME) -v $(MAIN_PATH)
-	$(BUILD_PATH)/$(BINARY_NAME)
+	go run $(MAIN_PATH)
