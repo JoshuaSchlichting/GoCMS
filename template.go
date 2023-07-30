@@ -5,23 +5,32 @@ import (
 	"html/template"
 	"io/fs"
 	"log"
-	"os"
 	"path/filepath"
+	"strings"
 )
 
 func init() {
-	loadTemplates()
+	loadTemplates(templateFS)
 }
 
 var templateFiles = []string{}
 
-func loadTemplates() {
-	filepath.Walk("./templates", func(path string, info os.FileInfo, err error) error {
-		if !info.IsDir() && filepath.Ext(path) == ".html" {
+func loadTemplates(templateFS fs.FS) {
+	err := fs.WalkDir(templateFS, ".", func(path string, d fs.DirEntry, err error) error {
+		if !d.IsDir() && filepath.Ext(path) == ".html" {
 			templateFiles = append(templateFiles, path)
 		}
 		return nil
 	})
+	if err != nil {
+		log.Fatalf("error walking templates dir: %v", err)
+	}
+	// Print all HTML template files
+	for _, file := range templateFiles {
+		if strings.Contains(file, "templates") {
+			log.Println(file)
+		}
+	}
 }
 
 func parseTemplateDir(dir string, templateFS fs.FS, funcMap template.FuncMap) (*template.Template, error) {
