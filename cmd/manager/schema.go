@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"database/sql"
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -18,8 +18,7 @@ func CreateSchema(db *sql.DB) {
 			_, err := db.Exec(query)
 
 			if err != nil {
-				log.Fatal(err)
-				return
+				log.Fatalf("an error occurred while executing the query against db '%v': %v", db, err)
 			}
 			fmt.Println("Successfully executed query: ", query)
 		}
@@ -44,7 +43,7 @@ func DestroySchema(db *sql.DB) {
 func dropTablesFromSQLFile(sqlFilePath string, db *sql.DB) error {
 	defer db.Close()
 	// Read the SQL file
-	sqlFile, err := ioutil.ReadFile(sqlFilePath)
+	sqlFile, err := os.ReadFile(sqlFilePath)
 	if err != nil {
 		return fmt.Errorf("failed to read SQL file: %v", err)
 	}
