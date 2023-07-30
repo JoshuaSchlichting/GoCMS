@@ -1,18 +1,18 @@
-package main
+package manager
 
 import (
 	"bufio"
 	"database/sql"
 	"fmt"
+	"io"
 	"log"
-	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 )
 
 func CreateSchema(db *sql.DB) {
-	queries := LoadQueriesFromFile(filepath.Join(getProjectDir(), "db", "sql", "schema.sql"))
+	queries := LoadQueriesFromFile(filepath.Join("db", "sql", "schema.sql"))
 	for _, query := range queries {
 		if query != "" {
 			_, err := db.Exec(query)
@@ -40,21 +40,25 @@ func LoadQueriesFromFile(filename string) []string {
 }
 
 func DestroySchema(db *sql.DB) {
-	dropTablesFromSQLFile(filepath.Join(getProjectDir(), "db", "sql", "schema.sql"), db)
+	dropTablesFromSQLFile(filepath.Join("db", "sql", "schema.sql"), db)
 }
 
-// dropTablesFromSQLFile reads a SQL file and drops all tables found in "create table" statements.
 func dropTablesFromSQLFile(sqlFilePath string, db *sql.DB) error {
 	defer db.Close()
-	// Read the SQL file
-	sqlFile, err := os.ReadFile(sqlFilePath)
+	// Open the SQL file
+	sqlFile, err := sqlDir.Open(sqlFilePath)
+	if err != nil {
+		return fmt.Errorf("failed to open SQL file: %v", err)
+	}
+
+	bytes, err := io.ReadAll(sqlFile)
 	if err != nil {
 		return fmt.Errorf("failed to read SQL file: %v", err)
 	}
 
 	// Parse the SQL file for "create table" statements
 	re := regexp.MustCompile(`create table if not exists ([^\s\(]+)`)
-	scanner := bufio.NewScanner(strings.NewReader(string(sqlFile)))
+	scanner := bufio.NewScanner(strings.NewReader(string(bytes)))
 	for scanner.Scan() {
 		line := scanner.Text()
 		matches := re.FindStringSubmatch(line)

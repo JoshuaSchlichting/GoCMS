@@ -18,6 +18,7 @@ import (
 	"github.com/joshuaschlichting/gocms/config"
 	database "github.com/joshuaschlichting/gocms/db"
 	"github.com/joshuaschlichting/gocms/filesystem"
+	"github.com/joshuaschlichting/gocms/manager"
 	"github.com/joshuaschlichting/gocms/middleware"
 	_ "github.com/lib/pq"
 )
@@ -31,6 +32,9 @@ var templateFS embed.FS
 //go:embed config.yml
 var configYml []byte
 
+//go:embed db/sql
+var sqlFS embed.FS
+
 func main() {
 	var (
 		host = flag.String("host", "", "host http address to listen on")
@@ -39,6 +43,10 @@ func main() {
 	flag.Parse()
 	log.Println("Starting server on port", *port)
 	config := config.LoadConfig(readConfigFile())
+	if manager.IsManagerProgramCall(*config, sqlFS) {
+		// This was a call to the manager program, not the web site executable
+		return
+	}
 
 	db, err := sql.Open("postgres", config.Database.ConnectionString)
 	if err != nil {

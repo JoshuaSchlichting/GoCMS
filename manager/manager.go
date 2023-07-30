@@ -1,12 +1,11 @@
-package main
+package manager
 
 import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"io/fs"
 	"log"
-	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/joshuaschlichting/gocms/config"
@@ -14,12 +13,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func main() {
-	fmt.Println("GoCMS Manager")
-	// read config.yml
-	configYmlData := readConfigFile()
-	configuration := config.LoadConfig(configYmlData)
+var sqlDir fs.FS
 
+func IsManagerProgramCall(configuration config.Config, sqlDirA fs.FS) bool {
+	sqlDir = sqlDirA
 	db, err := sql.Open("postgres", configuration.Database.ConnectionString)
 	queries := database.New(db)
 
@@ -59,25 +56,19 @@ func main() {
 		log.Println("Destroying schema")
 		DestroySchema(db)
 	default:
-		fmt.Println("No flags set")
+		return false
 	}
-
+	return true
 }
 
 func readFile(filename string) []byte {
-	filePayload, err := os.ReadFile(filename)
+	file, err := sqlDir.Open(filename)
+	filePayload := make([]byte, 0)
+	file.Read(filePayload)
 	if err != nil {
 		log.Fatal(err)
 	}
 	return filePayload
-}
-
-func readConfigFile() []byte {
-	configYml, err := os.ReadFile(filepath.Join(getProjectDir(), "config.yml"))
-	if err != nil {
-		log.Fatalf("Error reading config.yml: %v", err)
-	}
-	return configYml
 }
 
 func executeCreateSuperUserViaTerminalInput(queries database.Queries) {
@@ -89,13 +80,4 @@ func executeCreateSuperUserViaTerminalInput(queries database.Queries) {
 	fmt.Scanln(&email)
 
 	createSuperUser(queries, username, email)
-}
-
-func getProjectDir() string {
-	wd, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
-	projectDir := strings.Split(wd, "gocms")[0] + "gocms"
-	return projectDir
 }
