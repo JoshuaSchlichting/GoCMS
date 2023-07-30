@@ -46,7 +46,6 @@ func init() {
 	poolDesc, err := cognitoProvider.DescribeUserPool(&cognito.DescribeUserPoolInput{UserPoolId: aws.String(poolId)})
 	if err != nil {
 		log.Printf("Error describing user pool: %v\n", err)
-		return
 	}
 	cognitoEndpoint = oauth2.Endpoint{
 		AuthURL:  "https://" + *poolDesc.UserPool.Domain + ".auth." + region + ".amazoncognito.com/oauth2/authorize",
