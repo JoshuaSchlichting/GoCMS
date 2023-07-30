@@ -16,7 +16,7 @@ import (
 
 var sqlDir fs.FS
 
-func IsManagerProgramCall(configuration config.Config, sqlDirA fs.FS) bool {
+func HandleIfManagerCall(configuration config.Config, sqlDirA fs.FS) bool {
 	sqlDir = sqlDirA
 	db, err := sql.Open("postgres", configuration.Database.ConnectionString)
 	queries := database.New(db)
@@ -64,7 +64,6 @@ func IsManagerProgramCall(configuration config.Config, sqlDirA fs.FS) bool {
 }
 
 func readFile(filename string) []byte {
-
 	file, err := sqlDir.Open(filename)
 	if err != nil {
 		log.Fatal("error opening sql file:", err)

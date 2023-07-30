@@ -41,7 +41,7 @@ func main() {
 		port = flag.String("port", "8000", "port number for http listener")
 	)
 	config := config.LoadConfig(readConfigFile())
-	if manager.IsManagerProgramCall(*config, sqlFS) {
+	if manager.HandleIfManagerCall(*config, sqlFS) {
 		log.Println("Manager program call finished...")
 		// This was a call to the manager program, not the web site executable
 		return
