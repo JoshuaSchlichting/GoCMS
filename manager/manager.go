@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"io"
 	"io/fs"
 	"log"
 	"strings"
@@ -30,7 +31,8 @@ func IsManagerProgramCall(configuration config.Config, sqlDirA fs.FS) bool {
 	case createSuperUserFlag:
 		executeCreateSuperUserViaTerminalInput(*queries)
 	case initFlag:
-		CreateSchema(db)
+		log.Println("Initializing database schema...")
+		createSchema(db)
 	case listUsersFlag:
 		getUsers(*queries)
 	case deleteAllUsersFlag:
@@ -62,13 +64,17 @@ func IsManagerProgramCall(configuration config.Config, sqlDirA fs.FS) bool {
 }
 
 func readFile(filename string) []byte {
+
 	file, err := sqlDir.Open(filename)
-	filePayload := make([]byte, 0)
-	file.Read(filePayload)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("error opening sql file:", err)
 	}
-	return filePayload
+	filePayload := new([]byte)
+	*filePayload, err = io.ReadAll(file)
+	if err != nil {
+		log.Fatal("error reading sql file:", err)
+	}
+	return *filePayload
 }
 
 func executeCreateSuperUserViaTerminalInput(queries database.Queries) {
