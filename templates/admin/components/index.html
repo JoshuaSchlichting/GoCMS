@@ -1,51 +1,54 @@
-{{define "index"}}
+{{ define "index" }}
 <!DOCTYPE html>
 <html lang="en">
+
 {{ template "head" . }}
 
-
 <body>
-  <!-- ======= Header ======= -->
-  {{ template "header" . }}
+	<div class="wrapper">
+		{{ template "sidebar" . }}
+		
 
-  <!-- resolve golang variable "SecureText" -->
-  {{.SecureText}}
-  <!-- End Header -->
+		<div class="main">
+			{{ template "header" . }}
+			<main class="content">
+				<div class="container-fluid p-0">
+					<div id="main"></div>
+				</div>
+			</main>
 
-  <!-- ======= Sidebar ======= -->
-  <div id="sidebar"></div>
-  <!-- End Sidebar-->
-
-  <main id="main" class="main">
-    {{/* .main */}}
-  </main><!-- End #main -->
-
-  <!-- ======= Footer ======= -->
-  <footer id="footer" class="footer">
-    <div class="copyright">
-      &copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights Reserved
-    </div>
-    <div class="credits"> Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a></div>
-  </footer><!-- End Footer -->
-
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-      class="bi bi-arrow-up-short"></i></a>
-
-  <!-- Vendor JS Files -->
-  <script src="static/assets/admin/vendor/apexcharts/apexcharts.min.js"></script>
-  <!-- <script src="static/assets/admin/vendor/bootstrap/js/bootstrap.bundle.min.js"></script> -->
-  <script src="static/assets/admin/vendor/chart.js/chart.min.js"></script>
-  <script src="static/assets/admin/vendor/echarts/echarts.min.js"></script>
-  <script src="static/assets/admin/vendor/quill/quill.min.js"></script>
-  <script src="static/assets/admin/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="static/assets/admin/vendor/tinymce/tinymce.min.js"></script>
-  <script src="static/assets/admin/vendor/php-email-form/validate.js"></script>
-
-  <!-- Template Main JS File -->
-  <script src="static/assets/admin/js/main.js"></script>
-  <script src="static/js/index.js"></script>
+			<footer class="footer">
+				<div class="container-fluid">
+					<div class="row text-muted">
+						<div class="col-6 text-start">
+							<p class="mb-0">
+								<a class="text-muted" href="https://adminkit.io/" target="_blank"><strong>AdminKit</strong></a> &copy;
+							</p>
+						</div>
+						<div class="col-6 text-end">
+							<ul class="list-inline">
+								<li class="list-inline-item">
+									<a class="text-muted" href="https://adminkit.io/" target="_blank">Support</a>
+								</li>
+								<li class="list-inline-item">
+									<a class="text-muted" href="https://adminkit.io/" target="_blank">Help Center</a>
+								</li>
+								<li class="list-inline-item">
+									<a class="text-muted" href="https://adminkit.io/" target="_blank">Privacy</a>
+								</li>
+								<li class="list-inline-item">
+									<a class="text-muted" href="https://adminkit.io/" target="_blank">Terms</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</footer>
+		</div>
+	</div>
   <script src="static/js/jwt.js"></script>
-  <!-- Custom logic JS File -->
+  <script src="static/js/app.js"></script>
+  <script src="static/js/index.js"></script>
   <script type="application/javascript">
 
 
@@ -53,7 +56,7 @@
       'headers': { "Authorization": getCookie('jwt') }
     });
 
-    $("#sidebar").load("sidebar");
+    // $("#sidebar").load("sidebar");
     htmx.on('htmx:responseError', function(event) { 
       console.log(event.detail.xhr.status);
       alert("ERROR: " + event.detail.xhr.status);
@@ -66,4 +69,4 @@
 </body>
 
 </html>
-{{end}}
+{{ end }}
