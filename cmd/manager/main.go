@@ -23,7 +23,6 @@ func main() {
 	db, err := sql.Open("postgres", configuration.Database.ConnectionString)
 	queries := database.New(db)
 
-	print("Connected to db!\n")
 	if err != nil {
 		log.Fatal(err)
 	}
