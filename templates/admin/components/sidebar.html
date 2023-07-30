@@ -1,384 +1,149 @@
 {{define "sidebar"}}
-<aside id="sidebar" class="sidebar">
 
-  <ul class="sidebar-nav" id="sidebar-nav">
-
-    <li class="nav-item" id="dashboardLink">
-      <a class="nav-link">
-        <i class="bi bi-grid"></i>
-        <span>Dashboard</span>
+<!-- for reasons I don't know yet, this produces a duplicate
+  nav bar with the same ID, which then causes the menu items
+  to disappear when the window is horizontally shortened ¯\_(ツ)_/¯
+-->
+  <nav id="sidebarx" class="sidebar js-sidebar"> 
+    <div class="sidebar-content js-simplebar">
+      <a class="sidebar-brand" href="index.html">
+        <span class="align-middle">Dashboard</span>
       </a>
-    </li><!-- End Dashboard Nav -->
-    <li class="nav-item" id="upload_form" hx-get="upload_form" hx-target="#main" hx-swap="innerHTML">
-      <a class="nav-link collapsed">
-        <i class="bi bi-cloud-upload"></i>
-        <span>Upload files</span>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#blog-post-center-nav" aria-expanded="false">
-        <i class="bi bi-file-post"></i>
-        <span>Blog Post Center</span>
-        <i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul id="blog-post-center-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-        <li>
-          <a href="#" hx-get="my_blog_posts" hx-target="#main" hx-swap="innerHTML">
-            <i class="bi bi-circle"></i>
-            <span>My Posts</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" hx-get="draft_blog_posts" hx-target="#main" hx-swap="innerHTML">
-            <i class="bi bi-circle"></i>
-            <span>Draft Posts</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" hx-get="new_blog_post" hx-target="#main" hx-swap="innerHTML">
-            <i class="bi bi-circle"></i>
-            <span>New Post</span>
-          </a>
-        </li>
-      </ul>
-    </li>    
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#message-center-nav" aria-expanded="false">
-        <i class="bi bi-chat-left-dots"></i>
-        <span>Message Center</span>
-        <i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul id="message-center-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-        <li>
-          <a href="#" hx-get="inbox" hx-target="#main" hx-swap="innerHTML">
-            <i class="bi bi-circle"></i>
-            <span>Inbox</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" hx-get="sent_messages" hx-target="#main" hx-swap="innerHTML">
-            <i class="bi bi-circle"></i>
-            <span>Sent</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" hx-get="compose_msg" hx-target="#main" hx-swap="innerHTML">
-            <i class="bi bi-circle"></i>
-            <span>Compose</span>
-          </a>
-        </li>
-      </ul>
-    </li>
     
-    <li class="nav-item" >
-      <a class="nav-link collapsed"data-bs-target="#user-nav"data-bs-toggle="collapse" href="#">
-        <i class="bi bi-file-earmark-person"></i>
-        <span>User Management</span><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul id="user-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-        <li>
-          <a id="create_user_form" hx-get="create_user_form" hx-target="#main" hx-swap="innerHTML">
-            <i class="bi bi-circle"></i><span>Create User</span>
+      <ul class="sidebar-nav">
+        <li class="sidebar-header">
+          Pages
+        </li>
+    
+        <li id="dashboardLink" class="sidebar-item">
+          <a class="sidebar-link" href="#">
+            <i class="align-middle" data-feather="grid"></i> <span class="align-middle">Dashboard</span>
           </a>
         </li>
-        <li>
-          <a id="edit_user_form" hx-get="edit_user_form" hx-target="#main" hx-swap="innerHTML">
-            <i class="bi bi-circle"></i><span>Edit User</span>
+    
+        <li id="upload_form" hx-get="upload_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+          <a class="sidebar-link" href="#">
+            <i class="align-middle" data-feather="upload"></i> <span class="align-middle">Upload files</span>
           </a>
         </li>
-        <li>
-          <a id="delete_user_form" hx-get="delete_user_form" hx-target="#main" hx-swap="innerHTML">
-            <i class="bi bi-circle"></i><span>Delete User</span>
+    
+        <li class="sidebar-header">
+          Blog Post Center
+        </li>
+    
+        <li id="my_blog_posts" hx-get="my_blog_posts" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+          <a class="sidebar-link" href="#">
+            <i class="align-middle" data-feather="file-text"></i> <span class="align-middle">My Posts</span>
           </a>
         </li>
-      </ul>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link collapsed" data-bs-target="#org-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-building"></i>
-          <span>Organization Management</span>
-          <i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul id="org-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-          <li>
-              <a id="create_org_form" hx-get="create_org_form" hx-target="#main" hx-swap="innerHTML">
-                  <i class="bi bi-circle"></i>
-                  <span>Create Organization</span>
-              </a>
-          </li>
-          <li>
-              <a id="edit_org_form" hx-get="edit_org_form" hx-target="#main" hx-swap="innerHTML">
-                  <i class="bi bi-circle"></i>
-                  <span>Edit Organization</span>
-              </a>
-          </li>
-          <li>
-              <a id="delete_org_form" hx-get="delete_org_form" hx-target="#main" hx-swap="innerHTML">
-                  <i class="bi bi-circle"></i>
-                  <span>Delete Organization</span>
-              </a>
-          </li>
-      </ul>
-  </li>
-  <li class="nav-item" >
-    <a class="nav-link collapsed" data-bs-target="#user-group-nav" data-bs-toggle="collapse" href="#">
-      <i class="bi bi-people"></i>
-      <span>User Group Management</span>
-      <i class="bi bi-chevron-down ms-auto"></i>
-    </a>
-    <ul id="user-group-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-      <li>
-        <a id="create_usergroup_form" hx-get="create_usergroup_form" hx-target="#main" hx-swap="innerHTML">
-          <i class="bi bi-circle"></i>
-          <span>Create User Group</span>
-        </a>
-      </li>
-      <li>
-        <a id="edit_usergroup_form" hx-get="edit_usergroup_form" hx-target="#main" hx-swap="innerHTML">
-          <i class="bi bi-circle"></i>
-          <span>Edit User Group</span>
-        </a>
-      </li>
-      <li>
-        <a id="delete_usergroup_form" hx-get="delete_usergroup_form" hx-target="#main" hx-swap="innerHTML">
-          <i class="bi bi-circle"></i>
-          <span>Delete User Group</span>
-        </a>
-      </li>
-    </ul>
-  </li>
-  {{/*
-    <li class="nav-item">
-      <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
-        <i class="bi bi-menu-button-wide"></i><span>Components</span><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-        <li>
-          <a href="/">
-            <i class="bi bi-circle"></i><span>Alerts</span>
+    
+        <li id="draft_blog_posts" hx-get="draft_blog_posts" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+          <a class="sidebar-link" href="#">
+            <i class="align-middle" data-feather="file-text"></i> <span class="align-middle">Draft Posts</span>
           </a>
         </li>
-        <li>
-          <a href="components-accordion.html">
-            <i class="bi bi-circle"></i><span>Accordion</span>
+    
+        <li id="new_blog_post" hx-get="new_blog_post" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+          <a class="sidebar-link" href="#">
+            <i class="align-middle" data-feather="file-plus"></i> <span class="align-middle">New Post</span>
           </a>
         </li>
-        <li>
-          <a href="components-badges.html">
-            <i class="bi bi-circle"></i><span>Badges</span>
+    
+        <li class="sidebar-header">
+          Message Center
+        </li>
+    
+        <li id="inbox" hx-get="inbox" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+          <a class="sidebar-link" href="#">
+            <i class="align-middle" data-feather="inbox"></i> <span class="align-middle">Inbox</span>
           </a>
         </li>
-        <li>
-          <a href="components-breadcrumbs.html">
-            <i class="bi bi-circle"></i><span>Breadcrumbs</span>
+    
+        <li id="sent_messages" hx-get="sent_messages" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+          <a class="sidebar-link" href="#">
+            <i class="align-middle" data-feather="send"></i> <span class="align-middle">Sent</span>
           </a>
         </li>
-        <li>
-          <a href="components-buttons.html">
-            <i class="bi bi-circle"></i><span>Buttons</span>
+    
+        <li id="compose_msg" hx-get="compose_msg" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+          <a class="sidebar-link" href="#">
+            <i class="align-middle" data-feather="edit-2"></i> <span class="align-middle">Compose</span>
           </a>
         </li>
-        <li>
-          <a href="components-cards.html">
-            <i class="bi bi-circle"></i><span>Cards</span>
+    
+        <li class="sidebar-header">
+          User Management
+        </li>
+    
+        <li id="create_user_form" hx-get="create_user_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+          <a class="sidebar-link" href="#">
+            <i class="align-middle" data-feather="user-plus"></i> <span class="align-middle">Create User</span>
           </a>
         </li>
-        <li>
-          <a href="components-carousel.html">
-            <i class="bi bi-circle"></i><span>Carousel</span>
+    
+        <li id="edit_user_form" hx-get="edit_user_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+          <a class="sidebar-link" href="#">
+            <i class="align-middle" data-feather="user-check"></i> <span class="align-middle">Edit User</span>
           </a>
         </li>
-        <li>
-          <a href="components-list-group.html">
-            <i class="bi bi-circle"></i><span>List group</span>
+    
+        <li id="delete_user_form" hx-get="delete_user_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+          <a class="sidebar-link" href="#">
+            <i class="align-middle" data-feather="user-minus"></i> <span class="align-middle">Delete User</span>
           </a>
         </li>
-        <li>
-          <a href="components-modal.html">
-            <i class="bi bi-circle"></i><span>Modal</span>
+    
+        <li class="sidebar-header">
+          Organization Management
+        </li>
+    
+        <li id="create_org_form" hx-get="create_org_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+          <a class="sidebar-link" href="#">
+            <i class="align-middle" data-feather="plus-circle"></i> <span class="align-middle">Create Organization</span>
           </a>
         </li>
-        <li>
-          <a href="components-tabs.html">
-            <i class="bi bi-circle"></i><span>Tabs</span>
+    
+        <li id="edit_org_form" hx-get="edit_org_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+          <a class="sidebar-link" href="#">
+            <i class="align-middle" data-feather="edit-3"></i> <span class="align-middle">Edit Organization</span>
           </a>
         </li>
-        <li>
-          <a href="components-pagination.html">
-            <i class="bi bi-circle"></i><span>Pagination</span>
+    
+        <li id="delete_org_form" hx-get="delete_org_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+          <a class="sidebar-link" href="#">
+            <i class="align-middle" data-feather="minus-circle"></i> <span class="align-middle">Delete Organization</span>
           </a>
         </li>
-        <li>
-          <a href="components-progress.html">
-            <i class="bi bi-circle"></i><span>Progress</span>
+    
+        <li class="sidebar-header">
+          User Group Management
+        </li>
+    
+        <li id="create_usergroup_form" hx-get="create_usergroup_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+          <a class="sidebar-link" href="#">
+            <i class="align-middle" data-feather="users"></i> <span class="align-middle">Create User Group</span>
           </a>
         </li>
-        <li>
-          <a href="components-spinners.html">
-            <i class="bi bi-circle"></i><span>Spinners</span>
+    
+        <li id="edit_usergroup_form" hx-get="edit_usergroup_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+          <a class="sidebar-link" href="#">
+            <i class="align-middle" data-feather="users"></i> <span class="align-middle">Edit User Group</span>
           </a>
         </li>
-        <li>
-          <a href="components-tooltips.html">
-            <i class="bi bi-circle"></i><span>Tooltips</span>
+    
+        <li id="delete_usergroup_form" hx-get="delete_usergroup_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+          <a class="sidebar-link" href="#">
+            <i class="align-middle" data-feather="users"></i> <span class="align-middle">Delete User Group</span>
           </a>
         </li>
       </ul>
-    </li><!-- End Components Nav -->
+    </div>    
+</nav>
 
-    <li class="nav-item">
-      <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
-        <i class="bi bi-journal-text"></i><span>Forms</span><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-        <li>
-          <a href="forms-elements.html">
-            <i class="bi bi-circle"></i><span>Form Elements</span>
-          </a>
-        </li>
-        <li>
-          <a href="forms-layouts.html">
-            <i class="bi bi-circle"></i><span>Form Layouts</span>
-          </a>
-        </li>
-        <li>
-          <a href="forms-editors.html">
-            <i class="bi bi-circle"></i><span>Form Editors</span>
-          </a>
-        </li>
-        <li>
-          <a href="forms-validation.html">
-            <i class="bi bi-circle"></i><span>Form Validation</span>
-          </a>
-        </li>
-      </ul>
-    </li><!-- End Forms Nav -->
-
-    <li class="nav-item">
-      <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
-        <i class="bi bi-layout-text-window-reverse"></i><span>Tables</span><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-        <li>
-          <a href="tables-general.html">
-            <i class="bi bi-circle"></i><span>General Tables</span>
-          </a>
-        </li>
-        <li>
-          <a href="tables-data.html">
-            <i class="bi bi-circle"></i><span>Data Tables</span>
-          </a>
-        </li>
-      </ul>
-    </li><!-- End Tables Nav -->
-
-    <li class="nav-item">
-      <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
-        <i class="bi bi-bar-chart"></i><span>Charts</span><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-        <li>
-          <a href="charts-chartjs.html">
-            <i class="bi bi-circle"></i><span>Chart.js</span>
-          </a>
-        </li>
-        <li>
-          <a href="charts-apexcharts.html">
-            <i class="bi bi-circle"></i><span>ApexCharts</span>
-          </a>
-        </li>
-        <li>
-          <a href="charts-echarts.html">
-            <i class="bi bi-circle"></i><span>ECharts</span>
-          </a>
-        </li>
-      </ul>
-    </li><!-- End Charts Nav -->
-
-    <li class="nav-item">
-      <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
-        <i class="bi bi-gem"></i><span>Icons</span><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul id="icons-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-        <li>
-          <a href="icons-bootstrap.html">
-            <i class="bi bi-circle"></i><span>Bootstrap Icons</span>
-          </a>
-        </li>
-        <li>
-          <a href="icons-remix.html">
-            <i class="bi bi-circle"></i><span>Remix Icons</span>
-          </a>
-        </li>
-        <li>
-          <a href="icons-boxicons.html">
-            <i class="bi bi-circle"></i><span>Boxicons</span>
-          </a>
-        </li>
-      </ul>
-    </li><!-- End Icons Nav -->
-
-    <li class="nav-heading">Pages</li>
-
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="users-profile.html">
-        <i class="bi bi-person"></i>
-        <span>Profile</span>
-      </a>
-    </li><!-- End Profile Page Nav -->
-
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-faq.html">
-        <i class="bi bi-question-circle"></i>
-        <span>F.A.Q</span>
-      </a>
-    </li><!-- End F.A.Q Page Nav -->
-
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-contact.html">
-        <i class="bi bi-envelope"></i>
-        <span>Contact</span>
-      </a>
-    </li><!-- End Contact Page Nav -->
-
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-register.html">
-        <i class="bi bi-card-list"></i>
-        <span>Register</span>
-      </a>
-    </li><!-- End Register Page Nav -->
-
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-login.html">
-        <i class="bi bi-box-arrow-in-right"></i>
-        <span>Login</span>
-      </a>
-    </li><!-- End Login Page Nav -->
-
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-error-404.html">
-        <i class="bi bi-dash-circle"></i>
-        <span>Error 404</span>
-      </a>
-    </li><!-- End Error 404 Page Nav -->
-
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-blank.html">
-        <i class="bi bi-file-earmark"></i>
-        <span>Blank</span>
-      </a>
-    </li><!-- End Blank Page Nav -->
-
-  </ul> */}}
-
-</aside>
 <script type="text/javascript">
-
   $("#dashboardLink").click(() => {
     $("#main").load("securedashboard");
   });
   htmx.process(document.getElementById('sidebar'));
-
 </script>
-
 {{end}}
