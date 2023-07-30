@@ -28,13 +28,16 @@ var fileSystem embed.FS
 //go:embed templates
 var templateFS embed.FS
 
+//go:embed config.yml
+var configYml []byte
+
 func main() {
 	var (
 		host = flag.String("host", "", "host http address to listen on")
 		port = flag.String("port", "8000", "port number for http listener")
 	)
 	flag.Parse()
-
+	log.Println("Starting server on port", *port)
 	config := config.LoadConfig(readConfigFile())
 
 	db, err := sql.Open("postgres", config.Database.ConnectionString)
@@ -44,7 +47,7 @@ func main() {
 	defer db.Close()
 	queries := database.New(db)
 	funcMap := template.FuncMap{}
-
+	log.Println("Loading templates...")
 	templ, err := parseTemplateDir("templates", templateFS, funcMap)
 	if err != nil {
 		log.Fatalf("Error parsing templates: %v", err)
@@ -96,9 +99,5 @@ func listenServe(listenAddr string, handler http.Handler) error {
 
 func readConfigFile() []byte {
 	// read config.yml
-	configYml, err := os.ReadFile("config.yml")
-	if err != nil {
-		log.Fatalf("Error reading config.yml: %v", err)
-	}
 	return configYml
 }
