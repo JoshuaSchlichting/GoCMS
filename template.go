@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"log"
 	"path/filepath"
-	"strings"
 )
 
 func init() {
@@ -25,12 +24,7 @@ func loadTemplates(templateFS fs.FS) {
 	if err != nil {
 		log.Fatalf("error walking templates dir: %v", err)
 	}
-	// Print all HTML template files
-	for _, file := range templateFiles {
-		if strings.Contains(file, "templates") {
-			log.Println(file)
-		}
-	}
+
 }
 
 func parseTemplateDir(dir string, templateFS fs.FS, funcMap template.FuncMap) (*template.Template, error) {
