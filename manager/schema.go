@@ -11,10 +11,14 @@ import (
 	"strings"
 )
 
-func CreateSchema(db *sql.DB) {
-	queries := LoadQueriesFromFile(filepath.Join("db", "sql", "schema.sql"))
+func createSchema(db *sql.DB) {
+	queryFile := filepath.Join("db", "sql", "schema.sql")
+	log.Println("Loading queries from", queryFile)
+	queries := LoadQueriesFromFile(queryFile)
 	for _, query := range queries {
-		if query != "" {
+		trimmedQuery := strings.TrimSpace(query)
+		if trimmedQuery != "" && trimmedQuery != ";" {
+			log.Println("Executing query:", query)
 			_, err := db.Exec(query)
 
 			if err != nil {
@@ -22,7 +26,7 @@ func CreateSchema(db *sql.DB) {
 					fmt.Println("object already exists, skipping... (original error: ", err, ")")
 					continue
 				}
-				log.Fatalf("an error occurred while executing the query against db '%v': %v", db, err)
+				log.Fatalf("an error occurred while executing the query against db '%v': %v\n", db, err)
 			}
 			fmt.Println("Successfully executed query: ", query)
 		}
