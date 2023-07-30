@@ -1,4 +1,5 @@
-package main
+package manager
+
 
 import (
 	"flag"

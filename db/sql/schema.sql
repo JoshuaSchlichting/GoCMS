@@ -1,3 +1,4 @@
+create database cms;
 
 create table if not exists public.organization
 (

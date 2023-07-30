@@ -1,12 +1,12 @@
-package main
+package manager
 
 import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"io"
+	"io/fs"
 	"log"
-	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/joshuaschlichting/gocms/config"
@@ -14,16 +14,13 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func main() {
-	fmt.Println("GoCMS Manager")
-	// read config.yml
-	configYmlData := readConfigFile()
-	configuration := config.LoadConfig(configYmlData)
+var sqlDir fs.FS
 
+func IsManagerProgramCall(configuration config.Config, sqlDirA fs.FS) bool {
+	sqlDir = sqlDirA
 	db, err := sql.Open("postgres", configuration.Database.ConnectionString)
 	queries := database.New(db)
 
-	print("Connected to db!\n")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -34,7 +31,8 @@ func main() {
 	case createSuperUserFlag:
 		executeCreateSuperUserViaTerminalInput(*queries)
 	case initFlag:
-		CreateSchema(db)
+		log.Println("Initializing database schema...")
+		createSchema(db)
 	case listUsersFlag:
 		getUsers(*queries)
 	case deleteAllUsersFlag:
@@ -60,25 +58,23 @@ func main() {
 		log.Println("Destroying schema")
 		DestroySchema(db)
 	default:
-		fmt.Println("No flags set")
+		return false
 	}
-
+	return true
 }
 
 func readFile(filename string) []byte {
-	filePayload, err := os.ReadFile(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return filePayload
-}
 
-func readConfigFile() []byte {
-	configYml, err := os.ReadFile(filepath.Join(getProjectDir(), "config.yml"))
+	file, err := sqlDir.Open(filename)
 	if err != nil {
-		log.Fatalf("Error reading config.yml: %v", err)
+		log.Fatal("error opening sql file:", err)
 	}
-	return configYml
+	filePayload := new([]byte)
+	*filePayload, err = io.ReadAll(file)
+	if err != nil {
+		log.Fatal("error reading sql file:", err)
+	}
+	return *filePayload
 }
 
 func executeCreateSuperUserViaTerminalInput(queries database.Queries) {
@@ -90,13 +86,4 @@ func executeCreateSuperUserViaTerminalInput(queries database.Queries) {
 	fmt.Scanln(&email)
 
 	createSuperUser(queries, username, email)
-}
-
-func getProjectDir() string {
-	wd, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
-	projectDir := strings.Split(wd, "gocms")[0] + "gocms"
-	return projectDir
 }

@@ -18,6 +18,7 @@ import (
 	"github.com/joshuaschlichting/gocms/config"
 	database "github.com/joshuaschlichting/gocms/db"
 	"github.com/joshuaschlichting/gocms/filesystem"
+	"github.com/joshuaschlichting/gocms/manager"
 	"github.com/joshuaschlichting/gocms/middleware"
 	_ "github.com/lib/pq"
 )
@@ -28,15 +29,26 @@ var fileSystem embed.FS
 //go:embed templates
 var templateFS embed.FS
 
+//go:embed config.yml
+var configYml []byte
+
+//go:embed db/sql
+var sqlFS embed.FS
+
 func main() {
 	var (
 		host = flag.String("host", "", "host http address to listen on")
 		port = flag.String("port", "8000", "port number for http listener")
 	)
-	flag.Parse()
-
 	config := config.LoadConfig(readConfigFile())
+	if manager.IsManagerProgramCall(*config, sqlFS) {
+		log.Println("Manager program call finished...")
+		// This was a call to the manager program, not the web site executable
+		return
+	}
 
+	flag.Parse()
+	log.Println("Starting server on port", *port)
 	db, err := sql.Open("postgres", config.Database.ConnectionString)
 	if err != nil {
 		log.Fatal(err)
@@ -44,7 +56,7 @@ func main() {
 	defer db.Close()
 	queries := database.New(db)
 	funcMap := template.FuncMap{}
-
+	log.Println("Loading templates...")
 	templ, err := parseTemplateDir("templates", templateFS, funcMap)
 	if err != nil {
 		log.Fatalf("Error parsing templates: %v", err)
@@ -96,9 +108,5 @@ func listenServe(listenAddr string, handler http.Handler) error {
 
 func readConfigFile() []byte {
 	// read config.yml
-	configYml, err := os.ReadFile("config.yml")
-	if err != nil {
-		log.Fatalf("Error reading config.yml: %v", err)
-	}
 	return configYml
 }
