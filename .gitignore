@@ -6,3 +6,4 @@ launch.sh
 .vscode/
 config.yml
 out/
+.env
