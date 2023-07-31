@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"io/fs"
 	"log"
@@ -33,7 +32,6 @@ func parseTemplateDir(dir string, templateFS fs.FS, funcMap template.FuncMap) (*
 		if err != nil {
 			return err
 		}
-		fmt.Printf("path=%q, isDir=%v\n", path, d.IsDir())
 		if !d.IsDir() {
 			paths = append(paths, path)
 		}
@@ -42,7 +40,6 @@ func parseTemplateDir(dir string, templateFS fs.FS, funcMap template.FuncMap) (*
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("Found templates %v", paths)
 
 	return template.New("").Funcs(funcMap).ParseFS(templateFS, paths...)
 }
