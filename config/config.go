@@ -2,7 +2,6 @@ package config
 
 import (
 	"log"
-	"os"
 
 	"gopkg.in/yaml.v2"
 )
@@ -39,16 +38,7 @@ func loadConfigYaml(configYml []byte) *Config {
 	// unmarshal yml into config struct
 	err := yaml.Unmarshal(configYml, &config) // TODO: this isn't working
 	if err != nil {
-		log.Fatalf("Error unmarshaling config.yml: %v", err)
+		log.Fatalf("error unmarshaling config.yml: %v", err)
 	}
 	return &config
-}
-
-func readConfigFile() []byte {
-	// read config.yml
-	configYml, err := os.ReadFile("config.yml")
-	if err != nil {
-		log.Fatalf("Error reading config.yml: %v", err)
-	}
-	return configYml
 }
