@@ -98,7 +98,7 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 	})
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		err := tmpl.ExecuteTemplate(w, "public_index", map[string]interface{}{
+		err := tmpl.ExecuteTemplate(w, "public_index_titan", map[string]interface{}{
 			"sign_in_url": config.Auth.SignInUrl,
 		})
 		if err != nil {
