@@ -35,16 +35,14 @@ func (m DBMiddleware) AddUserToCtx(h http.Handler) http.Handler {
 		tokenAuth := jwtauth.New("HS256", []byte(m.jwtSecretKey), nil)
 		jwtAuthToken, err := tokenAuth.Decode(jwt)
 		if err != nil {
-			log.Printf("Unable to decode JWT: %s", jwt)
-			log.Printf("Error: %s", err.Error())
+			log.Printf("error decoding JWT from context: %s: JWT from context: %v", err.Error(), jwt)
 			h.ServeHTTP(w, r)
 			return
 		}
 		username, _ := jwtAuthToken.Get("userInfo")
 		user, err := m.db.GetUserByName(r.Context(), username.(string))
 		if err != nil {
-			log.Printf("Unable to get user from db: %s", username)
-			log.Printf("Error: %s", err.Error())
+			log.Printf("unable to get user '%s' from db due to error: %v", username, err.Error())
 		}
 		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), User, user)))
 	})
@@ -65,8 +63,7 @@ func (m DBMiddleware) AuthorizeUserGroup(group string) func(http.Handler) http.H
 				UsergroupName: group,
 			})
 			if err != nil {
-				log.Printf("Unable to check if user is in group: %s", user.Name)
-				log.Printf("Error: %s", err.Error())
+				log.Printf("unable to check if user '%s' is in group '%s' due to error: %v", user.Name, group, err.Error())
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
