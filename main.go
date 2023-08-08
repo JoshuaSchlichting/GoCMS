@@ -55,7 +55,11 @@ func main() {
 	}
 	defer db.Close()
 	queries := database.New(db)
-	funcMap := template.FuncMap{}
+	funcMap := template.FuncMap{
+		"mod": func(i, j int) int {
+			return i % j
+		},
+	}
 	log.Println("Loading templates...")
 	templ, err := parseTemplateDir("templates", templateFS, funcMap)
 	if err != nil {
