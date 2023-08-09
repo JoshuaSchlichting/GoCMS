@@ -163,3 +163,15 @@ select
 from public.blog_post
 where author_id = $1
 order by created_at desc;
+
+-- name: GetBlogPost :one
+select
+  id,
+  title,
+  subtitle,
+  body,
+  author_id,
+  created_at,
+  updated_at
+from public.blog_post
+where id = $1;
