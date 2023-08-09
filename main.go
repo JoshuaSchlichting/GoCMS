@@ -10,8 +10,10 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/go-chi/chi"
 	"github.com/joshuaschlichting/gocms/api"
@@ -20,6 +22,7 @@ import (
 	"github.com/joshuaschlichting/gocms/filesystem"
 	"github.com/joshuaschlichting/gocms/manager"
 	"github.com/joshuaschlichting/gocms/middleware"
+	"github.com/joshuaschlichting/gocms/templates/public/blog"
 	_ "github.com/lib/pq"
 )
 
@@ -95,6 +98,7 @@ func main() {
 	// Register routes
 	initRoutes(r, templ, config, *queries, middlewareMap)
 	api.InitAPI(r, templ, config, *queries, fs)
+	blog.InitRoutes(r, templ, config, *queries, middlewareMap)
 
 	if err := listenServe(addr, r); err != nil {
 		log.Fatal(err)
@@ -113,4 +117,16 @@ func listenServe(listenAddr string, handler http.Handler) error {
 func readConfigFile() []byte {
 	// read config.yml
 	return configYml
+}
+
+func parseConnectionString(connStr string) string {
+	u, err := url.Parse(connStr)
+	if err != nil {
+		log.Fatal(fmt.Errorf("error when parsing connectiong string for a URL: %v", err))
+	}
+
+	// Get DB name from path
+	dbName := strings.TrimPrefix(u.Path, "/")
+
+	return dbName + "@" + u.Host
 }

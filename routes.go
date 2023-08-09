@@ -98,7 +98,7 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 		http.Redirect(w, r, "/secure", http.StatusFound)
 	})
 
-	r.Get("/landing", func(w http.ResponseWriter, r *http.Request) {
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		model := cmstemplate.LandingPageModel{
 			Title:     "GoCMS",
 			SignInURL: config.Auth.SignInUrl,

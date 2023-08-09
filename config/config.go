@@ -26,9 +26,11 @@ type Config struct {
 		} `yaml:"jwt"`
 		SignInUrl string `yaml:"sign_in_url"`
 	} `yaml:"auth"`
+	
 }
 
 func LoadConfig(configYml []byte) *Config {
+	log.Print("DEBUG INFO: configYml: ", string(configYml))
 	return loadConfigYaml(configYml)
 }
 
