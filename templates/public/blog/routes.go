@@ -50,7 +50,6 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		print(body.String())
 		// render template
 		tmpl.ExecuteTemplate(w, "blog", Page{
 			Title:      "Go CMS | A CMS built in Golang!",
@@ -77,23 +76,40 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 		// get post from db
 		id, err := uuid.Parse(chi.URLParam(r, "id"))
 		if err != nil {
-			log.Println("/blog/{id} error parsing id: %v", err)
+			log.Printf("/blog/{id} error parsing id: %v\n", err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
 		}
 		post, err := queries.GetBlogPost(r.Context(), id)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
+		p := Post{
+			ID:                 post.ID,
+			Title:              post.Title,
+			Subtitle:           post.Subtitle,
+			FeaturedImageUri:   post.FeaturedImageUri,
+			Body:               post.Body,
+			PublishedTimestamp: post.CreatedTS,
+			UpdatedTimestamp:   post.UpdatedTS,
+		}
+		// get templates.HTML from "blog/post" template
+		var body bytes.Buffer
+		// create writer
+		bodyWriter := io.Writer(&body)
+		err = tmpl.ExecuteTemplate(bodyWriter, "blog/post", p)
+		if err != nil {
+			log.Printf("error executing template: %v", err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
 
-		// get side widget from db
-
-		// render template
 		// render template
 		tmpl.ExecuteTemplate(w, "blog", Page{
 			Title:      "Go CMS | A CMS built in Golang!",
 			Brand:      "GoCMS",
 			SignInURL:  config.Auth.SignInUrl,
-			Body:       "This is the blog page!",
 			Heading:    "This is the heading",
 			Subheading: "This is the subheading",
 			NavBarLinks: []NavBarLink{
@@ -102,15 +118,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 				{URL: "/about", Text: "About"},
 				{URL: "/contact", Text: "Contact"},
 			},
-			FeaturedPost: Post{
-				ID:                 post.ID,
-				Title:              post.Title,
-				Subtitle:           post.Subtitle,
-				FeaturedImageUri:   post.FeaturedImageUri,
-				Body:               post.Body,
-				PublishedTimestamp: post.CreatedTS,
-				UpdatedTimestamp:   post.UpdatedTS,
-			},
+			Body: template.HTML(body.String()),
 			SideWidget: SideWidget{
 				Title: "Blog Notice",
 				Body:  "Look, there's a lot of 'frameworks' for creating a CMS. What if we just had a dead simple pattern to follow while using as much of Go's standard library as possible?",

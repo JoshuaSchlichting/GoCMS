@@ -1,0 +1,12 @@
+{{ define "blog/post" }}
+<div class="card mb-4">
+    <a href="#!"><img class="card-img-top" src="{{ .FeaturedImageUri }}" alt="..." /></a>
+    <div class="card-body">
+        <div class="small text-muted">Published @ {{ .PublishedTimestamp.Format "2006-01-02 15:04:05" }}
+        </div>
+        <h2 class="card-title">{{ .Title }}</h2>
+        <p class="card-text">{{ .Subtitle }}</p>
+        <p class="card-text">{{ .Body }}</p>
+    </div>
+</div>
+{{ end }}

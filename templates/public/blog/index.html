@@ -9,16 +9,16 @@
     <meta name="author" content="" />
     <title>{{ .Title }}</title>
     <!-- Favicon-->
-    <link rel="icon" type="image/x-icon" href="static/blog/assets/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="/static/blog/assets/favicon.ico" />
     <!-- Core theme CSS (includes Bootstrap)-->
-    <link href="static/blog/css/styles.css" rel="stylesheet" />
+    <link href="/static/blog/css/styles.css" rel="stylesheet" />
 </head>
 
 <body>
     <!-- Responsive navbar-->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="#!">{{ .Brand }}</a>
+            <a class="navbar-brand" href="/blog">{{ .Brand }}</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
                 aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
@@ -46,20 +46,6 @@
             <!-- Blog entries-->
             <div class="col-lg-8">
                 {{ .Body }}
-                <!-- Pagination-->
-                <nav aria-label="Pagination">
-                    <hr class="my-0" />
-                    <ul class="pagination justify-content-center my-4">
-                        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                                aria-disabled="true">Newer</a></li>
-                        <li class="page-item active" aria-current="page"><a class="page-link" href="#!">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#!">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#!">3</a></li>
-                        <li class="page-item disabled"><a class="page-link" href="#!">...</a></li>
-                        <li class="page-item"><a class="page-link" href="#!">15</a></li>
-                        <li class="page-item"><a class="page-link" href="#!">Older</a></li>
-                    </ul>
-                </nav>
             </div>
             <!-- Side widgets-->
             <div class="col-lg-4">
@@ -107,13 +93,17 @@
     <!-- Footer-->
     <footer class="py-5 bg-dark">
         <div class="container">
-            <p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p>
+            <p id="copyRight" class="m-0 text-center text-white">Copyright &copy; {{ .Brand }}</p>
+            <script type="text/javascript">
+                // concat current year to copyRight
+                document.getElementById("copyRight").innerHTML += " " + new Date().getFullYear();
+            </script>
         </div>
     </footer>
     <!-- Bootstrap core JS-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Core theme JS-->
-    <script src="static/blog/js/scripts.js"></script>
+    <script src="/static/blog/js/scripts.js"></script>
 </body>
 
 </html>

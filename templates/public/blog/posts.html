@@ -2,12 +2,13 @@
 
 <!-- Featured blog post-->
 <div class="card mb-4">
-    <a href="#!"><img class="card-img-top" src="{{ .FeaturedPost.FeaturedImageUri }}" alt="..." /></a>
+    <a href="/blog/{{ .FeaturedPost.ID }}"><img class="card-img-top" src="{{ .FeaturedPost.FeaturedImageUri }}" alt="..." /></a>
     <div class="card-body">
-        <div class="small text-muted">Published @ {{ .FeaturedPost.PublishedTimestamp.Format "2006-01-02 15:04:05" }}</div>
+        <div class="small text-muted">Published @ {{ .FeaturedPost.PublishedTimestamp.Format "2006-01-02 15:04:05" }}
+        </div>
         <h2 class="card-title">{{ .FeaturedPost.Title }}</h2>
         <p class="card-text">{{ .FeaturedPost.Subtitle }}</p>
-        <a class="btn btn-primary" href="#!">Read more →</a>
+        <a class="btn btn-primary" href="/blog/{{ .FeaturedPost.ID }}">Read more →</a>
     </div>
 </div>
 <!-- Nested row for blog posts-->
@@ -17,13 +18,13 @@
         {{ range $index, $post := .Posts }}
         {{ if eq (mod $index 2) 0 }}
         <div class="card mb-4">
-            <a href="#!"><img class="card-img-top" src="{{ $post.FeaturedImageUri }}" alt="..." /></a>
+            <a href="/blog/{{ $post.ID }}"><img class="card-img-top" src="{{ $post.FeaturedImageUri }}" alt="..." /></a>
             <div class="card-body">
                 <div class="small text-muted">{{ $post.PublishedTimestamp.Format "2006-01-02 15:04:05"
                     }}</div>
                 <h2 class="card-title h4">{{ $post.Title }}</h2>
                 <p class="card-text">{{ $post.Subtitle }}</p>
-                <a class="btn btn-primary" href="#!">Read more →</a>
+                <a class="btn btn-primary" href="/blog/{{ $post.ID }}">Read more →</a>
             </div>
         </div>
         {{ end }}
@@ -34,17 +35,30 @@
         {{ range $index, $post := .Posts }}
         {{ if eq (mod $index 2) 1 }}
         <div class="card mb-4">
-            <a href="#!"><img class="card-img-top" src="{{ $post.FeaturedImageUri }}" alt="..." /></a>
+            <a href="/blog/{{ $post.ID }}"><img class="card-img-top" src="{{ $post.FeaturedImageUri }}" alt="..." /></a>
             <div class="card-body">
                 <div class="small text-muted">{{ $post.PublishedTimestamp.Format "2006-01-02 15:04:05"
                     }}</div>
                 <h2 class="card-title h4">{{ $post.Title }}</h2>
                 <p class="card-text">{{ $post.Subtitle }}</p>
-                <a class="btn btn-primary" href="#!">Read more →</a>
+                <a class="btn btn-primary" href="/blog/{{ $post.ID }}">Read more →</a>
             </div>
         </div>
         {{ end }}
         {{ end }}
     </div>
 </div>
+<!-- Pagination-->
+<nav aria-label="Pagination">
+    <hr class="my-0" />
+    <ul class="pagination justify-content-center my-4">
+        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Newer</a></li>
+        <li class="page-item active" aria-current="page"><a class="page-link" href="#!">1</a></li>
+        <li class="page-item"><a class="page-link" href="#!">2</a></li>
+        <li class="page-item"><a class="page-link" href="#!">3</a></li>
+        <li class="page-item disabled"><a class="page-link" href="#!">...</a></li>
+        <li class="page-item"><a class="page-link" href="#!">15</a></li>
+        <li class="page-item"><a class="page-link" href="#!">Older</a></li>
+    </ul>
+</nav>
 {{ end }}
