@@ -1,9 +1,11 @@
 package blog
 
 import (
+	"html/template"
 	"regexp"
+	"time"
 
-	"github.com/joshuaschlichting/gocms/db"
+	"github.com/google/uuid"
 )
 
 type NavBarLink struct {
@@ -12,23 +14,27 @@ type NavBarLink struct {
 }
 
 type Post struct {
-	ID          int
-	Title       string
-	Body        string
-	Author      string
-	PublishedAt string
+	ID                 uuid.UUID
+	Title              string
+	Subtitle           string
+	FeaturedImageUri   string
+	Body               string
+	Author             string
+	PublishedTimestamp time.Time
+	UpdatedTimestamp   time.Time
 }
 
 type Page struct {
-	Title       string
-	Brand       string
-	SignInURL   string
-	Body        string
-	Heading     string
-	Subheading  string
-	NavBarLinks []NavBarLink
-	Posts       []db.BlogPost
-	SideWidget  SideWidget
+	Title        string
+	Brand        string
+	SignInURL    string
+	Heading      string
+	Subheading   string
+	FeaturedPost Post
+	NavBarLinks  []NavBarLink
+	Posts        []Post
+	Body         template.HTML
+	SideWidget   SideWidget
 }
 
 type SideWidget struct {

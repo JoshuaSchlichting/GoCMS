@@ -1,4 +1,4 @@
-insert into public.user (id, name, email, attributes, created_at, updated_at)
+insert into public.user (id, name, email, attributes, created_ts, updated_ts)
 values 
     ('5a0e233a-6b11-4d47-8820-1f0b8ca630a2', 'admin', 'admin@localhost', '{"role": "admin"}', current_timestamp, current_timestamp),
     ('1e0f875a-2ab3-4d9f-8b5a-4e4d4b4f4b7c', 'user', 'user@localhost', '{"role": "user"}', current_timestamp, current_timestamp),
@@ -9,7 +9,7 @@ values
 
 
 -- seed public.permission_attribute with permissions such as 'create user', 'delete user', 'create organization', 'delete organization', etc.
-insert into public.permission_attribute (name, created_at, updated_at)
+insert into public.permission_attribute (name, created_ts, updated_ts)
 values
     ('is superuser',
         current_timestamp,
@@ -66,7 +66,7 @@ values
     )
 ;
 
-INSERT INTO public.message (id, to_id, subject, message, created_at, updated_at, from_id)
+INSERT INTO public.message (id, to_id, subject, message, created_ts, updated_ts, from_id)
 VALUES
 ('123e4567-e89b-12d3-a456-426655440000', '123e4567-e89b-12d3-a456-426655440001', 'Sample Subject 1', 'This is a sample message 1', current_timestamp, current_timestamp, '123e4567-e89b-12d3-a456-426655440002'),
 ('123e4567-e89b-12d3-a456-426655440003', '123e4567-e89b-12d3-a456-426655440004', 'Sample Subject 2', 'This is a sample message 2', current_timestamp, current_timestamp, '123e4567-e89b-12d3-a456-426655440005'),

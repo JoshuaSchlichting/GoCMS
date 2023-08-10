@@ -12,7 +12,7 @@ ORDER BY name;
 
 -- name: CreateUser :one
 INSERT INTO public.user (
-    id, name, email, attributes, created_at, updated_at
+    id, name, email, attributes, created_ts, updated_ts
 ) VALUES (
   $1, $2, $3, $4, current_timestamp, current_timestamp
 )
@@ -23,7 +23,7 @@ UPDATE public.user
   set name = $2,
     email = $3,
     attributes = $4,
-    updated_at = current_timestamp
+    updated_ts = current_timestamp
 WHERE id = $1
 RETURNING *;
 
@@ -37,7 +37,7 @@ ORDER BY name;
 
 -- name: UploadFile :one
 INSERT INTO public.file (
-    name, blob, created_at, updated_at, owner_id
+    name, blob, created_ts, updated_ts, owner_id
 ) VALUES (
   $1, $2, current_timestamp, current_timestamp, $3
 )
@@ -48,13 +48,13 @@ update public.organization
   set name = $2,
     email = $3,
     attributes = $4,
-    updated_at = current_timestamp
+    updated_ts = current_timestamp
 WHERE id = $1
 returning *;
 
 -- name: CreateOrganization :one
 insert into public.organization (
-    id, name, email, attributes, created_at, updated_at
+    id, name, email, attributes, created_ts, updated_ts
 ) values (
   $1, $2, $3, $4, current_timestamp, current_timestamp
 )
@@ -66,7 +66,7 @@ where id = $1;
 
 -- name: CreateUserGroup :one
 insert into public.usergroup (
-  id, name, email, attributes, created_at, updated_at
+  id, name, email, attributes, created_ts, updated_ts
 ) values (
   $1, $2, $3, $4, current_timestamp, current_timestamp
 )
@@ -77,7 +77,7 @@ update public.usergroup
   set name = $2,
     email = $3,
     attributes = $4,
-    updated_at = current_timestamp
+    updated_ts = current_timestamp
 where id = $1
 returning *;
 
@@ -107,8 +107,8 @@ select
   from_id,
   subject,
   message,
-  created_at,
-  updated_at
+  created_ts,
+  updated_ts
 from public.message
 where to_username = $1;
 
@@ -118,14 +118,14 @@ select
   to_username,
   subject,
   message,
-  created_at,
-  updated_at
+  created_ts,
+  updated_ts
 from public.message
 where from_id = $1;
 
 -- name: CreateMessage :one
 insert into public.message (
-  id, to_username, subject, message, created_at, updated_at, from_id
+  id, to_username, subject, message, created_ts, updated_ts, from_id
 ) values (
   $1, $2, $3, $4, current_timestamp, current_timestamp, $5
 )
@@ -133,7 +133,7 @@ returning *;
 
 -- name: CreateBlogPost :one
 insert into public.blog_post (
-  id, title, subtitle, body, author_id, created_at, updated_at
+  id, title, subtitle, body, author_id, created_ts, updated_ts
 ) values (
   $1, $2, $3, $4, $5, current_timestamp, current_timestamp
 )
@@ -146,10 +146,11 @@ select
   subtitle,
   body,
   author_id,
-  created_at,
-  updated_at
+  featured_image_uri,
+  created_ts,
+  updated_ts
 from public.blog_post
-order by created_at desc;
+order by created_ts desc;
 
 -- name: ListBlogPostsByUser :many
 select
@@ -158,11 +159,12 @@ select
   subtitle,
   body,
   author_id,
-  created_at,
-  updated_at
+  featured_image_uri,
+  created_ts,
+  updated_ts
 from public.blog_post
 where author_id = $1
-order by created_at desc;
+order by created_ts desc;
 
 -- name: GetBlogPost :one
 select
@@ -171,7 +173,8 @@ select
   subtitle,
   body,
   author_id,
-  created_at,
-  updated_at
+  featured_image_uri,
+  created_ts,
+  updated_ts
 from public.blog_post
 where id = $1;

@@ -1,0 +1,50 @@
+{{ define "blog/posts" }}
+
+<!-- Featured blog post-->
+<div class="card mb-4">
+    <a href="#!"><img class="card-img-top" src="{{ .FeaturedPost.FeaturedImageUri }}" alt="..." /></a>
+    <div class="card-body">
+        <div class="small text-muted">Published @ {{ .FeaturedPost.PublishedTimestamp.Format "2006-01-02 15:04:05" }}</div>
+        <h2 class="card-title">{{ .FeaturedPost.Title }}</h2>
+        <p class="card-text">{{ .FeaturedPost.Subtitle }}</p>
+        <a class="btn btn-primary" href="#!">Read more →</a>
+    </div>
+</div>
+<!-- Nested row for blog posts-->
+<div class="row">
+    <div class="col-lg-6">
+        <!-- Loop for the first half of the posts -->
+        {{ range $index, $post := .Posts }}
+        {{ if eq (mod $index 2) 0 }}
+        <div class="card mb-4">
+            <a href="#!"><img class="card-img-top" src="{{ $post.FeaturedImageUri }}" alt="..." /></a>
+            <div class="card-body">
+                <div class="small text-muted">{{ $post.PublishedTimestamp.Format "2006-01-02 15:04:05"
+                    }}</div>
+                <h2 class="card-title h4">{{ $post.Title }}</h2>
+                <p class="card-text">{{ $post.Subtitle }}</p>
+                <a class="btn btn-primary" href="#!">Read more →</a>
+            </div>
+        </div>
+        {{ end }}
+        {{ end }}
+    </div>
+    <div class="col-lg-6">
+        <!-- Loop for the second half of the posts -->
+        {{ range $index, $post := .Posts }}
+        {{ if eq (mod $index 2) 1 }}
+        <div class="card mb-4">
+            <a href="#!"><img class="card-img-top" src="{{ $post.FeaturedImageUri }}" alt="..." /></a>
+            <div class="card-body">
+                <div class="small text-muted">{{ $post.PublishedTimestamp.Format "2006-01-02 15:04:05"
+                    }}</div>
+                <h2 class="card-title h4">{{ $post.Title }}</h2>
+                <p class="card-text">{{ $post.Subtitle }}</p>
+                <a class="btn btn-primary" href="#!">Read more →</a>
+            </div>
+        </div>
+        {{ end }}
+        {{ end }}
+    </div>
+</div>
+{{ end }}

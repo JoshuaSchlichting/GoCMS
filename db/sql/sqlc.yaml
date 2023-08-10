@@ -8,3 +8,6 @@ sql:
         emit_json_tags: true
         package: "db"
         out: "../."
+        rename:
+          created_ts: "CreatedTS"
+          updated_ts: "UpdatedTS"

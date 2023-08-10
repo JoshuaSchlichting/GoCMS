@@ -15,11 +15,11 @@ import (
 
 const createBlogPost = `-- name: CreateBlogPost :one
 insert into public.blog_post (
-  id, title, subtitle, body, author_id, created_at, updated_at
+  id, title, subtitle, body, author_id, created_ts, updated_ts
 ) values (
   $1, $2, $3, $4, $5, current_timestamp, current_timestamp
 )
-returning id, title, subtitle, body, author_id, created_at, updated_at
+returning id, title, subtitle, featured_image_uri, body, author_id, created_ts, updated_ts
 `
 
 type CreateBlogPostParams struct {
@@ -43,21 +43,22 @@ func (q *Queries) CreateBlogPost(ctx context.Context, arg CreateBlogPostParams) 
 		&i.ID,
 		&i.Title,
 		&i.Subtitle,
+		&i.FeaturedImageUri,
 		&i.Body,
 		&i.AuthorID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.CreatedTS,
+		&i.UpdatedTS,
 	)
 	return i, err
 }
 
 const createMessage = `-- name: CreateMessage :one
 insert into public.message (
-  id, to_username, subject, message, created_at, updated_at, from_id
+  id, to_username, subject, message, created_ts, updated_ts, from_id
 ) values (
   $1, $2, $3, $4, current_timestamp, current_timestamp, $5
 )
-returning id, to_username, subject, message, created_at, updated_at, from_id
+returning id, to_username, subject, message, created_ts, updated_ts, from_id
 `
 
 type CreateMessageParams struct {
@@ -82,8 +83,8 @@ func (q *Queries) CreateMessage(ctx context.Context, arg CreateMessageParams) (M
 		&i.ToUsername,
 		&i.Subject,
 		&i.Message,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.CreatedTS,
+		&i.UpdatedTS,
 		&i.FromID,
 	)
 	return i, err
@@ -91,11 +92,11 @@ func (q *Queries) CreateMessage(ctx context.Context, arg CreateMessageParams) (M
 
 const createOrganization = `-- name: CreateOrganization :one
 insert into public.organization (
-    id, name, email, attributes, created_at, updated_at
+    id, name, email, attributes, created_ts, updated_ts
 ) values (
   $1, $2, $3, $4, current_timestamp, current_timestamp
 )
-returning id, name, email, attributes, created_at, updated_at
+returning id, name, email, attributes, created_ts, updated_ts
 `
 
 type CreateOrganizationParams struct {
@@ -118,19 +119,19 @@ func (q *Queries) CreateOrganization(ctx context.Context, arg CreateOrganization
 		&i.Name,
 		&i.Email,
 		&i.Attributes,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.CreatedTS,
+		&i.UpdatedTS,
 	)
 	return i, err
 }
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO public.user (
-    id, name, email, attributes, created_at, updated_at
+    id, name, email, attributes, created_ts, updated_ts
 ) VALUES (
   $1, $2, $3, $4, current_timestamp, current_timestamp
 )
-RETURNING id, organization_id, name, email, attributes, created_at, updated_at
+RETURNING id, organization_id, name, email, attributes, created_ts, updated_ts
 `
 
 type CreateUserParams struct {
@@ -154,19 +155,19 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Name,
 		&i.Email,
 		&i.Attributes,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.CreatedTS,
+		&i.UpdatedTS,
 	)
 	return i, err
 }
 
 const createUserGroup = `-- name: CreateUserGroup :one
 insert into public.usergroup (
-  id, name, email, attributes, created_at, updated_at
+  id, name, email, attributes, created_ts, updated_ts
 ) values (
   $1, $2, $3, $4, current_timestamp, current_timestamp
 )
-returning id, name, email, attributes, created_at, updated_at
+returning id, name, email, attributes, created_ts, updated_ts
 `
 
 type CreateUserGroupParams struct {
@@ -189,8 +190,8 @@ func (q *Queries) CreateUserGroup(ctx context.Context, arg CreateUserGroupParams
 		&i.Name,
 		&i.Email,
 		&i.Attributes,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.CreatedTS,
+		&i.UpdatedTS,
 	)
 	return i, err
 }
@@ -232,29 +233,42 @@ select
   subtitle,
   body,
   author_id,
-  created_at,
-  updated_at
+  featured_image_uri,
+  created_ts,
+  updated_ts
 from public.blog_post
 where id = $1
 `
 
-func (q *Queries) GetBlogPost(ctx context.Context, id uuid.UUID) (BlogPost, error) {
+type GetBlogPostRow struct {
+	ID               uuid.UUID `json:"id"`
+	Title            string    `json:"title"`
+	Subtitle         string    `json:"subtitle"`
+	Body             string    `json:"body"`
+	AuthorID         uuid.UUID `json:"author_id"`
+	FeaturedImageUri string    `json:"featured_image_uri"`
+	CreatedTS        time.Time `json:"created_ts"`
+	UpdatedTS        time.Time `json:"updated_ts"`
+}
+
+func (q *Queries) GetBlogPost(ctx context.Context, id uuid.UUID) (GetBlogPostRow, error) {
 	row := q.db.QueryRowContext(ctx, getBlogPost, id)
-	var i BlogPost
+	var i GetBlogPostRow
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
 		&i.Subtitle,
 		&i.Body,
 		&i.AuthorID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.FeaturedImageUri,
+		&i.CreatedTS,
+		&i.UpdatedTS,
 	)
 	return i, err
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, organization_id, name, email, attributes, created_at, updated_at FROM public.user
+SELECT id, organization_id, name, email, attributes, created_ts, updated_ts FROM public.user
 WHERE id = $1 LIMIT 1
 `
 
@@ -267,14 +281,14 @@ func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.Name,
 		&i.Email,
 		&i.Attributes,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.CreatedTS,
+		&i.UpdatedTS,
 	)
 	return i, err
 }
 
 const getUserByName = `-- name: GetUserByName :one
-SELECT id, organization_id, name, email, attributes, created_at, updated_at FROM public.user
+SELECT id, organization_id, name, email, attributes, created_ts, updated_ts FROM public.user
 WHERE name = $1
 `
 
@@ -287,8 +301,8 @@ func (q *Queries) GetUserByName(ctx context.Context, name string) (User, error) 
 		&i.Name,
 		&i.Email,
 		&i.Attributes,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.CreatedTS,
+		&i.UpdatedTS,
 	)
 	return i, err
 }
@@ -321,29 +335,42 @@ select
   subtitle,
   body,
   author_id,
-  created_at,
-  updated_at
+  featured_image_uri,
+  created_ts,
+  updated_ts
 from public.blog_post
-order by created_at desc
+order by created_ts desc
 `
 
-func (q *Queries) ListBlogPosts(ctx context.Context) ([]BlogPost, error) {
+type ListBlogPostsRow struct {
+	ID               uuid.UUID `json:"id"`
+	Title            string    `json:"title"`
+	Subtitle         string    `json:"subtitle"`
+	Body             string    `json:"body"`
+	AuthorID         uuid.UUID `json:"author_id"`
+	FeaturedImageUri string    `json:"featured_image_uri"`
+	CreatedTS        time.Time `json:"created_ts"`
+	UpdatedTS        time.Time `json:"updated_ts"`
+}
+
+func (q *Queries) ListBlogPosts(ctx context.Context) ([]ListBlogPostsRow, error) {
 	rows, err := q.db.QueryContext(ctx, listBlogPosts)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []BlogPost
+	var items []ListBlogPostsRow
 	for rows.Next() {
-		var i BlogPost
+		var i ListBlogPostsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
 			&i.Subtitle,
 			&i.Body,
 			&i.AuthorID,
-			&i.CreatedAt,
-			&i.UpdatedAt,
+			&i.FeaturedImageUri,
+			&i.CreatedTS,
+			&i.UpdatedTS,
 		); err != nil {
 			return nil, err
 		}
@@ -365,30 +392,43 @@ select
   subtitle,
   body,
   author_id,
-  created_at,
-  updated_at
+  featured_image_uri,
+  created_ts,
+  updated_ts
 from public.blog_post
 where author_id = $1
-order by created_at desc
+order by created_ts desc
 `
 
-func (q *Queries) ListBlogPostsByUser(ctx context.Context, authorID uuid.UUID) ([]BlogPost, error) {
+type ListBlogPostsByUserRow struct {
+	ID               uuid.UUID `json:"id"`
+	Title            string    `json:"title"`
+	Subtitle         string    `json:"subtitle"`
+	Body             string    `json:"body"`
+	AuthorID         uuid.UUID `json:"author_id"`
+	FeaturedImageUri string    `json:"featured_image_uri"`
+	CreatedTS        time.Time `json:"created_ts"`
+	UpdatedTS        time.Time `json:"updated_ts"`
+}
+
+func (q *Queries) ListBlogPostsByUser(ctx context.Context, authorID uuid.UUID) ([]ListBlogPostsByUserRow, error) {
 	rows, err := q.db.QueryContext(ctx, listBlogPostsByUser, authorID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []BlogPost
+	var items []ListBlogPostsByUserRow
 	for rows.Next() {
-		var i BlogPost
+		var i ListBlogPostsByUserRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
 			&i.Subtitle,
 			&i.Body,
 			&i.AuthorID,
-			&i.CreatedAt,
-			&i.UpdatedAt,
+			&i.FeaturedImageUri,
+			&i.CreatedTS,
+			&i.UpdatedTS,
 		); err != nil {
 			return nil, err
 		}
@@ -404,7 +444,7 @@ func (q *Queries) ListBlogPostsByUser(ctx context.Context, authorID uuid.UUID) (
 }
 
 const listFiles = `-- name: ListFiles :many
-SELECT id, name, blob, created_at, updated_at, owner_id FROM public.file
+SELECT id, name, blob, created_ts, updated_ts, owner_id FROM public.file
 ORDER BY name
 `
 
@@ -421,8 +461,8 @@ func (q *Queries) ListFiles(ctx context.Context) ([]File, error) {
 			&i.ID,
 			&i.Name,
 			&i.Blob,
-			&i.CreatedAt,
-			&i.UpdatedAt,
+			&i.CreatedTS,
+			&i.UpdatedTS,
 			&i.OwnerID,
 		); err != nil {
 			return nil, err
@@ -444,8 +484,8 @@ select
   to_username,
   subject,
   message,
-  created_at,
-  updated_at
+  created_ts,
+  updated_ts
 from public.message
 where from_id = $1
 `
@@ -455,8 +495,8 @@ type ListMessagesFromRow struct {
 	ToUsername string    `json:"to_username"`
 	Subject    string    `json:"subject"`
 	Message    string    `json:"message"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	CreatedTS  time.Time `json:"created_ts"`
+	UpdatedTS  time.Time `json:"updated_ts"`
 }
 
 func (q *Queries) ListMessagesFrom(ctx context.Context, fromID uuid.UUID) ([]ListMessagesFromRow, error) {
@@ -473,8 +513,8 @@ func (q *Queries) ListMessagesFrom(ctx context.Context, fromID uuid.UUID) ([]Lis
 			&i.ToUsername,
 			&i.Subject,
 			&i.Message,
-			&i.CreatedAt,
-			&i.UpdatedAt,
+			&i.CreatedTS,
+			&i.UpdatedTS,
 		); err != nil {
 			return nil, err
 		}
@@ -495,8 +535,8 @@ select
   from_id,
   subject,
   message,
-  created_at,
-  updated_at
+  created_ts,
+  updated_ts
 from public.message
 where to_username = $1
 `
@@ -506,8 +546,8 @@ type ListMessagesToRow struct {
 	FromID    uuid.UUID `json:"from_id"`
 	Subject   string    `json:"subject"`
 	Message   string    `json:"message"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CreatedTS time.Time `json:"created_ts"`
+	UpdatedTS time.Time `json:"updated_ts"`
 }
 
 func (q *Queries) ListMessagesTo(ctx context.Context, toUsername string) ([]ListMessagesToRow, error) {
@@ -524,8 +564,8 @@ func (q *Queries) ListMessagesTo(ctx context.Context, toUsername string) ([]List
 			&i.FromID,
 			&i.Subject,
 			&i.Message,
-			&i.CreatedAt,
-			&i.UpdatedAt,
+			&i.CreatedTS,
+			&i.UpdatedTS,
 		); err != nil {
 			return nil, err
 		}
@@ -541,7 +581,7 @@ func (q *Queries) ListMessagesTo(ctx context.Context, toUsername string) ([]List
 }
 
 const listOrganizations = `-- name: ListOrganizations :many
-SELECT id, name, email, attributes, created_at, updated_at FROM public.organization
+SELECT id, name, email, attributes, created_ts, updated_ts FROM public.organization
 ORDER BY name
 `
 
@@ -559,8 +599,8 @@ func (q *Queries) ListOrganizations(ctx context.Context) ([]Organization, error)
 			&i.Name,
 			&i.Email,
 			&i.Attributes,
-			&i.CreatedAt,
-			&i.UpdatedAt,
+			&i.CreatedTS,
+			&i.UpdatedTS,
 		); err != nil {
 			return nil, err
 		}
@@ -576,7 +616,7 @@ func (q *Queries) ListOrganizations(ctx context.Context) ([]Organization, error)
 }
 
 const listUserGroups = `-- name: ListUserGroups :many
-select id, name, email, attributes, created_at, updated_at from public.usergroup
+select id, name, email, attributes, created_ts, updated_ts from public.usergroup
 order by name
 `
 
@@ -594,8 +634,8 @@ func (q *Queries) ListUserGroups(ctx context.Context) ([]Usergroup, error) {
 			&i.Name,
 			&i.Email,
 			&i.Attributes,
-			&i.CreatedAt,
-			&i.UpdatedAt,
+			&i.CreatedTS,
+			&i.UpdatedTS,
 		); err != nil {
 			return nil, err
 		}
@@ -611,7 +651,7 @@ func (q *Queries) ListUserGroups(ctx context.Context) ([]Usergroup, error) {
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, organization_id, name, email, attributes, created_at, updated_at FROM public.user
+SELECT id, organization_id, name, email, attributes, created_ts, updated_ts FROM public.user
 ORDER BY name
 `
 
@@ -630,8 +670,8 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 			&i.Name,
 			&i.Email,
 			&i.Attributes,
-			&i.CreatedAt,
-			&i.UpdatedAt,
+			&i.CreatedTS,
+			&i.UpdatedTS,
 		); err != nil {
 			return nil, err
 		}
@@ -651,9 +691,9 @@ update public.organization
   set name = $2,
     email = $3,
     attributes = $4,
-    updated_at = current_timestamp
+    updated_ts = current_timestamp
 WHERE id = $1
-returning id, name, email, attributes, created_at, updated_at
+returning id, name, email, attributes, created_ts, updated_ts
 `
 
 type UpdateOrganizationParams struct {
@@ -676,8 +716,8 @@ func (q *Queries) UpdateOrganization(ctx context.Context, arg UpdateOrganization
 		&i.Name,
 		&i.Email,
 		&i.Attributes,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.CreatedTS,
+		&i.UpdatedTS,
 	)
 	return i, err
 }
@@ -687,9 +727,9 @@ UPDATE public.user
   set name = $2,
     email = $3,
     attributes = $4,
-    updated_at = current_timestamp
+    updated_ts = current_timestamp
 WHERE id = $1
-RETURNING id, organization_id, name, email, attributes, created_at, updated_at
+RETURNING id, organization_id, name, email, attributes, created_ts, updated_ts
 `
 
 type UpdateUserParams struct {
@@ -713,8 +753,8 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.Name,
 		&i.Email,
 		&i.Attributes,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.CreatedTS,
+		&i.UpdatedTS,
 	)
 	return i, err
 }
@@ -724,9 +764,9 @@ update public.usergroup
   set name = $2,
     email = $3,
     attributes = $4,
-    updated_at = current_timestamp
+    updated_ts = current_timestamp
 where id = $1
-returning id, name, email, attributes, created_at, updated_at
+returning id, name, email, attributes, created_ts, updated_ts
 `
 
 type UpdateUserGroupParams struct {
@@ -749,19 +789,19 @@ func (q *Queries) UpdateUserGroup(ctx context.Context, arg UpdateUserGroupParams
 		&i.Name,
 		&i.Email,
 		&i.Attributes,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.CreatedTS,
+		&i.UpdatedTS,
 	)
 	return i, err
 }
 
 const uploadFile = `-- name: UploadFile :one
 INSERT INTO public.file (
-    name, blob, created_at, updated_at, owner_id
+    name, blob, created_ts, updated_ts, owner_id
 ) VALUES (
   $1, $2, current_timestamp, current_timestamp, $3
 )
-RETURNING id, name, blob, created_at, updated_at, owner_id
+RETURNING id, name, blob, created_ts, updated_ts, owner_id
 `
 
 type UploadFileParams struct {
@@ -777,8 +817,8 @@ func (q *Queries) UploadFile(ctx context.Context, arg UploadFileParams) (File, e
 		&i.ID,
 		&i.Name,
 		&i.Blob,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.CreatedTS,
+		&i.UpdatedTS,
 		&i.OwnerID,
 	)
 	return i, err

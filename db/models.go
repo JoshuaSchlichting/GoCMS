@@ -12,43 +12,44 @@ import (
 )
 
 type BlogPost struct {
-	ID        uuid.UUID `json:"id"`
-	Title     string    `json:"title"`
-	Subtitle  string    `json:"subtitle"`
-	Body      string    `json:"body"`
-	AuthorID  uuid.UUID `json:"author_id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID               uuid.UUID `json:"id"`
+	Title            string    `json:"title"`
+	Subtitle         string    `json:"subtitle"`
+	FeaturedImageUri string    `json:"featured_image_uri"`
+	Body             string    `json:"body"`
+	AuthorID         uuid.UUID `json:"author_id"`
+	CreatedTS        time.Time `json:"created_ts"`
+	UpdatedTS        time.Time `json:"updated_ts"`
 }
 
 type File struct {
 	ID        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`
 	Blob      []byte    `json:"blob"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CreatedTS time.Time `json:"created_ts"`
+	UpdatedTS time.Time `json:"updated_ts"`
 	OwnerID   uuid.UUID `json:"owner_id"`
 }
 
 type FileFilegroup struct {
 	FileID      uuid.UUID `json:"file_id"`
 	FilegroupID uuid.UUID `json:"filegroup_id"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	CreatedTS   time.Time `json:"created_ts"`
+	UpdatedTS   time.Time `json:"updated_ts"`
 }
 
 type Filegroup struct {
 	ID        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CreatedTS time.Time `json:"created_ts"`
+	UpdatedTS time.Time `json:"updated_ts"`
 }
 
 type Invoice struct {
 	ID             uuid.UUID `json:"id"`
 	Amount         float64   `json:"amount"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
+	CreatedTS      time.Time `json:"created_ts"`
+	UpdatedTS      time.Time `json:"updated_ts"`
 	UserID         uuid.UUID `json:"user_id"`
 	OrgnaizationID uuid.UUID `json:"orgnaization_id"`
 }
@@ -58,8 +59,8 @@ type Message struct {
 	ToUsername string    `json:"to_username"`
 	Subject    string    `json:"subject"`
 	Message    string    `json:"message"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	CreatedTS  time.Time `json:"created_ts"`
+	UpdatedTS  time.Time `json:"updated_ts"`
 	FromID     uuid.UUID `json:"from_id"`
 }
 
@@ -68,15 +69,15 @@ type Organization struct {
 	Name       string          `json:"name"`
 	Email      string          `json:"email"`
 	Attributes json.RawMessage `json:"attributes"`
-	CreatedAt  time.Time       `json:"created_at"`
-	UpdatedAt  time.Time       `json:"updated_at"`
+	CreatedTS  time.Time       `json:"created_ts"`
+	UpdatedTS  time.Time       `json:"updated_ts"`
 }
 
 type PermissionAttribute struct {
 	ID        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CreatedTS time.Time `json:"created_ts"`
+	UpdatedTS time.Time `json:"updated_ts"`
 }
 
 type User struct {
@@ -85,22 +86,22 @@ type User struct {
 	Name           string          `json:"name"`
 	Email          string          `json:"email"`
 	Attributes     json.RawMessage `json:"attributes"`
-	CreatedAt      time.Time       `json:"created_at"`
-	UpdatedAt      time.Time       `json:"updated_at"`
+	CreatedTS      time.Time       `json:"created_ts"`
+	UpdatedTS      time.Time       `json:"updated_ts"`
 }
 
 type UserPermissionAttribute struct {
 	UserID                uuid.UUID `json:"user_id"`
 	PermissionAttributeID uuid.UUID `json:"permission_attribute_id"`
-	CreatedAt             time.Time `json:"created_at"`
-	UpdatedAt             time.Time `json:"updated_at"`
+	CreatedTS             time.Time `json:"created_ts"`
+	UpdatedTS             time.Time `json:"updated_ts"`
 }
 
 type UserUsergroup struct {
 	UserID      uuid.UUID `json:"user_id"`
 	UsergroupID uuid.UUID `json:"usergroup_id"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	CreatedTS   time.Time `json:"created_ts"`
+	UpdatedTS   time.Time `json:"updated_ts"`
 }
 
 type Usergroup struct {
@@ -108,20 +109,20 @@ type Usergroup struct {
 	Name       string          `json:"name"`
 	Email      string          `json:"email"`
 	Attributes json.RawMessage `json:"attributes"`
-	CreatedAt  time.Time       `json:"created_at"`
-	UpdatedAt  time.Time       `json:"updated_at"`
+	CreatedTS  time.Time       `json:"created_ts"`
+	UpdatedTS  time.Time       `json:"updated_ts"`
 }
 
 type UsergroupOrganization struct {
 	UsergroupID    uuid.UUID `json:"usergroup_id"`
 	OrganizationID uuid.UUID `json:"organization_id"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
+	CreatedTS      time.Time `json:"created_ts"`
+	UpdatedTS      time.Time `json:"updated_ts"`
 }
 
 type UsergroupPermissionAttribute struct {
 	UsergroupID           uuid.UUID `json:"usergroup_id"`
 	PermissionAttributeID uuid.UUID `json:"permission_attribute_id"`
-	CreatedAt             time.Time `json:"created_at"`
-	UpdatedAt             time.Time `json:"updated_at"`
+	CreatedTS             time.Time `json:"created_ts"`
+	UpdatedTS             time.Time `json:"updated_ts"`
 }
