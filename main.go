@@ -17,25 +17,26 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/joshuaschlichting/gocms/api"
+	"github.com/joshuaschlichting/gocms/apps/public/blog"
 	"github.com/joshuaschlichting/gocms/config"
-	database "github.com/joshuaschlichting/gocms/db"
+	"github.com/joshuaschlichting/gocms/data/cache"
+	database "github.com/joshuaschlichting/gocms/data/db"
 	"github.com/joshuaschlichting/gocms/filesystem"
 	"github.com/joshuaschlichting/gocms/manager"
 	"github.com/joshuaschlichting/gocms/middleware"
-	"github.com/joshuaschlichting/gocms/template/public/blog"
 	_ "github.com/lib/pq"
 )
 
 //go:embed static
 var fileSystem embed.FS
 
-//go:embed template
+//go:embed apps
 var templateFS embed.FS
 
 //go:embed config.yml
 var configYml []byte
 
-//go:embed db/sql
+//go:embed data/db/sql
 var sqlFS embed.FS
 
 func main() {
@@ -58,6 +59,8 @@ func main() {
 	}
 	defer db.Close()
 	queries := database.New(db)
+	c := cache.New()
+	cache := database.NewDBCache(queries, c)
 	funcMap := template.FuncMap{
 		"mod": func(i, j int) int {
 			return i % j
@@ -86,7 +89,7 @@ func main() {
 		},
 	}
 	log.Println("Loading templates...")
-	templ, err := parseTemplateDir("template", templateFS, funcMap)
+	templ, err := parseTemplateDir("apps", templateFS, funcMap)
 	if err != nil {
 		log.Fatalf("Error parsing templates: %v", err)
 	}
@@ -99,7 +102,7 @@ func main() {
 	middleware.InitMiddleware(config)
 
 	// Register common middleware
-	dbMiddlware := middleware.NewMiddlewareWithDB(*queries, config.Auth.JWT.SecretKey)
+	dbMiddlware := middleware.NewMiddlewareWithDB(*cache, config.Auth.JWT.SecretKey)
 	r.Use(middleware.LogAllButStaticRequests)
 
 	middlewareMap := map[string]func(http.Handler) http.Handler{}
@@ -118,9 +121,9 @@ func main() {
 	fs := filesystem.NewLocalFilesystem(gocmsPath)
 
 	// Register routes
-	initRoutes(r, templ, config, *queries, middlewareMap)
-	api.InitAPI(r, templ, config, *queries, fs)
-	blog.InitRoutes(r, templ, config, *queries, middlewareMap)
+	initRoutes(r, templ, config, *cache, middlewareMap)
+	api.InitAPI(r, templ, config, *cache, fs)
+	blog.InitRoutes(r, templ, config, *cache, middlewareMap)
 
 	if err := listenServe(addr, r); err != nil {
 		log.Fatal(err)

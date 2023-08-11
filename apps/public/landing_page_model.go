@@ -1,4 +1,4 @@
-package template
+package public
 
 type NavBarLink struct {
 	URL  string

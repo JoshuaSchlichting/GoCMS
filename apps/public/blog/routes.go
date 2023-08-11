@@ -11,10 +11,10 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 	"github.com/joshuaschlichting/gocms/config"
-	"github.com/joshuaschlichting/gocms/db"
+	"github.com/joshuaschlichting/gocms/data/db"
 )
 
-func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.Queries, middlewareMap map[string]func(http.Handler) http.Handler) {
+func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.DBCache, middlewareMap map[string]func(http.Handler) http.Handler) {
 
 	r.Get("/blog", func(w http.ResponseWriter, r *http.Request) {
 		// get posts from db

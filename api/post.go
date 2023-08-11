@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
-	"github.com/joshuaschlichting/gocms/db"
+	"github.com/joshuaschlichting/gocms/data/db"
 )
 
 func (a *API) initPostRoutes() {

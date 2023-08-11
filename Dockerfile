@@ -1,4 +1,4 @@
-FROM golang:latest AS builder
+FROM golang:1.21 AS builder
 WORKDIR /buildarea
 COPY go.mod go.sum ./
 # Dependencies will be cached if the go.mod and the go.sum files are not changed 

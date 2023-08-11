@@ -10,15 +10,15 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/jwtauth"
 	"github.com/google/uuid"
+	"github.com/joshuaschlichting/gocms/apps/admin/components"
+	cmstemplate "github.com/joshuaschlichting/gocms/apps/public"
 	"github.com/joshuaschlichting/gocms/auth"
 	"github.com/joshuaschlichting/gocms/config"
-	"github.com/joshuaschlichting/gocms/db"
+	"github.com/joshuaschlichting/gocms/data/db"
 	"github.com/joshuaschlichting/gocms/middleware"
-	cmstemplate "github.com/joshuaschlichting/gocms/template"
-	"github.com/joshuaschlichting/gocms/template/admin/components"
 )
 
-func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.Queries, middlewareMap map[string]func(http.Handler) http.Handler) {
+func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.DBCache, middlewareMap map[string]func(http.Handler) http.Handler) {
 	r.Get("/admin", func(w http.ResponseWriter, r *http.Request) {
 		// if not logged in
 		if r.Context().Value(middleware.User) == nil {

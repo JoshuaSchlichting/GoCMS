@@ -6,14 +6,14 @@ import (
 	"net/http"
 
 	"github.com/go-chi/jwtauth"
-	"github.com/joshuaschlichting/gocms/db"
+	"github.com/joshuaschlichting/gocms/data/db"
 )
 
 type MiddlewareWithDB interface {
 	AddUserToCtx(h http.Handler) http.Handler
 }
 
-func NewMiddlewareWithDB(db db.Queries, jwtSecretKey string) DBMiddleware {
+func NewMiddlewareWithDB(db db.DBCache, jwtSecretKey string) DBMiddleware {
 	r := DBMiddleware{
 		db:           db,
 		jwtSecretKey: jwtSecretKey,
@@ -22,7 +22,7 @@ func NewMiddlewareWithDB(db db.Queries, jwtSecretKey string) DBMiddleware {
 }
 
 type DBMiddleware struct {
-	db           db.Queries
+	db           db.DBCache
 	jwtSecretKey string
 }
 

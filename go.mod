@@ -1,6 +1,6 @@
 module github.com/joshuaschlichting/gocms
 
-go 1.19
+go 1.20
 
 require github.com/lestrrat-go/jwx v1.1.0
 

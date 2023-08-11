@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/joshuaschlichting/gocms/auth"
 	"github.com/joshuaschlichting/gocms/config"
-	"github.com/joshuaschlichting/gocms/db"
+	"github.com/joshuaschlichting/gocms/data/db"
 	"github.com/lestrrat-go/jwx/jwt"
 )
 

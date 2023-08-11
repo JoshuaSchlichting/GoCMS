@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/joshuaschlichting/gocms/config"
-	"github.com/joshuaschlichting/gocms/db"
+	"github.com/joshuaschlichting/gocms/data/db"
 )
 
 type filesystem interface {
@@ -17,13 +17,13 @@ type filesystem interface {
 type API struct {
 	tmpl       *template.Template
 	config     *config.Config
-	data       db.Queries
+	data       db.DBCache
 	fs         filesystem
 	router     *chi.Mux
 	middleware map[string]func(http.Handler) http.Handler
 }
 
-func InitAPI(r *chi.Mux, tmpl *template.Template, config *config.Config, data db.Queries, fs filesystem) *API {
+func InitAPI(r *chi.Mux, tmpl *template.Template, config *config.Config, data db.DBCache, fs filesystem) *API {
 	api := &API{
 		tmpl:   tmpl,
 		config: config,

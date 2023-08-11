@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/joshuaschlichting/gocms/config"
-	database "github.com/joshuaschlichting/gocms/db"
+	database "github.com/joshuaschlichting/gocms/data/db"
 	_ "github.com/lib/pq"
 )
 
