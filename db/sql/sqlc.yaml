@@ -11,3 +11,4 @@ sql:
         rename:
           created_ts: "CreatedTS"
           updated_ts: "UpdatedTS"
+          featured_image_uri: "FeaturedImageURI"

@@ -15,7 +15,7 @@ type BlogPost struct {
 	ID               uuid.UUID `json:"id"`
 	Title            string    `json:"title"`
 	Subtitle         string    `json:"subtitle"`
-	FeaturedImageUri string    `json:"featured_image_uri"`
+	FeaturedImageURI string    `json:"featured_image_uri"`
 	Body             string    `json:"body"`
 	AuthorID         uuid.UUID `json:"author_id"`
 	CreatedTS        time.Time `json:"created_ts"`

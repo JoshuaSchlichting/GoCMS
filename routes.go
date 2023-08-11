@@ -112,6 +112,10 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 					URL:  config.Auth.SignInUrl,
 					Text: "Sign In",
 				},
+				{
+					URL:  "/admin",
+					Text: "Login",
+				},
 			},
 			FeaturedItems: []cmstemplate.FeaturedItem{
 				{
@@ -595,8 +599,8 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 						<th>FromID</th>
 						<th>Subject</th>
 						<th>Message</th>
-						<th>CreatedAt</th>
-						<th>UpdatedAt</th>
+						<th>Created Time</th>
+						<th>Updated Time</th>
 					  </tr>
 					</thead>
 					<tbody>
@@ -606,8 +610,8 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 						<td>{{.FromID}}</td>
 						<td>{{.Subject}}</td>
 						<td>{{.Message}}</td>
-						<td>{{.CreatedAt}}</td>
-						<td>{{.UpdatedAt}}</td>
+						<td>{{.CreatedTS.Format "2006-01-02 15:04:05"  }}</td>
+						<td>{{.UpdatedTS.Format "2006-01-02 15:04:05"}}</td>
 					  </tr>
 					  {{end}}
 					</tbody>
@@ -647,8 +651,8 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 						<th>To</th>
 						<th>Subject</th>
 						<th>Message</th>
-						<th>CreatedAt</th>
-						<th>UpdatedAt</th>
+						<th>Created Time</th>
+						<th>Updated Time</th>
 					  </tr>
 					</thead>
 					<tbody>
@@ -658,8 +662,8 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 						<td>{{.ToUsername}}</td>
 						<td>{{.Subject}}</td>
 						<td>{{.Message}}</td>
-						<td>{{.CreatedAt}}</td>
-						<td>{{.UpdatedAt}}</td>
+						<td>{{.CreatedTS.Format "2006-01-02 15:04:05"}}</td>
+						<td>{{.UpdatedTS.Format "2006-01-02 15:04:05"}}</td>
 					  </tr>
 					  {{end}}
 					</tbody>
@@ -718,11 +722,12 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 				log.Printf("error getting user id")
 			}
 			params := db.CreateBlogPostParams{
-				ID:       uuid.New(),
-				Title:    r.FormValue("Title"),
-				Subtitle: r.FormValue("Subtitle"),
-				Body:     r.FormValue("Body"),
-				AuthorID: userID,
+				ID:               uuid.New(),
+				Title:            r.FormValue("Title"),
+				Subtitle:         r.FormValue("Subtitle"),
+				FeaturedImageURI: r.FormValue("FeaturedImageURI"),
+				Body:             r.FormValue("Body"),
+				AuthorID:         userID,
 			}
 
 			newBlogPost, err := queries.CreateBlogPost(r.Context(), params)
@@ -771,8 +776,8 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 						<th>Title</th>
 						<th>Subtitle</th>
 						<th>Body</th>
-						<th>CreatedAt</th>
-						<th>UpdatedAt</th>
+						<th>Created Time</th>
+						<th>Updated Time</th>
 					  </tr>
 					</thead>
 					<tbody>
@@ -782,8 +787,8 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 						<td>{{.Title}}</td>
 						<td>{{.Subtitle}}</td>
 						<td>{{.Body}}</td>
-						<td>{{.CreatedAt}}</td>
-						<td>{{.UpdatedAt}}</td>
+						<td>{{.CreatedTS.Format "2006-01-02 15:04:05"}}</td>
+						<td>{{.UpdatedTS.Format "2006-01-02 15:04:05"}}</td>
 					  </tr>
 					  {{end}}
 					</tbody>

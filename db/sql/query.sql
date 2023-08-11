@@ -133,9 +133,9 @@ returning *;
 
 -- name: CreateBlogPost :one
 insert into public.blog_post (
-  id, title, subtitle, body, author_id, created_ts, updated_ts
+  id, title, subtitle, featured_image_uri, body, author_id, created_ts, updated_ts
 ) values (
-  $1, $2, $3, $4, $5, current_timestamp, current_timestamp
+  $1, $2, $3, $4, $5, $6, current_timestamp, current_timestamp
 )
 returning *;
 

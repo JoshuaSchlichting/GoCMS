@@ -15,19 +15,20 @@ import (
 
 const createBlogPost = `-- name: CreateBlogPost :one
 insert into public.blog_post (
-  id, title, subtitle, body, author_id, created_ts, updated_ts
+  id, title, subtitle, featured_image_uri, body, author_id, created_ts, updated_ts
 ) values (
-  $1, $2, $3, $4, $5, current_timestamp, current_timestamp
+  $1, $2, $3, $4, $5, $6, current_timestamp, current_timestamp
 )
 returning id, title, subtitle, featured_image_uri, body, author_id, created_ts, updated_ts
 `
 
 type CreateBlogPostParams struct {
-	ID       uuid.UUID `json:"id"`
-	Title    string    `json:"title"`
-	Subtitle string    `json:"subtitle"`
-	Body     string    `json:"body"`
-	AuthorID uuid.UUID `json:"author_id"`
+	ID               uuid.UUID `json:"id"`
+	Title            string    `json:"title"`
+	Subtitle         string    `json:"subtitle"`
+	FeaturedImageURI string    `json:"featured_image_uri"`
+	Body             string    `json:"body"`
+	AuthorID         uuid.UUID `json:"author_id"`
 }
 
 func (q *Queries) CreateBlogPost(ctx context.Context, arg CreateBlogPostParams) (BlogPost, error) {
@@ -35,6 +36,7 @@ func (q *Queries) CreateBlogPost(ctx context.Context, arg CreateBlogPostParams) 
 		arg.ID,
 		arg.Title,
 		arg.Subtitle,
+		arg.FeaturedImageURI,
 		arg.Body,
 		arg.AuthorID,
 	)
@@ -43,7 +45,7 @@ func (q *Queries) CreateBlogPost(ctx context.Context, arg CreateBlogPostParams) 
 		&i.ID,
 		&i.Title,
 		&i.Subtitle,
-		&i.FeaturedImageUri,
+		&i.FeaturedImageURI,
 		&i.Body,
 		&i.AuthorID,
 		&i.CreatedTS,
@@ -246,7 +248,7 @@ type GetBlogPostRow struct {
 	Subtitle         string    `json:"subtitle"`
 	Body             string    `json:"body"`
 	AuthorID         uuid.UUID `json:"author_id"`
-	FeaturedImageUri string    `json:"featured_image_uri"`
+	FeaturedImageURI string    `json:"featured_image_uri"`
 	CreatedTS        time.Time `json:"created_ts"`
 	UpdatedTS        time.Time `json:"updated_ts"`
 }
@@ -260,7 +262,7 @@ func (q *Queries) GetBlogPost(ctx context.Context, id uuid.UUID) (GetBlogPostRow
 		&i.Subtitle,
 		&i.Body,
 		&i.AuthorID,
-		&i.FeaturedImageUri,
+		&i.FeaturedImageURI,
 		&i.CreatedTS,
 		&i.UpdatedTS,
 	)
@@ -348,7 +350,7 @@ type ListBlogPostsRow struct {
 	Subtitle         string    `json:"subtitle"`
 	Body             string    `json:"body"`
 	AuthorID         uuid.UUID `json:"author_id"`
-	FeaturedImageUri string    `json:"featured_image_uri"`
+	FeaturedImageURI string    `json:"featured_image_uri"`
 	CreatedTS        time.Time `json:"created_ts"`
 	UpdatedTS        time.Time `json:"updated_ts"`
 }
@@ -368,7 +370,7 @@ func (q *Queries) ListBlogPosts(ctx context.Context) ([]ListBlogPostsRow, error)
 			&i.Subtitle,
 			&i.Body,
 			&i.AuthorID,
-			&i.FeaturedImageUri,
+			&i.FeaturedImageURI,
 			&i.CreatedTS,
 			&i.UpdatedTS,
 		); err != nil {
@@ -406,7 +408,7 @@ type ListBlogPostsByUserRow struct {
 	Subtitle         string    `json:"subtitle"`
 	Body             string    `json:"body"`
 	AuthorID         uuid.UUID `json:"author_id"`
-	FeaturedImageUri string    `json:"featured_image_uri"`
+	FeaturedImageURI string    `json:"featured_image_uri"`
 	CreatedTS        time.Time `json:"created_ts"`
 	UpdatedTS        time.Time `json:"updated_ts"`
 }
@@ -426,7 +428,7 @@ func (q *Queries) ListBlogPostsByUser(ctx context.Context, authorID uuid.UUID) (
 			&i.Subtitle,
 			&i.Body,
 			&i.AuthorID,
-			&i.FeaturedImageUri,
+			&i.FeaturedImageURI,
 			&i.CreatedTS,
 			&i.UpdatedTS,
 		); err != nil {

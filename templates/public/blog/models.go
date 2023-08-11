@@ -17,7 +17,7 @@ type Post struct {
 	ID                 uuid.UUID
 	Title              string
 	Subtitle           string
-	FeaturedImageUri   string
+	FeaturedImageURI   string
 	Body               string
 	Author             string
 	PublishedTimestamp time.Time
@@ -25,16 +25,22 @@ type Post struct {
 }
 
 type Page struct {
-	Title        string
-	Brand        string
-	SignInURL    string
-	Heading      string
-	Subheading   string
-	FeaturedPost Post
-	NavBarLinks  []NavBarLink
+	Title       string
+	Brand       string
+	SignInURL   string
+	Heading     string
+	Subheading  string
+	NavBarLinks []NavBarLink
+	Posts       []Post
+	Body        template.HTML
+	SideWidget  SideWidget
+}
+
+type PostsBody struct {
+	CurrentPage  int
+	TotalPages   int
+	FeaturedPost *Post
 	Posts        []Post
-	Body         template.HTML
-	SideWidget   SideWidget
 }
 
 type SideWidget struct {

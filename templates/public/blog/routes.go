@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
@@ -31,25 +32,61 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 				ID:                 post.ID,
 				Title:              post.Title,
 				Subtitle:           post.Subtitle,
-				FeaturedImageUri:   post.FeaturedImageUri,
+				FeaturedImageURI:   post.FeaturedImageURI,
 				Body:               post.Body,
 				PublishedTimestamp: post.CreatedTS,
 				UpdatedTimestamp:   post.UpdatedTS,
 			})
 		}
+		// ... (The beginning part of your code remains the same)
+
+		postsPerPage := 6
+		totalPages := len(posts) / postsPerPage
+		if len(posts)%postsPerPage != 0 {
+			totalPages++
+		}
+		pageNumber := 1
+		// Check if 'page' query parameter exists
+		if pageParam := r.URL.Query().Get("page"); pageParam != "" {
+			if parsedPage, err := strconv.Atoi(pageParam); err == nil {
+				pageNumber = parsedPage
+			}
+		}
+
+		// Calculate start and end indices for slicing the posts based on the current page number.
+		startIdx := (pageNumber - 1) * postsPerPage
+		endIdx := startIdx + postsPerPage
+		if endIdx > len(posts) {
+			endIdx = len(posts)
+		}
+
+		var featuredPost *Post
+		if pageNumber == 1 {
+			featuredPost = &posts[0]
+		} else {
+			featuredPost = nil
+		}
+		print(featuredPost)
+		currentPagePosts := posts[startIdx:endIdx] // This will contain the posts for the current page.
+
 		// get templates.HTML from "blog/posts" template
+
 		var body bytes.Buffer
 		// create writer
 		bodyWriter := io.Writer(&body)
-		err = tmpl.ExecuteTemplate(bodyWriter, "blog/posts", map[string]interface{}{
-			"Posts":        posts[1:],
-			"FeaturedPost": posts[0],
+
+		err = tmpl.ExecuteTemplate(bodyWriter, "blog/posts", PostsBody{
+			Posts:        currentPagePosts,
+			FeaturedPost: featuredPost,
+			CurrentPage:  pageNumber,
+			TotalPages:   totalPages,
 		})
 		if err != nil {
 			log.Printf("error executing template: %v", err)
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
+
 		// render template
 		tmpl.ExecuteTemplate(w, "blog", Page{
 			Title:      "Go CMS | A CMS built in Golang!",
@@ -62,9 +99,9 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 				{URL: "/blog", Text: "Blog"},
 				{URL: "/about", Text: "About"},
 				{URL: "/contact", Text: "Contact"},
+				{URL: "/admin", Text: "Login"},
 			},
-			Body:         template.HTML(body.String()),
-			FeaturedPost: posts[0],
+			Body: template.HTML(body.String()),
 			SideWidget: SideWidget{
 				Title: "Blog Notice",
 				Body:  "Look, there's a lot of 'frameworks' for creating a CMS. What if we just had a dead simple pattern to follow while using as much of Go's standard library as possible?",
@@ -89,7 +126,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 			ID:                 post.ID,
 			Title:              post.Title,
 			Subtitle:           post.Subtitle,
-			FeaturedImageUri:   post.FeaturedImageUri,
+			FeaturedImageURI:   post.FeaturedImageURI,
 			Body:               post.Body,
 			PublishedTimestamp: post.CreatedTS,
 			UpdatedTimestamp:   post.UpdatedTS,
