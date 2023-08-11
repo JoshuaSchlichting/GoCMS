@@ -82,61 +82,7 @@ func (p *Presentor) EditListItemHTML(formID, formTitle, apiEndpoint, apiCallType
 			TableID:      template.JS(tableID),
 			Table:        dataMap,
 			CallbackFunc: template.JS("setItemInForm"),
-			JavaScript: template.JS(fmt.Sprintf(`
-				function getRowData(tableId, columnName, columnValue) {
-					console.log("getRowData-> params: " + tableId  + columnName + columnValue);
-					// Get the table using its ID
-					const table = document.getElementById(tableId);
-				
-					// Get the table headers
-					const headers = table.getElementsByTagName("th");
-				
-					// Get the index of the target column
-					let targetColumnIndex;
-					for (let i = 0; i < headers.length; i++) {
-						if (headers[i].textContent === columnName) {
-							targetColumnIndex = i;
-							break;
-						}
-					}
-				
-					// Get the table rows
-					const rows = table.getElementsByTagName("tr");
-				
-					// Loop through each row
-					for (let i = 0; i < rows.length; i++) {
-					const cells = rows[i].getElementsByTagName("td");
-				
-					// Check if the target column exists in the row
-					if (cells[targetColumnIndex]) {
-						// Check if the value of the target column matches the columnValue
-						if (cells[targetColumnIndex].textContent === columnValue) {
-						// Get the header names
-						const headerNames = Array.from(headers).map(header => header.textContent);
-				
-						// Get the cell values
-						const cellValues = Array.from(cells).map(cell => cell.textContent);
-				
-						// Combine the header names and cell values into an object
-						const rowData = headerNames.reduce((obj, headerName, index) => {
-							obj[headerName] = cellValues[index];
-							return obj;
-						}, {});
-						return rowData;
-					}}}
-					// Return null if the row is not found
-					return null;
-				}
-				function setItemInForm() {
-					console.log("setItemInForm->");
-					// get row data where row id == %[2]sSelectedRow
-					let formData = getRowData("%[2]s", "ID", %[2]sSelectedRow);
-					// get the form
-					console.log(formData);
-					// prefill the form with id edit_user_form
-					%[1]s
-				}
-			`, jsSetFormElements+jsSetApiUrl, tableID)),
+			JavaScript:   getRowDataJS + template.JS(fmt.Sprintf(string(setItemInFormJS), jsSetFormElements+jsSetApiUrl, tableID)),
 		},
 	})
 	return err
@@ -170,62 +116,7 @@ func (p *Presentor) DeleteItemFormHTML(formID, formTitle, apiEndpoint, refreshUR
 			TableID:      template.JS(tableID),
 			Table:        dataMap,
 			CallbackFunc: template.JS("setItemInForm"),
-			JavaScript: template.JS(fmt.Sprintf(`
-				function getRowData(tableId, columnName, columnValue) {
-					console.log("getRowData-> params: " + tableId  + columnName + columnValue);
-					// Get the table using its ID
-					const table = document.getElementById(tableId);
-				
-					// Get the table headers
-					const headers = table.getElementsByTagName("th");
-				
-					// Get the index of the target column
-					let targetColumnIndex;
-					for (let i = 0; i < headers.length; i++) {
-						if (headers[i].textContent === columnName) {
-							targetColumnIndex = i;
-							break;
-						}
-					}
-				
-					// Get the table rows
-					const rows = table.getElementsByTagName("tr");
-				
-					// Loop through each row
-					for (let i = 0; i < rows.length; i++) {
-					const cells = rows[i].getElementsByTagName("td");
-				
-					// Check if the target column exists in the row
-					if (cells[targetColumnIndex]) {
-						// Check if the value of the target column matches the columnValue
-						if (cells[targetColumnIndex].textContent === columnValue) {
-						// Get the header names
-						const headerNames = Array.from(headers).map(header => header.textContent);
-				
-						// Get the cell values
-						const cellValues = Array.from(cells).map(cell => cell.textContent);
-				
-						// Combine the header names and cell values into an object
-						const rowData = headerNames.reduce((obj, headerName, index) => {
-							obj[headerName] = cellValues[index];
-							return obj;
-						}, {});
-						return rowData;
-					}}}
-					// Return null if the row is not found
-					return null;
-				}
-				function setItemInForm() {
-					console.log("setItemInForm->");
-					// get row data where row id == %[2]sSelectedRow
-					let formData = getRowData("%[2]s", "ID", %[2]sSelectedRow);
-					// get the form
-					console.log(formData);
-					// prefill the form with id edit_user_form
-					%[1]s
-					%[3]s
-				}
-			`, jsSetFormElements+jsSetApiUrl, tableID, setItemAdditionalJS)),
+			JavaScript:   getRowDataJS + template.JS(fmt.Sprintf(string(setItemInFormJS), jsSetFormElements+jsSetApiUrl+setItemAdditionalJS, tableID)),
 		},
 	})
 	return err
@@ -290,3 +181,55 @@ func generateForm(title string, fields []FormField, hxMethod, hxURL, idPrefix, b
 
 	return template.HTML(tpl.String())
 }
+
+const setItemInFormJS template.JS = (`function setItemInForm() {
+	console.log("setItemInForm->");
+	let formData = getRowData("%[2]s", "ID", %[2]sSelectedRow);
+	console.log(formData);
+	%[1]s
+}`)
+
+const getRowDataJS template.JS = (`function getRowData(tableId, columnName, columnValue) {
+	console.log("getRowData-> params: " + tableId  + columnName + columnValue);
+	// Get the table using its ID
+	const table = document.getElementById(tableId);
+
+	// Get the table headers
+	const headers = table.getElementsByTagName("th");
+
+	// Get the index of the target column
+	let targetColumnIndex;
+	for (let i = 0; i < headers.length; i++) {
+		if (headers[i].textContent === columnName) {
+			targetColumnIndex = i;
+			break;
+		}
+	}
+
+	// Get the table rows
+	const rows = table.getElementsByTagName("tr");
+
+	// Loop through each row
+	for (let i = 0; i < rows.length; i++) {
+	const cells = rows[i].getElementsByTagName("td");
+
+	// Check if the target column exists in the row
+	if (cells[targetColumnIndex]) {
+		// Check if the value of the target column matches the columnValue
+		if (cells[targetColumnIndex].textContent === columnValue) {
+		// Get the header names
+		const headerNames = Array.from(headers).map(header => header.textContent);
+
+		// Get the cell values
+		const cellValues = Array.from(cells).map(cell => cell.textContent);
+
+		// Combine the header names and cell values into an object
+		const rowData = headerNames.reduce((obj, headerName, index) => {
+			obj[headerName] = cellValues[index];
+			return obj;
+		}, {});
+		return rowData;
+	}}}
+	// Return null if the row is not found
+	return null;
+}`)
