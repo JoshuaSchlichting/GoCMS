@@ -112,10 +112,6 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 					URL:  config.Auth.SignInUrl,
 					Text: "Sign In",
 				},
-				{
-					URL:  "/admin",
-					Text: "Login",
-				},
 			},
 			FeaturedItems: []cmstemplate.FeaturedItem{
 				{
