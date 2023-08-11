@@ -22,14 +22,14 @@ import (
 	"github.com/joshuaschlichting/gocms/filesystem"
 	"github.com/joshuaschlichting/gocms/manager"
 	"github.com/joshuaschlichting/gocms/middleware"
-	"github.com/joshuaschlichting/gocms/templates/public/blog"
+	"github.com/joshuaschlichting/gocms/template/public/blog"
 	_ "github.com/lib/pq"
 )
 
 //go:embed static
 var fileSystem embed.FS
 
-//go:embed templates
+//go:embed template
 var templateFS embed.FS
 
 //go:embed config.yml
@@ -86,7 +86,7 @@ func main() {
 		},
 	}
 	log.Println("Loading templates...")
-	templ, err := parseTemplateDir("templates", templateFS, funcMap)
+	templ, err := parseTemplateDir("template", templateFS, funcMap)
 	if err != nil {
 		log.Fatalf("Error parsing templates: %v", err)
 	}

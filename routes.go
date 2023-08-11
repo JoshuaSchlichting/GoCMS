@@ -14,8 +14,8 @@ import (
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/db"
 	"github.com/joshuaschlichting/gocms/middleware"
-	"github.com/joshuaschlichting/gocms/presentation"
-	cmstemplate "github.com/joshuaschlichting/gocms/templates"
+	cmstemplate "github.com/joshuaschlichting/gocms/template"
+	"github.com/joshuaschlichting/gocms/template/admin/components"
 )
 
 func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.Queries, middlewareMap map[string]func(http.Handler) http.Handler) {
@@ -169,7 +169,7 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 				})
 
 			}
-			formFields := []presentation.FormField{
+			formFields := []components.FormField{
 				{
 					Name:  "ID",
 					Type:  "",
@@ -191,7 +191,7 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 					Value: "",
 				},
 			}
-			p := presentation.NewPresentor(tmpl, w)
+			p := components.NewPresentor(tmpl, w)
 			err = p.EditListItemHTML("edit_org_form", "Edit Organization Form", "/api/organization", "put", "/edit_org_form", formFields, orgMap)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -201,8 +201,8 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 		r.Get("/compose_msg", func(w http.ResponseWriter, r *http.Request) {
 			// Define a template string for the message form
 
-			presentor := presentation.NewPresentor(tmpl, w)
-			presentor.CreateItemFormHTML("compose_msg_form", "Compose Message", "/message", "/inbox", []presentation.FormField{
+			presentor := components.NewPresentor(tmpl, w)
+			presentor.CreateItemFormHTML("compose_msg_form", "Compose Message", "/message", "/inbox", []components.FormField{
 				{
 					Name:  "ToUsername",
 					Type:  "text",
@@ -222,7 +222,7 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 		})
 
 		r.Get("/create_org_form", func(w http.ResponseWriter, r *http.Request) {
-			formFields := []presentation.FormField{
+			formFields := []components.FormField{
 				{
 					Name:  "Name",
 					Type:  "text",
@@ -239,14 +239,14 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 					Value: "{}",
 				},
 			}
-			p := presentation.NewPresentor(tmpl, w)
+			p := components.NewPresentor(tmpl, w)
 			err := p.CreateItemFormHTML("create_org_form", "Create Organization Form", "/api/organization", "/edit_org_form", formFields)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
 		})
 		r.Get("/create_user_form", func(w http.ResponseWriter, r *http.Request) {
-			formFields := []presentation.FormField{
+			formFields := []components.FormField{
 				{
 					Name:  "Name",
 					Type:  "text",
@@ -263,14 +263,14 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 					Value: "{}",
 				},
 			}
-			p := presentation.NewPresentor(tmpl, w)
+			p := components.NewPresentor(tmpl, w)
 			err := p.CreateItemFormHTML("create_user_form", "Create User Form", "/api/user", "/edit_user_form", formFields)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
 		})
 		r.Get("/create_usergroup_form", func(w http.ResponseWriter, r *http.Request) {
-			formFields := []presentation.FormField{
+			formFields := []components.FormField{
 				{
 					Name:  "Name",
 					Type:  "text",
@@ -282,7 +282,7 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 					Value: "{}",
 				},
 			}
-			p := presentation.NewPresentor(tmpl, w)
+			p := components.NewPresentor(tmpl, w)
 			err := p.CreateItemFormHTML("create_usergroup_form", "Create User Group Form", "/api/usergroup", "/edit_usergroup_form", formFields)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -304,8 +304,8 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 				})
 			}
 
-			p := presentation.NewPresentor(tmpl, w)
-			formFields := []presentation.FormField{
+			p := components.NewPresentor(tmpl, w)
+			formFields := []components.FormField{
 				{
 					Name:  "ID",
 					Type:  "text",
@@ -352,8 +352,8 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 				})
 			}
 
-			p := presentation.NewPresentor(tmpl, w)
-			formFields := []presentation.FormField{
+			p := components.NewPresentor(tmpl, w)
+			formFields := []components.FormField{
 				{
 					Name:  "ID",
 					Type:  "text",
@@ -401,8 +401,8 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 				})
 			}
 
-			p := presentation.NewPresentor(tmpl, w)
-			formFields := []presentation.FormField{
+			p := components.NewPresentor(tmpl, w)
+			formFields := []components.FormField{
 				{
 					Name:  "ID",
 					Type:  "text",
@@ -452,7 +452,7 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 				})
 
 			}
-			formFields := []presentation.FormField{
+			formFields := []components.FormField{
 				{
 					Name:  "ID",
 					Type:  "",
@@ -474,7 +474,7 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 					Value: "",
 				},
 			}
-			p := presentation.NewPresentor(tmpl, w)
+			p := components.NewPresentor(tmpl, w)
 			err = p.EditListItemHTML("edit_user_form", "Edit User Form", "/api/user", "put", "/edit_user_form", formFields, userMap)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -501,7 +501,7 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 				})
 			}
 
-			formFields := []presentation.FormField{
+			formFields := []components.FormField{
 				{
 					Name:  "ID",
 					Type:  "",
@@ -518,7 +518,7 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 					Value: "",
 				},
 			}
-			p := presentation.NewPresentor(tmpl, w)
+			p := components.NewPresentor(tmpl, w)
 			err = p.EditListItemHTML("edit_usergroup_form", "Edit User Group Form", "/api/usergroup", "put", "/edit_usergroup_form", formFields, usergroupMap)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -682,7 +682,7 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 		})
 
 		r.Get("/new_blog_post", func(w http.ResponseWriter, r *http.Request) {
-			presentor := presentation.NewPresentor(tmpl, w)
+			presentor := components.NewPresentor(tmpl, w)
 			presentor.CreateBlogHTML()
 		})
 

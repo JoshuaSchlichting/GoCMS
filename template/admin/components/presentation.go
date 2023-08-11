@@ -1,7 +1,7 @@
 // Package presentation provides the presentation layer for the gocms application.
 // The Presentor struct is used to render the templates, writing them directly to
 // the http.ResponseWriter passed to NewPresentor.
-package presentation
+package components
 
 import (
 	"bytes"
@@ -120,6 +120,44 @@ func (p *Presentor) DeleteItemFormHTML(formID, formTitle, apiEndpoint, refreshUR
 		},
 	})
 	return err
+}
+
+func (p *Presentor) CreateBlogHTML() error {
+
+	return p.template.ExecuteTemplate(p.writer, "create_blog", map[string]interface{}{
+		"CreateBlogForm": generateForm(
+			"Create Blog",
+			[]FormField{
+				{
+					Name:  "title",
+					Type:  "text",
+					Value: "",
+				},
+				{
+					Name:  "description",
+					Type:  "text",
+					Value: "",
+				},
+			},
+			"post",
+			"/api/v1/blogs",
+			"create-blog-form",
+			getSubmitResetButtonDiv(),
+		),
+		"FormID": "create-blog-form",
+		"ImageURLs": []string{
+			"https://picsum.photos/200/300?random=1",
+			"https://picsum.photos/200/300?random=2",
+			"https://picsum.photos/200/300?random=3",
+			"https://picsum.photos/200/300?random=4",
+			"https://picsum.photos/200/300?random=5",
+			"https://picsum.photos/200/300?random=6",
+			"https://picsum.photos/200/300?random=7",
+			"https://picsum.photos/200/300?random=8",
+			"https://picsum.photos/200/300?random=9",
+			"https://picsum.photos/200/300?random=10",
+		},
+	})
 }
 
 func getSubmitResetButtonDiv() string {

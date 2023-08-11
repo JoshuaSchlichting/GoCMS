@@ -66,7 +66,6 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 		} else {
 			featuredPost = nil
 		}
-		print(featuredPost)
 		currentPagePosts := posts[startIdx:endIdx] // This will contain the posts for the current page.
 
 		// get templates.HTML from "blog/posts" template
