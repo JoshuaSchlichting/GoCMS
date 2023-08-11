@@ -1,8 +1,9 @@
 {{ define "blog/posts" }}
 
+{{ if .FeaturedPost }}
 <!-- Featured blog post-->
 <div class="card mb-4">
-    <a href="/blog/{{ .FeaturedPost.ID }}"><img class="card-img-top" src="{{ .FeaturedPost.FeaturedImageUri }}" alt="..." /></a>
+    <a href="/blog/{{ .FeaturedPost.ID }}"><img class="card-img-top" src="{{ .FeaturedPost.FeaturedImageURI }}" alt="..." /></a>
     <div class="card-body">
         <div class="small text-muted">Published @ {{ .FeaturedPost.PublishedTimestamp.Format "2006-01-02 15:04:05" }}
         </div>
@@ -11,6 +12,7 @@
         <a class="btn btn-primary" href="/blog/{{ .FeaturedPost.ID }}">Read more →</a>
     </div>
 </div>
+{{ end }}
 <!-- Nested row for blog posts-->
 <div class="row">
     <div class="col-lg-6">
@@ -18,7 +20,7 @@
         {{ range $index, $post := .Posts }}
         {{ if eq (mod $index 2) 0 }}
         <div class="card mb-4">
-            <a href="/blog/{{ $post.ID }}"><img class="card-img-top" src="{{ $post.FeaturedImageUri }}" alt="..." /></a>
+            <a href="/blog/{{ $post.ID }}"><img class="card-img-top" src="{{ $post.FeaturedImageURI }}" alt="..." /></a>
             <div class="card-body">
                 <div class="small text-muted">{{ $post.PublishedTimestamp.Format "2006-01-02 15:04:05"
                     }}</div>
@@ -35,7 +37,7 @@
         {{ range $index, $post := .Posts }}
         {{ if eq (mod $index 2) 1 }}
         <div class="card mb-4">
-            <a href="/blog/{{ $post.ID }}"><img class="card-img-top" src="{{ $post.FeaturedImageUri }}" alt="..." /></a>
+            <a href="/blog/{{ $post.ID }}"><img class="card-img-top" src="{{ $post.FeaturedImageURI }}" alt="..." /></a>
             <div class="card-body">
                 <div class="small text-muted">{{ $post.PublishedTimestamp.Format "2006-01-02 15:04:05"
                     }}</div>
@@ -52,13 +54,28 @@
 <nav aria-label="Pagination">
     <hr class="my-0" />
     <ul class="pagination justify-content-center my-4">
-        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Newer</a></li>
-        <li class="page-item active" aria-current="page"><a class="page-link" href="#!">1</a></li>
-        <li class="page-item"><a class="page-link" href="#!">2</a></li>
-        <li class="page-item"><a class="page-link" href="#!">3</a></li>
-        <li class="page-item disabled"><a class="page-link" href="#!">...</a></li>
-        <li class="page-item"><a class="page-link" href="#!">15</a></li>
-        <li class="page-item"><a class="page-link" href="#!">Older</a></li>
+        {{ $currentPage := .CurrentPage }}
+        {{ $totalPages := .TotalPages }}
+
+        <!-- Previous page link -->
+        {{ if gt $currentPage 1 }}
+        <li class="page-item"><a class="page-link" href="/blog?page={{ sub $currentPage 1 }}">Newer</a></li>
+        {{ else }}
+        <li class="page-item disabled"><a class="page-link" tabindex="-1" aria-disabled="true">Newer</a></li>
+        {{ end }}
+
+        <!-- Page numbers -->
+        {{ range $i := seq 1 $totalPages }}
+        <li class="page-item {{ if eq $i $currentPage }}active{{ end }}"><a class="page-link" href="/blog?page={{ $i }}">{{ $i }}</a></li>
+        {{ end }}
+
+        <!-- Next page link -->
+        {{ if lt $currentPage $totalPages }}
+        <li class="page-item"><a class="page-link" href="/blog?page={{ add $currentPage 1 }}">Older</a></li>
+        {{ else }}
+        <li class="page-item disabled"><a class="page-link" tabindex="-1" aria-disabled="true">Older</a></li>
+        {{ end }}
     </ul>
 </nav>
+
 {{ end }}
