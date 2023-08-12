@@ -20,6 +20,7 @@ import (
 	"github.com/joshuaschlichting/gocms/apps/admin"
 	"github.com/joshuaschlichting/gocms/apps/public/blog"
 	"github.com/joshuaschlichting/gocms/apps/public/landing_page"
+	"github.com/joshuaschlichting/gocms/auth"
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/data/cache"
 	database "github.com/joshuaschlichting/gocms/data/db"
@@ -45,9 +46,21 @@ var sqlFS embed.FS
 var logger *slog.Logger
 
 func init() {
-	var programLevel = new(slog.LevelVar) // Default might be Info level
-	programLevel.Set(slog.LevelDebug)     // Now set to Debug level
+	// Set up logging
+	debugFlag := flag.Bool("debug", false, "debug logging mode")
+	flag.Parse()
+	var programLevel = new(slog.LevelVar)
+
+	if *debugFlag {
+		programLevel.Set(slog.LevelDebug)
+	} else {
+		programLevel.Set(slog.LevelInfo)
+	}
 	logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: programLevel}))
+	api.SetLogger(logger)
+	admin.SetLogger(logger)
+	blog.SetLogger(logger)
+	auth.SetLogger(logger)
 }
 
 func main() {

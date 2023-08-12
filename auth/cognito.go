@@ -1,10 +1,10 @@
 package auth
 
 import (
-	"log"
 	"os"
 
 	cognito "github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
+	"golang.org/x/exp/slog"
 	"golang.org/x/oauth2"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -25,6 +25,14 @@ const redirectUri string = "http://localhost:8000/getjwtandlogin"
 var cognitoProvider cognito.CognitoIdentityProvider
 var cognitoEndpoint oauth2.Endpoint
 
+var logger *slog.Logger
+
+func SetLogger(l *slog.Logger) {
+	logger = l
+	logger.Debug("", "poolId", poolId)
+	logger.Debug("", "region", region)
+	logger.Debug("clientId", clientId)
+}
 func init() {
 	poolId = os.Getenv("POOL_ID")
 	region = os.Getenv("REGION")
@@ -32,23 +40,23 @@ func init() {
 	clientSecret = os.Getenv("CLIENT_SECRET")
 	awsAccessKeyId = os.Getenv("AWS_ACCESS_KEY_ID")
 	awsSecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
-
 	session, err := session.NewSession(&aws.Config{
 		Region: aws.String(region),
 		Credentials: credentials.NewStaticCredentials(
 			awsAccessKeyId, awsSecretAccessKey, ""),
 	})
 	if err != nil {
-		log.Printf("Error creating session for cognito: %v\n", err)
+		logger.Error("error creating session for cognito:", err)
 	}
 	cognitoProvider = *cognito.New(session, aws.NewConfig().WithRegion(region))
 
 	poolDesc, err := cognitoProvider.DescribeUserPool(&cognito.DescribeUserPoolInput{UserPoolId: aws.String(poolId)})
 	if err != nil {
-		log.Printf("Error describing user pool: %v\n", err)
+		logger.Error("error describing user pool:", err)
 	}
 	cognitoEndpoint = oauth2.Endpoint{
 		AuthURL:  "https://" + *poolDesc.UserPool.Domain + ".auth." + region + ".amazoncognito.com/oauth2/authorize",
 		TokenURL: "https://" + *poolDesc.UserPool.Domain + ".auth." + region + ".amazoncognito.com/oauth2/token",
 	}
+
 }

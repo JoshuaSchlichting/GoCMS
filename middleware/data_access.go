@@ -2,12 +2,20 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/go-chi/jwtauth"
 	"github.com/joshuaschlichting/gocms/data/db"
+	"golang.org/x/exp/slog"
 )
+
+var logger *slog.Logger
+
+func SetLogger(l *slog.Logger) {
+	logger = l
+}
 
 type MiddlewareWithDB interface {
 	AddUserToCtx(h http.Handler) http.Handler
@@ -35,7 +43,7 @@ func (m DBMiddleware) AddUserToCtx(h http.Handler) http.Handler {
 		tokenAuth := jwtauth.New("HS256", []byte(m.jwtSecretKey), nil)
 		jwtAuthToken, err := tokenAuth.Decode(jwt)
 		if err != nil {
-			log.Printf("error decoding JWT from context: %s: JWT from context: %v", err.Error(), jwt)
+			logger.Error(fmt.Sprintf("error decoding JWT from context: %s: JWT from context: %v", err.Error(), jwt))
 			h.ServeHTTP(w, r)
 			return
 		}
@@ -63,7 +71,7 @@ func (m DBMiddleware) AuthorizeUserGroup(group string) func(http.Handler) http.H
 				UsergroupName: group,
 			})
 			if err != nil {
-				log.Printf("unable to check if user '%s' is in group '%s' due to error: %v", user.Name, group, err.Error())
+				logger.Error("unable to check if user '%s' is in group '%s' due to error: %v", user.Name, group, err.Error())
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}

@@ -2,6 +2,7 @@ package blog
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -12,15 +13,21 @@ import (
 	"github.com/google/uuid"
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/data/db"
+	"golang.org/x/exp/slog"
 )
 
+var logger *slog.Logger
+
+func SetLogger(l *slog.Logger) {
+	logger = l
+}
 func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.DBCache, middlewareMap map[string]func(http.Handler) http.Handler) {
 
 	r.Get("/blog", func(w http.ResponseWriter, r *http.Request) {
 		// get posts from db
 		dbPosts, err := queries.ListBlogPosts(r.Context())
 		if err != nil {
-			log.Printf("error getting posts: %v", err)
+			logger.Error(fmt.Sprintf("error getting posts: %v", err))
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
@@ -81,7 +88,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 			TotalPages:   totalPages,
 		})
 		if err != nil {
-			log.Printf("error executing template: %v", err)
+			logger.Error(fmt.Sprintf("error executing template: %v", err))
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
@@ -136,7 +143,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 		bodyWriter := io.Writer(&body)
 		err = tmpl.ExecuteTemplate(bodyWriter, "blog/post", p)
 		if err != nil {
-			log.Printf("error executing template: %v", err)
+			logger.Error(fmt.Sprintf("error executing template: %v", err))
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}

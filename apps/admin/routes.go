@@ -2,6 +2,7 @@ package admin
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -15,8 +16,14 @@ import (
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/data/db"
 	"github.com/joshuaschlichting/gocms/middleware"
+	"golang.org/x/exp/slog"
 )
 
+var logger *slog.Logger
+
+func SetLogger(l *slog.Logger) {
+	logger = l
+}
 func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.DBCache, middlewareMap map[string]func(http.Handler) http.Handler) {
 	r.Get("/admin", func(w http.ResponseWriter, r *http.Request) {
 		// if not logged in
@@ -648,7 +655,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 			log.Printf("form: %v", r.Form)
 			userID := r.Context().Value(middleware.User).(db.User).ID
 			if userID == uuid.Nil {
-				log.Printf("error getting user id")
+				logger.Error(fmt.Sprintf("error getting user id"))
 			}
 			params := db.CreateMessageParams{
 				ID:         uuid.New(),
@@ -660,7 +667,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 
 			newMessage, err := queries.CreateMessage(r.Context(), params)
 			if err != nil {
-				log.Printf("error creating message: %v", err)
+				logger.Error(fmt.Sprintf("error creating message: %v", err))
 			}
 			log.Println(newMessage)
 		})
@@ -671,7 +678,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 			log.Printf("form: %v", r.Form)
 			userID := r.Context().Value(middleware.User).(db.User).ID
 			if userID == uuid.Nil {
-				log.Printf("error getting user id")
+				logger.Error(fmt.Sprintf("error getting user id"))
 			}
 			params := db.CreateBlogPostParams{
 				ID:               uuid.New(),
@@ -684,7 +691,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 
 			newBlogPost, err := queries.CreateBlogPost(r.Context(), params)
 			if err != nil {
-				log.Printf("error creating blog post: %v", err)
+				logger.Error(fmt.Sprintf("error creating blog post: %v", err))
 			}
 
 			templateText := `
@@ -702,12 +709,12 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 
 			tmpl, err := template.New("").Parse(templateText)
 			if err != nil {
-				log.Printf("error parsing template: %v", err)
+				logger.Error(fmt.Sprintf("error parsing template: %v", err))
 			}
 
 			err = tmpl.Execute(w, newBlogPost)
 			if err != nil {
-				log.Printf("error executing template: %v", err)
+				logger.Error(fmt.Sprintf("error executing template: %v", err))
 			}
 		})
 

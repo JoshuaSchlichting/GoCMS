@@ -2,13 +2,21 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 	"github.com/joshuaschlichting/gocms/data/db"
+	"golang.org/x/exp/slog"
 )
+
+var logger *slog.Logger
+
+func SetLogger(l *slog.Logger) {
+	logger = l
+}
 
 func (a *API) initPostRoutes() {
 	a.router.Route("/api", func(r chi.Router) {
@@ -21,7 +29,7 @@ func (a *API) initPostRoutes() {
 			payload := make([]byte, y.Size)
 			size, err := file.Read(payload)
 			if err != nil {
-				log.Printf("error reading file: %v", err)
+				logger.Error(fmt.Sprintf("error reading file: %v", err))
 			}
 			log.Printf("file: %v\n\tsize: %v", y.Header, size)
 			// data.UploadFile(payload, y.Filename, "userid")
@@ -35,7 +43,7 @@ func (a *API) initPostRoutes() {
 			payload := make([]byte, y.Size)
 			size, err := file.Read(payload)
 			if err != nil {
-				log.Printf("error reading file: %v", err)
+				logger.Error(fmt.Sprintf("error reading file: %v", err))
 			}
 			log.Printf("file: %v\n\tsize: %v", y.Header, size)
 			// data.UploadFile(payload, y.Filename, "userid")
@@ -53,7 +61,7 @@ func (a *API) initPostRoutes() {
 
 			newUser, err := a.data.CreateUser(r.Context(), params)
 			if err != nil {
-				log.Printf("error creating user: %v", err)
+				logger.Error(fmt.Sprintf("error creating user: %v", err))
 			}
 			log.Println(newUser)
 		})
@@ -63,7 +71,7 @@ func (a *API) initPostRoutes() {
 			log.Printf("form: %v", r.Form)
 			id, err := uuid.Parse(chi.URLParam(r, "id"))
 			if err != nil {
-				log.Printf("error parsing id: %v", err)
+				logger.Error(fmt.Sprintf("error parsing id: %v", err))
 			}
 
 			params := db.UpdateUserParams{
@@ -75,7 +83,7 @@ func (a *API) initPostRoutes() {
 
 			newUser, err := a.data.UpdateUser(r.Context(), params)
 			if err != nil {
-				log.Printf("error updating user: %v", err)
+				logger.Error(fmt.Sprintf("error updating user: %v", err))
 			}
 			log.Println(newUser)
 		})
@@ -86,12 +94,12 @@ func (a *API) initPostRoutes() {
 			// get id from url param
 			id, err := uuid.Parse(chi.URLParam(r, "id"))
 			if err != nil {
-				log.Printf("error parsing id: %v", err)
+				logger.Error(fmt.Sprintf("error parsing id: %v", err))
 			}
 
 			err = a.data.DeleteUser(r.Context(), id)
 			if err != nil {
-				log.Printf("error deleting user: %v", err)
+				logger.Error(fmt.Sprintf("error deleting user: %v", err))
 			}
 		})
 
@@ -107,7 +115,7 @@ func (a *API) initPostRoutes() {
 
 			newOrganization, err := a.data.CreateOrganization(r.Context(), params)
 			if err != nil {
-				log.Printf("error creating organization: %v", err)
+				logger.Error(fmt.Sprintf("error creating organization: %v", err))
 			}
 			log.Println(newOrganization)
 		})
@@ -117,7 +125,7 @@ func (a *API) initPostRoutes() {
 			log.Printf("form: %v", r.Form)
 			id, err := uuid.Parse(chi.URLParam(r, "id"))
 			if err != nil {
-				log.Printf("error parsing id: %v", err)
+				logger.Error(fmt.Sprintf("error parsing id: %v", err))
 			}
 
 			params := db.UpdateOrganizationParams{
@@ -129,7 +137,7 @@ func (a *API) initPostRoutes() {
 
 			newOrganization, err := a.data.UpdateOrganization(r.Context(), params)
 			if err != nil {
-				log.Printf("error updating organization: %v", err)
+				logger.Error(fmt.Sprintf("error updating organization: %v", err))
 			}
 			log.Println(newOrganization)
 		})
@@ -140,12 +148,12 @@ func (a *API) initPostRoutes() {
 			// get id from url param
 			id, err := uuid.Parse((chi.URLParam(r, "id")))
 			if err != nil {
-				log.Printf("error parsing id: %v", err)
+				logger.Error(fmt.Sprintf("error parsing id: %v", err))
 			}
 
 			err = a.data.DeleteOrganization(r.Context(), id)
 			if err != nil {
-				log.Printf("error deleting organization: %v", err)
+				logger.Error(fmt.Sprintf("error deleting organization: %v", err))
 			}
 		})
 		r.Post("/usergroup", func(w http.ResponseWriter, r *http.Request) {
@@ -160,7 +168,7 @@ func (a *API) initPostRoutes() {
 
 			newUserGroup, err := a.data.CreateUserGroup(r.Context(), params)
 			if err != nil {
-				log.Printf("error creating user group: %v", err)
+				logger.Error(fmt.Sprintf("error creating user group: %v", err))
 			}
 			log.Println(newUserGroup)
 		})
@@ -170,7 +178,7 @@ func (a *API) initPostRoutes() {
 			log.Printf("form: %v", r.Form)
 			id, err := uuid.Parse(chi.URLParam(r, "id"))
 			if err != nil {
-				log.Printf("error parsing id: %v", err)
+				logger.Error(fmt.Sprintf("error parsing id: %v", err))
 			}
 
 			params := db.UpdateUserGroupParams{
@@ -182,7 +190,7 @@ func (a *API) initPostRoutes() {
 
 			newUserGroup, err := a.data.UpdateUserGroup(r.Context(), params)
 			if err != nil {
-				log.Printf("error updating user group: %v", err)
+				logger.Error(fmt.Sprintf("error updating user group: %v", err))
 			}
 			log.Println(newUserGroup)
 		})
@@ -192,12 +200,12 @@ func (a *API) initPostRoutes() {
 			// get id from url param
 			id, err := uuid.Parse(chi.URLParam(r, "id"))
 			if err != nil {
-				log.Printf("error parsing id: %v", err)
+				logger.Error(fmt.Sprintf("error parsing id: %v", err))
 			}
 
 			err = a.data.DeleteUserGroup(r.Context(), id)
 			if err != nil {
-				log.Printf("error deleting user group: %v", err)
+				logger.Error(fmt.Sprintf("error deleting user group: %v", err))
 			}
 		})
 
@@ -214,11 +222,11 @@ func (a *API) UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	payload := make([]byte, y.Size)
 	size, err := file.Read(payload)
 	if err != nil {
-		log.Printf("error reading file: %v", err)
+		logger.Error(fmt.Sprintf("error reading file: %v", err))
 	}
 	log.Printf("file: %v\n\tsize: %v", y.Header, size)
 	err = a.fs.WriteFileContents(y.Filename, payload)
 	if err != nil {
-		log.Printf("error writing file: %v", err)
+		logger.Error(fmt.Sprintf("error writing file: %v", err))
 	}
 }
