@@ -1,4 +1,4 @@
-package main
+package admin
 
 import (
 	"encoding/json"
@@ -11,14 +11,13 @@ import (
 	"github.com/go-chi/jwtauth"
 	"github.com/google/uuid"
 	"github.com/joshuaschlichting/gocms/apps/admin/components"
-	cmstemplate "github.com/joshuaschlichting/gocms/apps/public"
 	"github.com/joshuaschlichting/gocms/auth"
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/data/db"
 	"github.com/joshuaschlichting/gocms/middleware"
 )
 
-func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.DBCache, middlewareMap map[string]func(http.Handler) http.Handler) {
+func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.DBCache, middlewareMap map[string]func(http.Handler) http.Handler) {
 	r.Get("/admin", func(w http.ResponseWriter, r *http.Request) {
 		// if not logged in
 		if r.Context().Value(middleware.User) == nil {
@@ -96,49 +95,6 @@ func initRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 			Path:  "/",
 		})
 		http.Redirect(w, r, "/secure", http.StatusFound)
-	})
-
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		model := cmstemplate.LandingPageModel{
-			Title:     "GoCMS",
-			SignInURL: config.Auth.SignInUrl,
-			Body:      "Welcome to GoCMS",
-			NavBarLinks: []cmstemplate.NavBarLink{
-				{
-					URL:  "/",
-					Text: "Home",
-				},
-				{
-					URL:  config.Auth.SignInUrl,
-					Text: "Sign In",
-				},
-			},
-			FeaturedItems: []cmstemplate.FeaturedItem{
-				{
-					Title:    "For those about to rock...",
-					Body:     "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod aliquid, mollitia odio veniam sit iste esse assumenda amet aperiam exercitationem, ea animi blanditiis recusandae! Ratione voluptatum molestiae adipisci, beatae obcaecati.",
-					ImageURL: "static/onepagewonder/assets/img/01.jpg",
-				},
-				{
-					Title:    "We salute you!",
-					Body:     "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod aliquid, mollitia odio veniam sit iste esse assumenda amet aperiam exercitationem, ea animi blanditiis recusandae! Ratione voluptatum molestiae adipisci, beatae obcaecati.",
-					ImageURL: "static/onepagewonder/assets/img/02.jpg",
-				},
-				{
-					Title:    "Let there be rock!",
-					Body:     "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod aliquid, mollitia odio veniam sit iste esse assumenda amet aperiam exercitationem, ea animi blanditiis recusandae! Ratione voluptatum molestiae adipisci, beatae obcaecati.",
-					ImageURL: "static/onepagewonder/assets/img/01.jpg",
-				},
-			},
-			Brand:      "GoCMS",
-			Heading:    "GoCMS",
-			Subheading: "A CMS built in your favorite language!",
-		}
-
-		err := tmpl.ExecuteTemplate(w, "onepagewonder/index", model)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
 	})
 
 	r.Group(func(r chi.Router) {

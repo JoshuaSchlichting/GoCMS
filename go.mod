@@ -1,6 +1,6 @@
 module github.com/joshuaschlichting/gocms
 
-go 1.21
+go 1.20
 
 require github.com/lestrrat-go/jwx v1.1.0
 
@@ -50,6 +50,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/lib/pq v1.10.7
 	github.com/stretchr/testify v1.8.0
+	golang.org/x/exp v0.0.0-20230811145659-89c5cff77bcb
 	golang.org/x/oauth2 v0.5.0
 	gopkg.in/yaml.v2 v2.4.0
 )

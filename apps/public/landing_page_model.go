@@ -1,4 +1,4 @@
-package public
+package landing_page
 
 type NavBarLink struct {
 	URL  string

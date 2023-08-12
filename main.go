@@ -17,7 +17,9 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/joshuaschlichting/gocms/api"
+	"github.com/joshuaschlichting/gocms/apps/admin"
 	"github.com/joshuaschlichting/gocms/apps/public/blog"
+	"github.com/joshuaschlichting/gocms/apps/public/landing_page"
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/data/cache"
 	database "github.com/joshuaschlichting/gocms/data/db"
@@ -25,6 +27,7 @@ import (
 	"github.com/joshuaschlichting/gocms/manager"
 	"github.com/joshuaschlichting/gocms/middleware"
 	_ "github.com/lib/pq"
+	"golang.org/x/exp/slog"
 )
 
 //go:embed static
@@ -39,6 +42,12 @@ var configYml []byte
 //go:embed data/db/sql
 var sqlFS embed.FS
 
+var logger *slog.Logger
+
+func init() {
+	logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{}))
+}
+
 func main() {
 	var (
 		host = flag.String("host", "", "host http address to listen on")
@@ -46,21 +55,25 @@ func main() {
 	)
 	config := config.LoadConfig(readConfigFile())
 	if manager.HandleIfManagerCall(*config, sqlFS) {
-		log.Println("Manager program call finished...")
+		logger.Info("Manager program call finished...")
 		// This was a call to the manager program, not the web site executable
 		return
 	}
 
 	flag.Parse()
-	log.Println("Starting server on port", *port)
+	logger.Info(fmt.Sprintf("Starting server on port: %v", *port))
 	db, err := sql.Open("postgres", config.Database.ConnectionString)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
+
+	// Create data layer
 	queries := database.New(db)
 	c := cache.New()
 	cache := database.NewDBCache(queries, c)
+
+	// Add template functions
 	funcMap := template.FuncMap{
 		"mod": func(i, j int) int {
 			return i % j
@@ -88,43 +101,45 @@ func main() {
 			return a == b
 		},
 	}
-	log.Println("Loading templates...")
+
+	// Load templates
+	logger.Info("Loading templates...")
 	templ, err := parseTemplateDir("apps", templateFS, funcMap)
 	if err != nil {
 		log.Fatalf("Error parsing templates: %v", err)
 	}
 
-	addr := net.JoinHostPort(*host, *port)
-
-	r := chi.NewRouter()
 	// Middleware /////////////////////////////////////////////////////////////
 	// Initialize middlware
 	middleware.InitMiddleware(config)
 
-	// Register common middleware
+	// Create the router
+	r := chi.NewRouter()
+
+	// Register common middleware with the router
 	dbMiddlware := middleware.NewMiddlewareWithDB(*cache, config.Auth.JWT.SecretKey)
 	r.Use(middleware.LogAllButStaticRequests)
-
 	middlewareMap := map[string]func(http.Handler) http.Handler{}
 	middlewareMap["addUserToCtx"] = dbMiddlware.AddUserToCtx
-	// End Middleware /////////////////////////////////////////////////////////
 
 	// Register static file serve
-	// new file system made from fileSystem sub folder "static"
 	staticFS, _ := fs.Sub(fileSystem, "static")
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
 
 	// Create file system for content delivery
 	homeDir, _ := os.UserHomeDir()
 	gocmsPath := path.Join(homeDir, "gocms")
-	log.Println("Using the following gocmsPath for local filesystem: ", gocmsPath)
+	logger.Info(fmt.Sprintf("Using the following gocmsPath for local filesystem: %s", gocmsPath))
 	fs := filesystem.NewLocalFilesystem(gocmsPath)
 
 	// Register routes
-	initRoutes(r, templ, config, *cache, middlewareMap)
+	admin.InitRoutes(r, templ, config, *cache, middlewareMap)
 	api.InitAPI(r, templ, config, *cache, fs)
 	blog.InitRoutes(r, templ, config, *cache, middlewareMap)
+	landing_page.InitRoutes(r, templ, config, *cache, middlewareMap)
 
+	// Start server
+	addr := net.JoinHostPort(*host, *port)
 	if err := listenServe(addr, r); err != nil {
 		log.Fatal(err)
 	}
@@ -135,7 +150,7 @@ func listenServe(listenAddr string, handler http.Handler) error {
 		Addr:    listenAddr,
 		Handler: handler, // Our own instance of servemux
 	}
-	fmt.Printf("Starting HTTP listener at %s\n", listenAddr)
+	logger.Debug(fmt.Sprintf("Starting HTTP listener at %s", listenAddr))
 	return s.ListenAndServe()
 }
 

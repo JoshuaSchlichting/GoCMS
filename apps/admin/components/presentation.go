@@ -67,7 +67,7 @@ func (p *Presentor) EditListItemHTML(formID, formTitle, apiEndpoint, apiCallType
 		htmx.process(document.getElementById("%[1]s_form"));`, formID, apiEndpoint, apiCallType)
 	tableID := formID + "_table"
 
-	initDataTableCode := ""//fmt.Sprintf(`let table = new DataTable('#%s', {});`, tableID)
+	initDataTableCode := "" //fmt.Sprintf(`let table = new DataTable('#%s', {});`, tableID)
 
 	err := p.template.ExecuteTemplate(p.writer, "edit_item_form", map[string]interface{}{
 		"EditItemForm": generateForm(
@@ -125,7 +125,6 @@ func (p *Presentor) DeleteItemFormHTML(formID, formTitle, apiEndpoint, refreshUR
 }
 
 func (p *Presentor) CreateBlogHTML() error {
-
 	return p.template.ExecuteTemplate(p.writer, "create_blog", map[string]interface{}{
 		"CreateBlogForm": generateForm(
 			"Create Blog",
