@@ -45,7 +45,9 @@ var sqlFS embed.FS
 var logger *slog.Logger
 
 func init() {
-	logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{}))
+	var programLevel = new(slog.LevelVar) // Default might be Info level
+	programLevel.Set(slog.LevelDebug)     // Now set to Debug level
+	logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: programLevel}))
 }
 
 func main() {
