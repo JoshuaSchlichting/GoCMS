@@ -14,6 +14,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"sync"
 
 	"github.com/go-chi/chi"
 	"github.com/joshuaschlichting/gocms/api"
@@ -86,7 +87,8 @@ func main() {
 	// Create data layer
 	queries := database.New(db)
 	logger.Info("Connected to database: " + parseConnectionString(config.Database.ConnectionString))
-	c := cache.New()
+	mu := new(sync.RWMutex)
+	c := cache.New(mu)
 	cache := database.NewDBCache(queries, c)
 
 	// Add template functions

@@ -8,7 +8,7 @@ import (
 
 type Cache struct {
 	cache map[string]*cacheItem
-	mu    sync.RWMutex
+	mu    *sync.RWMutex
 }
 
 type cacheItem struct {
@@ -16,8 +16,8 @@ type cacheItem struct {
 	expiry time.Time
 }
 
-func New() *Cache {
-	return &Cache{cache: make(map[string]*cacheItem)}
+func New(mu *sync.RWMutex) *Cache {
+	return &Cache{cache: make(map[string]*cacheItem), mu: mu}
 }
 
 func (c *Cache) Get(key string) (interface{}, error) {
