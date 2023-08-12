@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
-	cmstemplate "github.com/joshuaschlichting/gocms/apps/public"
 
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/data/db"
@@ -14,11 +13,11 @@ import (
 func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.DBCache, middlewareMap map[string]func(http.Handler) http.Handler) {
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		model := cmstemplate.LandingPageModel{
+		model := LandingPageModel{
 			Title:     "GoCMS",
 			SignInURL: config.Auth.SignInUrl,
 			Body:      "Welcome to GoCMS",
-			NavBarLinks: []cmstemplate.NavBarLink{
+			NavBarLinks: []NavBarLink{
 				{
 					URL:  "/",
 					Text: "Home",
@@ -28,7 +27,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 					Text: "Sign In",
 				},
 			},
-			FeaturedItems: []cmstemplate.FeaturedItem{
+			FeaturedItems: []FeaturedItem{
 				{
 					Title:    "For those about to rock...",
 					Body:     "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod aliquid, mollitia odio veniam sit iste esse assumenda amet aperiam exercitationem, ea animi blanditiis recusandae! Ratione voluptatum molestiae adipisci, beatae obcaecati.",
