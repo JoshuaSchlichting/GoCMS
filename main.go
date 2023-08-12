@@ -72,6 +72,7 @@ func main() {
 
 	// Create data layer
 	queries := database.New(db)
+	logger.Info("Connected to database: " + parseConnectionString(config.Database.ConnectionString))
 	c := cache.New()
 	cache := database.NewDBCache(queries, c)
 
@@ -108,7 +109,9 @@ func main() {
 	logger.Info("Loading templates...")
 	templ, err := parseTemplateDir("apps", templateFS, funcMap)
 	if err != nil {
-		log.Fatalf("Error parsing templates: %v", err)
+		errMsg := fmt.Sprintf("error parsing templates: %v", err)
+		logger.Error(errMsg)
+		log.Fatalf(errMsg)
 	}
 
 	// Middleware /////////////////////////////////////////////////////////////
@@ -134,7 +137,7 @@ func main() {
 	logger.Info(fmt.Sprintf("Using the following gocmsPath for local filesystem: %s", gocmsPath))
 	fs := filesystem.NewLocalFilesystem(gocmsPath)
 
-	// Register routes
+	// Register apps routes
 	admin.InitRoutes(r, templ, config, *cache, middlewareMap)
 	api.InitAPI(r, templ, config, *cache, fs)
 	blog.InitRoutes(r, templ, config, *cache, middlewareMap)
