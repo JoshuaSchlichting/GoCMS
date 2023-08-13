@@ -10,8 +10,8 @@ import (
 
 	"github.com/go-chi/jwtauth"
 	"github.com/google/uuid"
-	"github.com/joshuaschlichting/gocms/internal/auth"
-	"github.com/joshuaschlichting/gocms/internal/config"
+	"github.com/joshuaschlichting/gocms/auth"
+	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/internal/data/db"
 	"github.com/lestrrat-go/jwx/jwt"
 )

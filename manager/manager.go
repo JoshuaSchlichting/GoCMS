@@ -9,7 +9,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/joshuaschlichting/gocms/internal/config"
+	"github.com/joshuaschlichting/gocms/config"
 	database "github.com/joshuaschlichting/gocms/internal/data/db"
 	_ "github.com/lib/pq"
 )

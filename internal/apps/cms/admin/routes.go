@@ -11,9 +11,9 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/jwtauth"
 	"github.com/google/uuid"
+	"github.com/joshuaschlichting/gocms/auth"
+	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/internal/apps/cms/admin/components"
-	"github.com/joshuaschlichting/gocms/internal/auth"
-	"github.com/joshuaschlichting/gocms/internal/config"
 	"github.com/joshuaschlichting/gocms/internal/data/db"
 	"golang.org/x/exp/slog"
 )
