@@ -1,11 +1,22 @@
-database:
-  connection_string: postgresql://<your connection string>
-auth:
-  jwt:
-    secret_key: xyz
-    expiration_time: 1000
-    issuer: issuerstring
-    audience: audiencestring
-    subject: 'user'
-
-  sign_in_url: cognito sign in url
+cms:
+  database:
+    connection_string: postgresql://<your connection string>
+  auth:
+    jwt:
+      secret_key: xyz
+      expiration_time: 1000
+      issuer: issuerstring
+      audience: audiencestring
+      subject: 'user'
+  
+    sign_in_url: cognito sign in url
+another_app:
+  database:
+    [...]
+  auth:
+    [...]
+and_another_app:
+  database:
+    [...]
+  auth:
+    [...]
