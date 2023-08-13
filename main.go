@@ -9,10 +9,8 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"net/url"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/go-chi/chi"
 	"github.com/joshuaschlichting/gocms/auth"
@@ -73,33 +71,7 @@ func main() {
 
 	flag.Parse()
 	// Add template functions
-	funcMap := template.FuncMap{
-		"mod": func(i, j int) int {
-			return i % j
-		},
-		"sub": func(a, b int) int {
-			return a - b
-		},
-		"add": func(a, b int) int {
-			return a + b
-		},
-		"seq": func(start, end int) []int {
-			var sequence []int
-			for i := start; i <= end; i++ {
-				sequence = append(sequence, i)
-			}
-			return sequence
-		},
-		"gt": func(a, b int) bool {
-			return a > b
-		},
-		"lt": func(a, b int) bool {
-			return a < b
-		},
-		"eq": func(a, b int) bool {
-			return a == b
-		},
-	}
+	funcMap := commonFuncMap
 	// Load templates
 	logger.Info("Loading templates...")
 	templ, err := parseTemplateDir("internal/apps", templateFS, funcMap)
@@ -152,14 +124,30 @@ func readConfigFile() []byte {
 	return configYml
 }
 
-func parseConnectionString(connStr string) string {
-	u, err := url.Parse(connStr)
-	if err != nil {
-		log.Fatal(fmt.Errorf("error when parsing connectiong string for a URL: %v", err))
-	}
-
-	// Get DB name from path
-	dbName := strings.TrimPrefix(u.Path, "/")
-
-	return dbName + "@" + u.Host
+var commonFuncMap = template.FuncMap{
+	"mod": func(i, j int) int {
+		return i % j
+	},
+	"sub": func(a, b int) int {
+		return a - b
+	},
+	"add": func(a, b int) int {
+		return a + b
+	},
+	"seq": func(start, end int) []int {
+		var sequence []int
+		for i := start; i <= end; i++ {
+			sequence = append(sequence, i)
+		}
+		return sequence
+	},
+	"gt": func(a, b int) bool {
+		return a > b
+	},
+	"lt": func(a, b int) bool {
+		return a < b
+	},
+	"eq": func(a, b int) bool {
+		return a == b
+	},
 }
