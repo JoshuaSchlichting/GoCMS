@@ -6,7 +6,13 @@ import (
 	"time"
 )
 
-type Cache struct {
+type Cache interface {
+	Get(key string) (interface{}, error)
+	Set(key string, value interface{}, duration time.Duration)
+	Delete(key string)
+}
+
+type MemCache struct {
 	cache map[string]*cacheItem
 	mu    *sync.RWMutex
 }
@@ -16,11 +22,11 @@ type cacheItem struct {
 	expiry time.Time
 }
 
-func New(mu *sync.RWMutex) *Cache {
-	return &Cache{cache: make(map[string]*cacheItem), mu: mu}
+func New(mu *sync.RWMutex) *MemCache {
+	return &MemCache{cache: make(map[string]*cacheItem), mu: mu}
 }
 
-func (c *Cache) Get(key string) (interface{}, error) {
+func (c *MemCache) Get(key string) (interface{}, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -42,7 +48,7 @@ func (c *Cache) Get(key string) (interface{}, error) {
 	return item.value, nil
 }
 
-func (c *Cache) Set(key string, val interface{}, duration time.Duration) {
+func (c *MemCache) Set(key string, val interface{}, duration time.Duration) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -52,7 +58,7 @@ func (c *Cache) Set(key string, val interface{}, duration time.Duration) {
 	}
 }
 
-func (c *Cache) Delete(key string) {
+func (c *MemCache) Delete(key string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 

@@ -28,13 +28,13 @@ type Config struct {
 	} `yaml:"auth"`
 }
 
-func LoadConfig(configYml []byte) *Config {
+func LoadConfig(configYml []byte) *map[string]Config {
 	return loadConfigYaml(configYml)
 }
 
-func loadConfigYaml(configYml []byte) *Config {
+func loadConfigYaml(configYml []byte) *map[string]Config {
 	// load yml from config.yml
-	config := Config{}
+	config := map[string]Config{}
 	// unmarshal yml into config struct
 	err := yaml.Unmarshal(configYml, &config) // TODO: this isn't working
 	if err != nil {

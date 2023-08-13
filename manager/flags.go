@@ -10,9 +10,12 @@ var deleteAllUsersFlag bool
 var initFlag bool
 var executeRawSqlFlag string
 var destroySchemaFlag bool
+var appName string
 
 func init() {
 	managerFlag := flag.NewFlagSet("manager", flag.ExitOnError)
+	managerFlag.StringVar(&appName, "app", "", "The name of the app to manage")
+
 	managerFlag.BoolVar(&listUsersFlag, "list-users", false, "List users")
 
 	managerFlag.BoolVar(&createSuperUserFlag, "create-superuser", false, "Create super user")

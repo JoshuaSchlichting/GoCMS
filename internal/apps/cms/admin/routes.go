@@ -14,7 +14,7 @@ import (
 	"github.com/joshuaschlichting/gocms/auth"
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/internal/apps/cms/admin/components"
-	"github.com/joshuaschlichting/gocms/internal/data/db"
+	"github.com/joshuaschlichting/gocms/internal/apps/cms/data/db"
 	"golang.org/x/exp/slog"
 )
 
@@ -30,6 +30,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 			// redirect to login
 			// set Content-Type header
 			w.Header().Set("Content-Type", "")
+			logger.Debug("redirecting to login: " + config.Auth.SignInUrl)
 			http.Redirect(w, r, config.Auth.SignInUrl, http.StatusFound)
 			return
 		}

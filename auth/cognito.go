@@ -31,7 +31,7 @@ func SetLogger(l *slog.Logger) {
 	logger = l
 	logger.Debug("", "poolId", poolId)
 	logger.Debug("", "region", region)
-	logger.Debug("clientId", clientId)
+	logger.Debug("", "clientId", clientId)
 }
 func init() {
 	poolId = os.Getenv("POOL_ID")

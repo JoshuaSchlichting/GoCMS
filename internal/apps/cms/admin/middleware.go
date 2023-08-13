@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/joshuaschlichting/gocms/auth"
 	"github.com/joshuaschlichting/gocms/config"
-	"github.com/joshuaschlichting/gocms/internal/data/db"
+	"github.com/joshuaschlichting/gocms/internal/apps/cms/data/db"
 	"github.com/lestrrat-go/jwx/jwt"
 )
 
@@ -96,6 +96,11 @@ var conf *config.Config
 
 func InitMiddleware(config *config.Config) {
 	conf = config
+}
+
+func init() {
+	// find and load config.yml independently of the app
+
 }
 
 func AddURLAccessCodeToCtx(h http.Handler) http.Handler {

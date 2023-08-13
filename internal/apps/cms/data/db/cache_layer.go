@@ -6,15 +6,15 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/joshuaschlichting/gocms/internal/data/cache"
+	"github.com/joshuaschlichting/gocms/cache"
 )
 
 type DBCache struct {
 	queries *Queries
-	cache   *cache.Cache
+	cache   cache.Cache
 }
 
-func NewDBCache(q *Queries, c *cache.Cache) *DBCache {
+func NewDBCache(q *Queries, c cache.Cache) *DBCache {
 	return &DBCache{queries: q, cache: c}
 }
 

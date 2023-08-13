@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	database "github.com/joshuaschlichting/gocms/internal/data/db"
+	database "github.com/joshuaschlichting/gocms/internal/apps/cms/data/db"
 )
 
 func deleteAllUsers(db *sql.DB) {

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"embed"
 	"flag"
 	"fmt"
@@ -14,7 +13,6 @@ import (
 	"os"
 	"path"
 	"strings"
-	"sync"
 
 	"github.com/go-chi/chi"
 	"github.com/joshuaschlichting/gocms/auth"
@@ -23,9 +21,6 @@ import (
 	"github.com/joshuaschlichting/gocms/internal/apps/cms/admin"
 	"github.com/joshuaschlichting/gocms/internal/apps/cms/api"
 	"github.com/joshuaschlichting/gocms/internal/apps/cms/blog"
-	"github.com/joshuaschlichting/gocms/internal/apps/landing_page"
-	"github.com/joshuaschlichting/gocms/internal/data/cache"
-	database "github.com/joshuaschlichting/gocms/internal/data/db"
 	"github.com/joshuaschlichting/gocms/manager"
 	"github.com/joshuaschlichting/gocms/middleware"
 	_ "github.com/lib/pq"
@@ -41,7 +36,7 @@ var templateFS embed.FS
 //go:embed config.yml
 var configYml []byte
 
-//go:embed internal/data/db/sql
+//go:embed internal/apps/cms/data/db/sql
 var sqlFS embed.FS
 
 var logger *slog.Logger
@@ -77,20 +72,6 @@ func main() {
 	}
 
 	flag.Parse()
-	logger.Info(fmt.Sprintf("Starting server on port: %v", *port))
-	db, err := sql.Open("postgres", config.Database.ConnectionString)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	// Create data layer
-	queries := database.New(db)
-	logger.Info("Connected to database: " + parseConnectionString(config.Database.ConnectionString))
-	mu := new(sync.RWMutex)
-	c := cache.New(mu)
-	cache := database.NewDBCache(queries, c)
-
 	// Add template functions
 	funcMap := template.FuncMap{
 		"mod": func(i, j int) int {
@@ -119,7 +100,6 @@ func main() {
 			return a == b
 		},
 	}
-
 	// Load templates
 	logger.Info("Loading templates...")
 	templ, err := parseTemplateDir("internal/apps", templateFS, funcMap)
@@ -129,34 +109,25 @@ func main() {
 		log.Fatalf(errMsg)
 	}
 
-	// Middleware /////////////////////////////////////////////////////////////
-	// Initialize middlware
-	admin.InitMiddleware(config)
+	logger.Info(fmt.Sprintf("Starting server on port: %v", *port))
 
 	// Create the router
 	r := chi.NewRouter()
-
-	// Register common middleware with the router
-	dbMiddlware := admin.NewMiddlewareWithDB(*cache, config.Auth.JWT.SecretKey)
-	r.Use(middleware.LogAllButStaticRequests)
-	middlewareMap := map[string]func(http.Handler) http.Handler{}
-	middlewareMap["addUserToCtx"] = dbMiddlware.AddUserToCtx
-
-	// Register static file serve
-	staticFS, _ := fs.Sub(fileSystem, "static")
-	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
 
 	// Create file system for content delivery
 	homeDir, _ := os.UserHomeDir()
 	gocmsPath := path.Join(homeDir, "gocms")
 	logger.Info(fmt.Sprintf("Using the following gocmsPath for local filesystem: %s", gocmsPath))
-	fs := filesystem.NewLocalFilesystem(gocmsPath)
+	localFS := filesystem.NewLocalFilesystem(gocmsPath)
 
-	// Register apps routes
-	admin.InitRoutes(r, templ, config, *cache, middlewareMap)
-	api.InitAPI(r, templ, config, *cache, fs)
-	blog.InitRoutes(r, templ, config, *cache, middlewareMap)
-	landing_page.InitRoutes(r, templ, config, *cache, middlewareMap)
+	// Register common middleware with the router
+	r.Use(middleware.LogAllButStaticRequests)
+
+	registerApps(r, templ, *config, *localFS)
+
+	// Register static file serve
+	staticFS, _ := fs.Sub(fileSystem, "static")
+	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
 
 	// Start server
 	addr := net.JoinHostPort(*host, *port)

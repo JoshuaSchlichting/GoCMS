@@ -10,15 +10,15 @@ import (
 	"strings"
 
 	"github.com/joshuaschlichting/gocms/config"
-	database "github.com/joshuaschlichting/gocms/internal/data/db"
+	database "github.com/joshuaschlichting/gocms/internal/apps/cms/data/db"
 	_ "github.com/lib/pq"
 )
 
 var sqlDir fs.FS
 
-func HandleIfManagerCall(configuration config.Config, sqlDirA fs.FS) bool {
+func HandleIfManagerCall(configuration map[string]config.Config, sqlDirA fs.FS) bool {
 	sqlDir = sqlDirA
-	db, err := sql.Open("postgres", configuration.Database.ConnectionString)
+	db, err := sql.Open("postgres", configuration[appName].Database.ConnectionString)
 	queries := database.New(db)
 
 	if err != nil {

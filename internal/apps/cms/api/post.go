@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
-	"github.com/joshuaschlichting/gocms/internal/data/db"
+	"github.com/joshuaschlichting/gocms/internal/apps/cms/data/db"
 	"golang.org/x/exp/slog"
 )
 

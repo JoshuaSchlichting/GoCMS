@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/joshuaschlichting/gocms/config"
-	"github.com/joshuaschlichting/gocms/internal/data/db"
+	"github.com/joshuaschlichting/gocms/internal/apps/cms/data/db"
 )
 
 type filesystem interface {

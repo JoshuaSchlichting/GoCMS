@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/chi"
 
 	"github.com/joshuaschlichting/gocms/config"
-	"github.com/joshuaschlichting/gocms/internal/data/db"
+	"github.com/joshuaschlichting/gocms/internal/apps/cms/data/db"
 )
 
 func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.DBCache, middlewareMap map[string]func(http.Handler) http.Handler) {
