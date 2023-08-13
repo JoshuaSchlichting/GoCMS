@@ -24,6 +24,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lestrrat-go/backoff/v2 v2.0.7 // indirect
@@ -48,6 +49,7 @@ require (
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/jwtauth v1.2.0
 	github.com/google/uuid v1.3.0
+	github.com/gorilla/csrf v1.7.1
 	github.com/lib/pq v1.10.7
 	github.com/stretchr/testify v1.8.0
 	golang.org/x/exp v0.0.0-20230811145659-89c5cff77bcb

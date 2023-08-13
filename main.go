@@ -130,6 +130,8 @@ func main() {
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
 
 	// Start server
+	// TODO: Setup CSRF with CSRF(r) in listenServe()
+	// CSRF := csrf.Protect([]byte("32-byte-long-auth-key"))
 	addr := net.JoinHostPort(*host, *port)
 	if err := listenServe(addr, r); err != nil {
 		log.Fatal(err)
