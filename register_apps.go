@@ -29,7 +29,7 @@ func connecToDB(c config.Config) *sql.DB {
 }
 
 func registerApps(r *chi.Mux, templ *template.Template, c map[string]config.Config, fs filesystem.LocalFilesystem) {
-
+	/////////////////////////// CMS APP ///////////////////////////
 	// Register apps databases
 	blogDB := connecToDB(c["cms"])
 	queries := database.New(blogDB)
