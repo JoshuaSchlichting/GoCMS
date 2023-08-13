@@ -17,16 +17,16 @@ import (
 	"sync"
 
 	"github.com/go-chi/chi"
-	"github.com/joshuaschlichting/gocms/api"
-	"github.com/joshuaschlichting/gocms/apps/admin"
-	"github.com/joshuaschlichting/gocms/apps/public/blog"
-	"github.com/joshuaschlichting/gocms/apps/public/landing_page"
-	"github.com/joshuaschlichting/gocms/auth"
-	"github.com/joshuaschlichting/gocms/config"
-	"github.com/joshuaschlichting/gocms/data/cache"
-	database "github.com/joshuaschlichting/gocms/data/db"
-	"github.com/joshuaschlichting/gocms/filesystem"
-	"github.com/joshuaschlichting/gocms/manager"
+	"github.com/joshuaschlichting/gocms/internal/apps/cms/admin"
+	"github.com/joshuaschlichting/gocms/internal/apps/cms/api"
+	"github.com/joshuaschlichting/gocms/internal/apps/cms/blog"
+	"github.com/joshuaschlichting/gocms/internal/apps/landing_page"
+	"github.com/joshuaschlichting/gocms/internal/auth"
+	"github.com/joshuaschlichting/gocms/internal/config"
+	"github.com/joshuaschlichting/gocms/internal/data/cache"
+	database "github.com/joshuaschlichting/gocms/internal/data/db"
+	"github.com/joshuaschlichting/gocms/internal/filesystem"
+	"github.com/joshuaschlichting/gocms/internal/manager"
 	"github.com/joshuaschlichting/gocms/middleware"
 	_ "github.com/lib/pq"
 	"golang.org/x/exp/slog"
@@ -35,13 +35,13 @@ import (
 //go:embed static
 var fileSystem embed.FS
 
-//go:embed apps
+//go:embed internal/apps
 var templateFS embed.FS
 
 //go:embed config.yml
 var configYml []byte
 
-//go:embed data/db/sql
+//go:embed internal/data/db/sql
 var sqlFS embed.FS
 
 var logger *slog.Logger
@@ -122,7 +122,7 @@ func main() {
 
 	// Load templates
 	logger.Info("Loading templates...")
-	templ, err := parseTemplateDir("apps", templateFS, funcMap)
+	templ, err := parseTemplateDir("internal/apps", templateFS, funcMap)
 	if err != nil {
 		errMsg := fmt.Sprintf("error parsing templates: %v", err)
 		logger.Error(errMsg)
@@ -131,13 +131,13 @@ func main() {
 
 	// Middleware /////////////////////////////////////////////////////////////
 	// Initialize middlware
-	middleware.InitMiddleware(config)
+	admin.InitMiddleware(config)
 
 	// Create the router
 	r := chi.NewRouter()
 
 	// Register common middleware with the router
-	dbMiddlware := middleware.NewMiddlewareWithDB(*cache, config.Auth.JWT.SecretKey)
+	dbMiddlware := admin.NewMiddlewareWithDB(*cache, config.Auth.JWT.SecretKey)
 	r.Use(middleware.LogAllButStaticRequests)
 	middlewareMap := map[string]func(http.Handler) http.Handler{}
 	middlewareMap["addUserToCtx"] = dbMiddlware.AddUserToCtx

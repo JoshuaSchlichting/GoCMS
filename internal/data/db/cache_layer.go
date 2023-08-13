@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/joshuaschlichting/gocms/data/cache"
+	"github.com/joshuaschlichting/gocms/internal/data/cache"
 )
 
 type DBCache struct {

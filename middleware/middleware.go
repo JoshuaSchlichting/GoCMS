@@ -6,15 +6,6 @@ import (
 	"strings"
 )
 
-type contextKey int
-
-const (
-	AccessCode contextKey = iota
-	AccessToken
-	User
-	JWTEncodedString
-)
-
 func LogAllButStaticRequests(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(r.RequestURI, "/static/") {

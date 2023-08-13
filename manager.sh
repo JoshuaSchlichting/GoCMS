@@ -1,1 +1,1 @@
-docker compose run --rm --name gocms-web-manager web ./app $@
+docker compose run --rm --name gocms-web-manager web ./app manager $@

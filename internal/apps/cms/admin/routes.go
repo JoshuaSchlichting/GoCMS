@@ -11,11 +11,10 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/jwtauth"
 	"github.com/google/uuid"
-	"github.com/joshuaschlichting/gocms/apps/admin/components"
-	"github.com/joshuaschlichting/gocms/auth"
-	"github.com/joshuaschlichting/gocms/config"
-	"github.com/joshuaschlichting/gocms/data/db"
-	"github.com/joshuaschlichting/gocms/middleware"
+	"github.com/joshuaschlichting/gocms/internal/apps/cms/admin/components"
+	"github.com/joshuaschlichting/gocms/internal/auth"
+	"github.com/joshuaschlichting/gocms/internal/config"
+	"github.com/joshuaschlichting/gocms/internal/data/db"
 	"golang.org/x/exp/slog"
 )
 
@@ -27,7 +26,7 @@ func SetLogger(l *slog.Logger) {
 func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, queries db.DBCache, middlewareMap map[string]func(http.Handler) http.Handler) {
 	r.Get("/admin", func(w http.ResponseWriter, r *http.Request) {
 		// if not logged in
-		if r.Context().Value(middleware.User) == nil {
+		if r.Context().Value(User) == nil {
 			// redirect to login
 			// set Content-Type header
 			w.Header().Set("Content-Type", "")
@@ -107,8 +106,8 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 	r.Group(func(r chi.Router) {
 		jwtAuth := jwtauth.New("HS256", []byte(config.Auth.JWT.SecretKey), nil)
 		r.Use(jwtauth.Verifier(jwtAuth))
-		r.Use(middleware.AddClientJWTStringToCtx)
-		r.Use(middleware.AuthenticateJWT)
+		r.Use(AddClientJWTStringToCtx)
+		r.Use(AuthenticateJWT)
 		r.Use(middlewareMap["addUserToCtx"])
 		r.Get("/edit_org_form", func(w http.ResponseWriter, r *http.Request) {
 			orgs, err := queries.ListOrganizations(r.Context())
@@ -489,7 +488,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 		})
 		r.Get("/upload_form", func(w http.ResponseWriter, r *http.Request) {
 			err := tmpl.ExecuteTemplate(w, "upload_form", map[string]interface{}{
-				"Token":   r.Context().Value(middleware.JWTEncodedString).(string),
+				"Token":   r.Context().Value(JWTEncodedString).(string),
 				"PostURL": "/api/upload_file",
 			})
 			if err != nil {
@@ -507,17 +506,17 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 		r.Get("/secure", func(w http.ResponseWriter, r *http.Request) {
 			var username string
 
-			if r.Context().Value(middleware.User) == nil {
+			if r.Context().Value(User) == nil {
 				username = ""
 			} else {
-				username = r.Context().Value(middleware.User).(db.User).Name
+				username = r.Context().Value(User).(db.User).Name
 			}
 
 			err := tmpl.ExecuteTemplate(w, "index", map[string]interface{}{
 				"SecureText":  username,
 				"sign_in_url": config.Auth.SignInUrl,
-				"username":    r.Context().Value(middleware.User).(db.User).Name,
-				"user_id":     r.Context().Value(middleware.User).(db.User).ID.String(),
+				"username":    r.Context().Value(User).(db.User).Name,
+				"user_id":     r.Context().Value(User).(db.User).ID.String(),
 			})
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -534,7 +533,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 
 		r.Get("/inbox", func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
-			messages, err := queries.ListMessagesTo(r.Context(), r.Context().Value(middleware.User).(db.User).Name)
+			messages, err := queries.ListMessagesTo(r.Context(), r.Context().Value(User).(db.User).Name)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
@@ -593,7 +592,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 		})
 
 		r.Get("/sent_messages", func(w http.ResponseWriter, r *http.Request) {
-			userID := r.Context().Value(middleware.User).(db.User).ID
+			userID := r.Context().Value(User).(db.User).ID
 			messages, err := queries.ListMessagesFrom(r.Context(), userID)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -653,7 +652,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 			r.ParseForm()
 			// get user id
 			log.Printf("form: %v", r.Form)
-			userID := r.Context().Value(middleware.User).(db.User).ID
+			userID := r.Context().Value(User).(db.User).ID
 			if userID == uuid.Nil {
 				logger.Error(fmt.Sprintf("error getting user id"))
 			}
@@ -676,7 +675,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 			r.ParseForm()
 			// get user id
 			log.Printf("form: %v", r.Form)
-			userID := r.Context().Value(middleware.User).(db.User).ID
+			userID := r.Context().Value(User).(db.User).ID
 			if userID == uuid.Nil {
 				logger.Error(fmt.Sprintf("error getting user id"))
 			}
@@ -719,7 +718,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 		})
 
 		r.Get("/my_blog_posts", func(w http.ResponseWriter, r *http.Request) {
-			userID := r.Context().Value(middleware.User).(db.User).ID
+			userID := r.Context().Value(User).(db.User).ID
 			blogPosts, err := queries.ListBlogPostsByUser(r.Context(), userID)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
