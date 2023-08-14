@@ -13,6 +13,7 @@ import (
 	"path"
 
 	"github.com/go-chi/chi"
+	"github.com/gorilla/csrf"
 	"github.com/joshuaschlichting/gocms/auth"
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/filesystem"
@@ -94,6 +95,8 @@ func main() {
 
 	// Register common middleware with the router
 	r.Use(middleware.LogAllButStaticRequests)
+	CSRF := csrf.Protect([]byte("32-byte-long-auth-keyccccccccccc"), csrf.Path("/"), csrf.Secure(false))
+	r.Use(CSRF)
 
 	registerApps(r, templ, *config, *localFS)
 
@@ -103,7 +106,6 @@ func main() {
 
 	// Start server
 	// TODO: Setup CSRF with CSRF(r) in listenServe()
-	// CSRF := csrf.Protect([]byte("32-byte-long-auth-key"))
 	addr := net.JoinHostPort(*host, *port)
 	if err := listenServe(addr, r); err != nil {
 		log.Fatal(err)

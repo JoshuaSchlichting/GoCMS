@@ -23,35 +23,19 @@ func (a *API) initPostRoutes() {
 		r.Post("/upload", func(w http.ResponseWriter, r *http.Request) {
 			// get payload
 			file, y, _ := r.FormFile("file")
-			header := y.Header
-			log.Printf("header: %v", header)
 			// convert file to []byte
 			payload := make([]byte, y.Size)
 			size, err := file.Read(payload)
 			if err != nil {
 				logger.Error(fmt.Sprintf("error reading file: %v", err))
 			}
-			log.Printf("file: %v\n\tsize: %v", y.Header, size)
-			// data.UploadFile(payload, y.Filename, "userid")
-		})
-
-		r.Post("/upload_media", func(w http.ResponseWriter, r *http.Request) {
-			// get payload
-			file, y, _ := r.FormFile("file")
-			header := y.Header
-			log.Printf("header: %v", header)
-			payload := make([]byte, y.Size)
-			size, err := file.Read(payload)
-			if err != nil {
-				logger.Error(fmt.Sprintf("error reading file: %v", err))
-			}
-			log.Printf("file: %v\n\tsize: %v", y.Header, size)
+			logger.Debug("/api/upload", "filename", y.Filename, "size", size)
 			// data.UploadFile(payload, y.Filename, "userid")
 		})
 
 		r.Post("/user", func(w http.ResponseWriter, r *http.Request) {
 			r.ParseForm()
-			log.Printf("form: %v", r.Form)
+			logger.Debug("", "form", r.Form)
 			params := db.CreateUserParams{
 				ID:         uuid.New(),
 				Name:       r.FormValue("Name"),
@@ -68,7 +52,7 @@ func (a *API) initPostRoutes() {
 
 		r.Put("/user/{id}", func(w http.ResponseWriter, r *http.Request) {
 			r.ParseForm()
-			log.Printf("form: %v", r.Form)
+			logger.Debug("", "form", r.Form)
 			id, err := uuid.Parse(chi.URLParam(r, "id"))
 			if err != nil {
 				logger.Error(fmt.Sprintf("error parsing id: %v", err))
@@ -90,7 +74,7 @@ func (a *API) initPostRoutes() {
 
 		r.Delete("/user/{id}", func(w http.ResponseWriter, r *http.Request) {
 			// log url params
-			log.Printf("url params: %v", chi.URLParam(r, "id"))
+			logger.Debug("url params", "id", chi.URLParam(r, "id"))
 			// get id from url param
 			id, err := uuid.Parse(chi.URLParam(r, "id"))
 			if err != nil {
@@ -196,7 +180,7 @@ func (a *API) initPostRoutes() {
 		})
 		r.Delete("/usergroup/{id}", func(w http.ResponseWriter, r *http.Request) {
 			// log url params
-			log.Printf("url params: %v", chi.URLParam(r, "id"))
+			logger.Debug("url param", "id", chi.URLParam(r, "id"))
 			// get id from url param
 			id, err := uuid.Parse(chi.URLParam(r, "id"))
 			if err != nil {

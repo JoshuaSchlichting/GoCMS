@@ -6,8 +6,8 @@
         <body>
             <form enctype="multipart/form-data" action="{{.PostURL}}" method="post">
                 <input type="file" name="file" />
-                <input type="hidden" name="token" value="{{.Token}}"/>
                 <input type="submit" value="upload" />
+                {{ .csrfField }}
             </form>
         </body>
         </html>

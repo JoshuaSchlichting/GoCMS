@@ -132,7 +132,7 @@ func AddClientJWTStringToCtx(h http.Handler) http.Handler {
 
 		jwtToken := r.Header.Get("Authorization")
 		if jwtToken == "" {
-			log.Println("No JWT token found in header")
+			logger.Debug("No JWT token found in header")
 		}
 		cookieJWTToken, err := r.Cookie("jwt")
 		if err != nil {
@@ -140,7 +140,7 @@ func AddClientJWTStringToCtx(h http.Handler) http.Handler {
 			h.ServeHTTP(w, r)
 			return
 		}
-		log.Println("JWT found in cookie")
+		logger.Debug("JWT found in cookie")
 		jwtToken = cookieJWTToken.Value
 
 		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), JWTEncodedString, jwtToken)))
@@ -220,7 +220,7 @@ func AuthenticateJWT(h http.Handler) http.Handler {
 
 		claims, _ := jwtToken.AsMap(r.Context())
 
-		log.Printf("claims: %v", claims)
+		logger.Debug("JWT claims", "JWT", claims)
 		h.ServeHTTP(w, r)
 	})
 }

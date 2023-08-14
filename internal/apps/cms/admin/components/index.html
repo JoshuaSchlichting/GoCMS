@@ -53,10 +53,10 @@
   <script src="static/admin/js/app.js"></script>
   <script src="static/admin/js/index.js"></script>
   <script type="application/javascript">
-
-
     $.ajaxSetup({
-      'headers': { "Authorization": getCookie('jwt') }
+      'headers': {
+		"Authorization": getCookie('jwt'),
+	  },
     });
 
     // $("#sidebar").load("sidebar");

@@ -2,7 +2,7 @@ package auth
 
 import (
 	"errors"
-	"log"
+	"fmt"
 
 	cognito "github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
 
@@ -34,7 +34,7 @@ func GetAccessJWT(authorizationCode string) (string, error) {
 	authClient, _ := New()
 	payload, err := authClient.GetOauthTokenFromEndpoint(authorizationCode)
 	if err != nil {
-		log.Printf("Error getting token endpoint payload: %v\n", err)
+		logger.Debug(fmt.Sprintf("error getting token endpoint payload: %v\n", err), "tokenEndpoint", authClient.endpoint.AuthURL)
 		return "", err
 	}
 	return payload.AccessToken, nil

@@ -9,6 +9,8 @@ import (
 	"html/template"
 	"io"
 	"strings"
+
+	"github.com/gorilla/csrf"
 )
 
 type ClickableTable struct {
@@ -25,16 +27,18 @@ type FormField struct {
 }
 
 type Presentor struct {
-	template *template.Template
-	writer   io.Writer
+	template  *template.Template
+	writer    io.Writer
+	csrfField template.HTML
 }
 
 // NewPresentor returns a new Presentor struct who's methods will write directly
 // to the http.ResponseWriter passed to this constructor.
-func NewPresentor(t *template.Template, w io.Writer) *Presentor {
+func NewPresentor(t *template.Template, w io.Writer, csrfField template.HTML) *Presentor {
 	return &Presentor{
-		template: t,
-		writer:   w,
+		template:  t,
+		writer:    w,
+		csrfField: csrfField,
 	}
 }
 
@@ -47,9 +51,11 @@ func (p *Presentor) CreateItemFormHTML(formID, formTitle, apiEndpoint, refreshUR
 			apiEndpoint,
 			formID,
 			getSubmitResetButtonDiv(),
+			p.csrfField,
 		),
-		"FormID":     formID,
-		"RefreshURL": template.JS(refreshURL),
+		"FormID":         formID,
+		"RefreshURL":     template.JS(refreshURL),
+		csrf.TemplateTag: p.csrfField,
 	})
 }
 
@@ -77,6 +83,7 @@ func (p *Presentor) EditListItemHTML(formID, formTitle, apiEndpoint, apiCallType
 			apiEndpoint,
 			formID,
 			getSubmitResetButtonDiv(),
+			p.csrfField,
 		),
 		"FormID":     formID,
 		"RefreshURL": template.JS(refreshURL),
@@ -111,6 +118,7 @@ func (p *Presentor) DeleteItemFormHTML(formID, formTitle, apiEndpoint, refreshUR
 			apiEndpoint,
 			formID,
 			`<button id="deleteItemButton" hx-confirm="Are you sure you want to delete this object?" type="button" class="btn btn-danger">Delete</button>`,
+			p.csrfField,
 		),
 		"FormID":     formID,
 		"RefreshURL": template.JS(refreshURL),
@@ -144,6 +152,7 @@ func (p *Presentor) CreateBlogHTML() error {
 			"/api/v1/blogs",
 			"create-blog-form",
 			getSubmitResetButtonDiv(),
+			p.csrfField,
 		),
 		"FormID": "create-blog-form",
 		"ImageURLs": []string{
@@ -169,7 +178,7 @@ func getSubmitResetButtonDiv() string {
 		</div>`
 }
 
-func generateForm(title string, fields []FormField, hxMethod, hxURL, idPrefix, buttonDiv string) template.HTML {
+func generateForm(title string, fields []FormField, hxMethod, hxURL, idPrefix, buttonDiv string, csrfField template.HTML) template.HTML {
 	tmpl := `
 		<div class="card">
 			<div class="card-body">
@@ -181,6 +190,7 @@ func generateForm(title string, fields []FormField, hxMethod, hxURL, idPrefix, b
 							<input type="{{$field.Type}}" class="form-control" id="{{$.IDPrefix}}{{$field.Name}}" name="{{$field.Name}}" value="{{$field.Value}}" {{if eq (ToLower $field.Name) "id"}}readonly{{end}}>
 						</div>
 					{{end}}
+					{{ .CSRFField }}
 					{{.ButtonDiv}}
 				</form>
 			</div>
@@ -195,6 +205,7 @@ func generateForm(title string, fields []FormField, hxMethod, hxURL, idPrefix, b
 		HxMethod  template.JS
 		HxURL     string
 		ButtonDiv template.HTML
+		CSRFField template.HTML
 	}{
 		Title:     title,
 		Fields:    fields,
@@ -203,6 +214,7 @@ func generateForm(title string, fields []FormField, hxMethod, hxURL, idPrefix, b
 		HxMethod:  template.JS(hxMethod),
 		HxURL:     hxURL,
 		ButtonDiv: template.HTML(buttonDiv),
+		CSRFField: csrfField,
 	}
 
 	funcMap := template.FuncMap{
