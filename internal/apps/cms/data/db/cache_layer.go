@@ -91,9 +91,10 @@ func (c *DBCache) GetUserByName(ctx context.Context, name string) (User, error) 
 	}
 
 	user, err := c.queries.GetUserByName(ctx, name)
-	if err == nil {
-		c.cache.Set(cacheKey, user, time.Minute*5)
+	if err != nil {
+		return User{}, err
 	}
+	c.cache.Set(cacheKey, user, time.Minute*5)
 	return user, err
 }
 

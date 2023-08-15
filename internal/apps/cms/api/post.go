@@ -52,7 +52,7 @@ func (a *API) initPostRoutes() {
 
 		r.Put("/user/{id}", func(w http.ResponseWriter, r *http.Request) {
 			r.ParseForm()
-			logger.Debug("", "form", r.Form)
+			logger.Debug("/user/{id}", "form", r.Form)
 			id, err := uuid.Parse(chi.URLParam(r, "id"))
 			if err != nil {
 				logger.Error(fmt.Sprintf("error parsing id: %v", err))

@@ -57,7 +57,7 @@ func (m DBMiddleware) AddUserToCtx(h http.Handler) http.Handler {
 		username, _ := jwtAuthToken.Get("userInfo")
 		user, err := m.db.GetUserByName(r.Context(), username.(string))
 		if err != nil {
-			log.Printf("unable to get user '%s' from db due to error: %v", username, err.Error())
+			logger.Error(fmt.Sprintf("unable to add user to context in middleware: unable to get user '%s' from db due to error: %v", username, err.Error()))
 		}
 		h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), User, user)))
 	})

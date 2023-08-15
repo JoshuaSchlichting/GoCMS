@@ -11,7 +11,6 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/jwtauth"
 	"github.com/google/uuid"
-	"github.com/gorilla/csrf"
 	"github.com/joshuaschlichting/gocms/auth"
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/internal/apps/cms/admin/components"
@@ -155,7 +154,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 					Value: "",
 				},
 			}
-			p := components.NewPresentor(tmpl, w, csrf.TemplateField(r))
+			p := components.NewPresentor(tmpl, w)
 			err = p.EditListItemHTML("edit_org_form", "Edit Organization Form", "/api/organization", "put", "/edit_org_form", formFields, orgMap)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -165,7 +164,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 		r.Get("/compose_msg", func(w http.ResponseWriter, r *http.Request) {
 			// Define a template string for the message form
 
-			presentor := components.NewPresentor(tmpl, w, csrf.TemplateField(r))
+			presentor := components.NewPresentor(tmpl, w)
 			presentor.CreateItemFormHTML("compose_msg_form", "Compose Message", "/message", "/inbox", []components.FormField{
 				{
 					Name:  "ToUsername",
@@ -203,7 +202,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 					Value: "{}",
 				},
 			}
-			p := components.NewPresentor(tmpl, w, csrf.TemplateField(r))
+			p := components.NewPresentor(tmpl, w)
 			err := p.CreateItemFormHTML("create_org_form", "Create Organization Form", "/api/organization", "/edit_org_form", formFields)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -228,7 +227,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 				},
 			}
 
-			p := components.NewPresentor(tmpl, w, csrf.TemplateField(r))
+			p := components.NewPresentor(tmpl, w)
 			err := p.CreateItemFormHTML("create_user_form", "Create User Form", "/api/user", "/edit_user_form", formFields)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -247,7 +246,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 					Value: "{}",
 				},
 			}
-			p := components.NewPresentor(tmpl, w, csrf.TemplateField(r))
+			p := components.NewPresentor(tmpl, w)
 			err := p.CreateItemFormHTML("create_usergroup_form", "Create User Group Form", "/api/usergroup", "/edit_usergroup_form", formFields)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -269,7 +268,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 				})
 			}
 
-			p := components.NewPresentor(tmpl, w, csrf.TemplateField(r))
+			p := components.NewPresentor(tmpl, w)
 			formFields := []components.FormField{
 				{
 					Name:  "ID",
@@ -317,7 +316,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 				})
 			}
 
-			p := components.NewPresentor(tmpl, w, csrf.TemplateField(r))
+			p := components.NewPresentor(tmpl, w)
 			formFields := []components.FormField{
 				{
 					Name:  "ID",
@@ -366,7 +365,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 				})
 			}
 
-			p := components.NewPresentor(tmpl, w, csrf.TemplateField(r))
+			p := components.NewPresentor(tmpl, w)
 			formFields := []components.FormField{
 				{
 					Name:  "ID",
@@ -439,7 +438,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 					Value: "",
 				},
 			}
-			p := components.NewPresentor(tmpl, w, csrf.TemplateField(r))
+			p := components.NewPresentor(tmpl, w)
 			err = p.EditListItemHTML("edit_user_form", "Edit User Form", "/api/user", "put", "/edit_user_form", formFields, userMap)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -483,17 +482,16 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 					Value: "",
 				},
 			}
-			p := components.NewPresentor(tmpl, w, csrf.TemplateField(r))
+			p := components.NewPresentor(tmpl, w)
 			err = p.EditListItemHTML("edit_usergroup_form", "Edit User Group Form", "/api/usergroup", "put", "/edit_usergroup_form", formFields, usergroupMap)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
 		})
 		r.Get("/upload_form", func(w http.ResponseWriter, r *http.Request) {
-			logger.Debug("/upload_form", "csrfToken", csrf.Token(r))
+			logger.Debug("/upload_form")
 			err := tmpl.ExecuteTemplate(w, "upload_form", map[string]interface{}{
-				"PostURL":        "/api/upload",
-				csrf.TemplateTag: csrf.TemplateField(r),
+				"PostURL": "/api/upload",
 			})
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -515,14 +513,11 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 			} else {
 				username = r.Context().Value(User).(db.User).Name
 			}
-			w.Header().Set("X-CSRF-Token", csrf.Token(r))
 			err := tmpl.ExecuteTemplate(w, "index", map[string]interface{}{
-				"SecureText":     username,
-				"sign_in_url":    config.Auth.SignInUrl,
-				"username":       r.Context().Value(User).(db.User).Name,
-				"user_id":        r.Context().Value(User).(db.User).ID.String(),
-				csrf.TemplateTag: csrf.TemplateField(r),
-				"csrfToken":      csrf.Token(r),
+				"SecureText":  username,
+				"sign_in_url": config.Auth.SignInUrl,
+				"username":    r.Context().Value(User).(db.User).Name,
+				"user_id":     r.Context().Value(User).(db.User).ID.String(),
 			})
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -650,14 +645,14 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 		})
 
 		r.Get("/new_blog_post", func(w http.ResponseWriter, r *http.Request) {
-			presentor := components.NewPresentor(tmpl, w, csrf.TemplateField(r))
+			presentor := components.NewPresentor(tmpl, w)
 			presentor.CreateBlogHTML()
 		})
 
 		r.Post("/message", func(w http.ResponseWriter, r *http.Request) {
 			r.ParseForm()
 			// get user id
-			log.Printf("form: %v", r.Form)
+			logger.Debug("/message", "form", r.Form)
 			userID := r.Context().Value(User).(db.User).ID
 			if userID == uuid.Nil {
 				logger.Error(fmt.Sprintf("error getting user id"))
