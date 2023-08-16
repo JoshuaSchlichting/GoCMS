@@ -1,15 +1,13 @@
-{{ define "edit_item_form" }}
+{{ define "modify_item_form" }}
 {{ template "clickable_table" . }}
-{{ .EditItemForm }}
+{{ .Form }}
 <script type="text/javascript">
     htmx.process(document.getElementById('{{ .FormID }}_form'));
-
     document.addEventListener('htmx:afterRequest', function (event) {
-        if (event.detail.target.id != '{{ .FormID }}_form') {return;}
+        if (event.detail.target.id != '{{ .EventTargetID }}') {return;}
         let url = '{{ .RefreshURL }}';
         let target = document.getElementById('main');
         htmx.ajax('GET', url, { target: target });
     });
 </script>
-
 {{ end }}

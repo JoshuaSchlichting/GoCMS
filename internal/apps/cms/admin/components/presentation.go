@@ -39,8 +39,8 @@ func NewPresentor(t *template.Template, w io.Writer) *Presentor {
 }
 
 func (p *Presentor) CreateItemFormHTML(formID, formTitle, apiEndpoint, refreshURL string, formFields []FormField) error {
-	return p.template.ExecuteTemplate(p.writer, "create_item_form", map[string]interface{}{
-		"CreateItemForm": generateForm(
+	return p.template.ExecuteTemplate(p.writer, "modify_item_form", map[string]interface{}{
+		"Form": generateForm(
 			formTitle,
 			formFields,
 			"post",
@@ -48,8 +48,9 @@ func (p *Presentor) CreateItemFormHTML(formID, formTitle, apiEndpoint, refreshUR
 			formID,
 			getSubmitResetButtonDiv(),
 		),
-		"FormID":     formID,
-		"RefreshURL": template.JS(refreshURL),
+		"EventTargetID": formID + "_form",
+		"FormID":        formID,
+		"RefreshURL":    template.JS(refreshURL),
 	})
 }
 
@@ -69,8 +70,8 @@ func (p *Presentor) EditListItemHTML(formID, formTitle, apiEndpoint, apiCallType
 
 	initDataTableCode := "" //fmt.Sprintf(`let table = new DataTable('#%s', {});`, tableID)
 
-	err := p.template.ExecuteTemplate(p.writer, "edit_item_form", map[string]interface{}{
-		"EditItemForm": generateForm(
+	err := p.template.ExecuteTemplate(p.writer, "modify_item_form", map[string]interface{}{
+		"Form": generateForm(
 			formTitle,
 			formFields,
 			"put",
@@ -78,8 +79,9 @@ func (p *Presentor) EditListItemHTML(formID, formTitle, apiEndpoint, apiCallType
 			formID,
 			getSubmitResetButtonDiv(),
 		),
-		"FormID":     formID,
-		"RefreshURL": template.JS(refreshURL),
+		"EventTargetID": formID + "_form",
+		"FormID":        formID,
+		"RefreshURL":    template.JS(refreshURL),
 		"ClickableTable": &ClickableTable{
 			TableID:      template.JS(tableID),
 			Table:        dataMap,
@@ -103,8 +105,8 @@ func (p *Presentor) DeleteItemFormHTML(formID, formTitle, apiEndpoint, refreshUR
 		document.getElementById("%[1]s_form").setAttribute("hx-%[3]s", "%[2]s/" + formData["ID"]);
 		htmx.process(document.getElementById("%[1]s_form"));`, formID, apiEndpoint, "delete")
 
-	err := p.template.ExecuteTemplate(p.writer, "delete_item_form", map[string]interface{}{
-		"DeleteItemForm": generateForm(
+	err := p.template.ExecuteTemplate(p.writer, "modify_item_form", map[string]interface{}{
+		"Form": generateForm(
 			formTitle,
 			formFields,
 			"delete",
@@ -112,8 +114,9 @@ func (p *Presentor) DeleteItemFormHTML(formID, formTitle, apiEndpoint, refreshUR
 			formID,
 			`<button id="deleteItemButton" hx-confirm="Are you sure you want to delete this object?" type="button" class="btn btn-danger">Delete</button>`,
 		),
-		"FormID":     formID,
-		"RefreshURL": template.JS(refreshURL),
+		"FormID":        formID,
+		"RefreshURL":    template.JS(refreshURL),
+		"EventTargetID": "deleteItemButton",
 		"ClickableTable": &ClickableTable{
 			TableID:      template.JS(tableID),
 			Table:        dataMap,
