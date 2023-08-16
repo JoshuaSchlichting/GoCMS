@@ -498,8 +498,8 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 			}
 		})
 
-		r.Get("/securedashboard", func(w http.ResponseWriter, r *http.Request) {
-			err := tmpl.ExecuteTemplate(w, "securedashboard", map[string]interface{}{})
+		r.Get("/debug", func(w http.ResponseWriter, r *http.Request) {
+			err := tmpl.ExecuteTemplate(w, "debug", map[string]interface{}{})
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
