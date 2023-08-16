@@ -101,9 +101,6 @@ func (p *Presentor) DeleteItemFormHTML(formID, formTitle, apiEndpoint, refreshUR
 			document.getElementById("%[1]s%s").value = formData["%[2]s"];
 		`, formID, field.Name)
 	}
-	jsSetApiUrl := fmt.Sprintf(`
-		document.getElementById("%[1]s_form").setAttribute("hx-%[3]s", "%[2]s/" + formData["ID"]);
-		htmx.process(document.getElementById("%[1]s_form"));`, formID, apiEndpoint, "delete")
 
 	err := p.template.ExecuteTemplate(p.writer, "modify_item_form", map[string]interface{}{
 		"Form": generateForm(
@@ -121,7 +118,7 @@ func (p *Presentor) DeleteItemFormHTML(formID, formTitle, apiEndpoint, refreshUR
 			TableID:      template.JS(tableID),
 			Table:        dataMap,
 			CallbackFunc: template.JS("setItemInForm"),
-			JavaScript:   template.JS(fmt.Sprintf(string(setItemInFormJS), jsSetFormElements+jsSetApiUrl+setItemAdditionalJS, tableID)),
+			JavaScript:   template.JS(fmt.Sprintf(string(setItemInFormJS), jsSetFormElements+setItemAdditionalJS, tableID)),
 		},
 	})
 	return err
