@@ -9,6 +9,8 @@ import (
 	"github.com/joshuaschlichting/gocms/cache"
 )
 
+const CACHE_EXPIRY = time.Second * 0
+
 type DBCache struct {
 	queries *Queries
 	cache   cache.Cache
@@ -30,7 +32,7 @@ func (c *DBCache) GetBlogPost(ctx context.Context, id uuid.UUID) (GetBlogPostRow
 
 	bp, err := c.queries.GetBlogPost(ctx, id)
 	if err == nil {
-		c.cache.Set(cacheKey, bp, time.Second*30)
+		c.cache.Set(cacheKey, bp, CACHE_EXPIRY)
 	}
 	return bp, err
 }
@@ -48,7 +50,7 @@ func (c *DBCache) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
 
 	user, err := c.queries.GetUser(ctx, id)
 	if err == nil {
-		c.cache.Set(cacheKey, user, time.Second*20)
+		c.cache.Set(cacheKey, user, CACHE_EXPIRY)
 	}
 	return user, err
 }
@@ -58,7 +60,7 @@ func (c *DBCache) CreateBlogPost(ctx context.Context, arg CreateBlogPostParams) 
 	bp, err := c.queries.CreateBlogPost(ctx, arg)
 	if err == nil {
 		cacheKey := "BlogPost:" + bp.ID.String()
-		c.cache.Set(cacheKey, bp, time.Second*20)
+		c.cache.Set(cacheKey, bp, CACHE_EXPIRY)
 	}
 	return bp, err
 }
@@ -75,7 +77,7 @@ func (c *DBCache) CreateOrganization(ctx context.Context, arg CreateOrganization
 	org, err := c.queries.CreateOrganization(ctx, arg)
 	if err == nil {
 		cacheKey := "Organization:" + org.ID.String()
-		c.cache.Set(cacheKey, org, time.Second*20)
+		c.cache.Set(cacheKey, org, CACHE_EXPIRY)
 	}
 	return org, err
 }
@@ -94,7 +96,7 @@ func (c *DBCache) GetUserByName(ctx context.Context, name string) (User, error) 
 	if err != nil {
 		return User{}, err
 	}
-	c.cache.Set(cacheKey, user, time.Second*20)
+	c.cache.Set(cacheKey, user, CACHE_EXPIRY)
 	return user, err
 }
 
@@ -110,7 +112,7 @@ func (c *DBCache) GetUserIsInGroup(ctx context.Context, arg GetUserIsInGroupPara
 
 	isInGroup, err := c.queries.GetUserIsInGroup(ctx, arg)
 	if err == nil {
-		c.cache.Set(cacheKey, isInGroup, time.Second*20)
+		c.cache.Set(cacheKey, isInGroup, CACHE_EXPIRY)
 	}
 	return isInGroup, err
 }
@@ -127,7 +129,7 @@ func (c *DBCache) ListBlogPosts(ctx context.Context) ([]ListBlogPostsRow, error)
 
 	bpList, err := c.queries.ListBlogPosts(ctx)
 	if err == nil {
-		c.cache.Set(cacheKey, bpList, time.Second*20)
+		c.cache.Set(cacheKey, bpList, CACHE_EXPIRY)
 	}
 	return bpList, err
 }
@@ -144,7 +146,7 @@ func (c *DBCache) ListBlogPostsByUser(ctx context.Context, authorID uuid.UUID) (
 
 	bpList, err := c.queries.ListBlogPostsByUser(ctx, authorID)
 	if err == nil {
-		c.cache.Set(cacheKey, bpList, time.Second*20)
+		c.cache.Set(cacheKey, bpList, CACHE_EXPIRY)
 	}
 	return bpList, err
 }
@@ -161,7 +163,7 @@ func (c *DBCache) ListFiles(ctx context.Context) ([]File, error) {
 
 	fileList, err := c.queries.ListFiles(ctx)
 	if err == nil {
-		c.cache.Set(cacheKey, fileList, time.Second*20)
+		c.cache.Set(cacheKey, fileList, CACHE_EXPIRY)
 	}
 	return fileList, err
 }
@@ -178,7 +180,7 @@ func (c *DBCache) ListMessagesFrom(ctx context.Context, fromID uuid.UUID) ([]Lis
 
 	msgList, err := c.queries.ListMessagesFrom(ctx, fromID)
 	if err == nil {
-		c.cache.Set(cacheKey, msgList, time.Second*20)
+		c.cache.Set(cacheKey, msgList, CACHE_EXPIRY)
 	}
 	return msgList, err
 }
@@ -195,7 +197,7 @@ func (c *DBCache) ListMessagesTo(ctx context.Context, toUsername string) ([]List
 
 	msgList, err := c.queries.ListMessagesTo(ctx, toUsername)
 	if err == nil {
-		c.cache.Set(cacheKey, msgList, time.Second*20)
+		c.cache.Set(cacheKey, msgList, CACHE_EXPIRY)
 	}
 	return msgList, err
 }
@@ -291,7 +293,7 @@ func (c *DBCache) ListOrganizations(ctx context.Context) ([]Organization, error)
 
 	orgs, err := c.queries.ListOrganizations(ctx)
 	if err == nil {
-		c.cache.Set(cacheKey, orgs, time.Second*20)
+		c.cache.Set(cacheKey, orgs, CACHE_EXPIRY)
 	}
 	return orgs, err
 }
@@ -307,7 +309,7 @@ func (c *DBCache) ListUsers(ctx context.Context) ([]User, error) {
 
 	users, err := c.queries.ListUsers(ctx)
 	if err == nil {
-		c.cache.Set(cacheKey, users, time.Second*20)
+		c.cache.Set(cacheKey, users, CACHE_EXPIRY)
 	}
 	return users, err
 }
@@ -323,7 +325,7 @@ func (c *DBCache) ListUserGroups(ctx context.Context) ([]Usergroup, error) {
 
 	userGroups, err := c.queries.ListUserGroups(ctx)
 	if err == nil {
-		c.cache.Set(cacheKey, userGroups, time.Second*20)
+		c.cache.Set(cacheKey, userGroups, CACHE_EXPIRY)
 	}
 	return userGroups, err
 }
