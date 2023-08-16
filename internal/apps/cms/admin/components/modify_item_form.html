@@ -1,5 +1,7 @@
 {{ define "modify_item_form" }}
+{{ if .ClickableTable }}
 {{ template "clickable_table" . }}
+{{ end }}
 {{ .Form }}
 <script type="text/javascript">
     htmx.process(document.getElementById('{{ .FormID }}_form'));
