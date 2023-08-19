@@ -77,13 +77,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 			log.Println("no Ory Kratos cookie found in request")
 		} else {
 			logger.Debug("Ory Kratos cookie found in request", "cookie", oryCookie.Value)
-			jwtTokenS, err = kratos.GetJWT(oryCookie.Value)
-			if err != nil {
-				logger.Debug("", "error", err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			username, email, err = kratos.GetUserInfo(jwtTokenS)
+			username, email, err = kratos.GetUserInfo(oryCookie.Value)
 			if err != nil {
 				logger.Debug("", "error", err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -93,7 +87,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 
 		var tokenAuth *jwtauth.JWTAuth = jwtauth.New("HS256", []byte(config.Auth.JWT.SecretKey), nil)
 		claims := map[string]interface{}{
-			"userInfo": username,
+			"username": username,
 			"email":    email,
 			"exp":      time.Now().Add(time.Duration(config.Auth.JWT.ExpirationTime) * time.Second).Unix(),
 			"iat":      time.Now().Unix(),
