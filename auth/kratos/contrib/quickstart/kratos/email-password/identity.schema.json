@@ -26,6 +26,13 @@
             }
           }
         },
+        "username":{
+          "type": "string",
+          "format": "username",
+          "title": "Username",
+          "minLength": 3
+
+        },
         "name": {
           "type": "object",
           "properties": {
@@ -41,7 +48,7 @@
         }
       },
       "required": [
-        "email"
+        "email", "username"
       ],
       "additionalProperties": false
     }
