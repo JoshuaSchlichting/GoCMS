@@ -8,8 +8,10 @@ cms:
       issuer: issuerstring
       audience: audiencestring
       subject: 'user'
-  
-    sign_in_url: cognito sign in url
+    kratos:
+      host: kratos # kratos's name on the docker compose intranet network
+      port: 4433
+    sign_in_url: http://127.0.0.1:4455/welcome # Kratos login url
 another_app:
   database:
     [...]
