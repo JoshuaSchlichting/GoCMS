@@ -24,6 +24,11 @@ type Config struct {
 			Subject        string
 			JwtID          string
 		} `yaml:"jwt"`
+		// Kratos config
+		Kratos struct {
+			Host string `yaml:"host"`
+			Port string `yaml:"port"`
+		} `yaml:"kratos"`
 		SignInUrl string `yaml:"sign_in_url"`
 	} `yaml:"auth"`
 }

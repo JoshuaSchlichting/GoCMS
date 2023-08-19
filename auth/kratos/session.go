@@ -8,24 +8,8 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 
-	"log/slog"
-
-	"github.com/joshuaschlichting/gocms/config"
 	"golang.org/x/net/publicsuffix"
 )
-
-const KRATOS_WHOAMI = "http://kratos:4433/sessions/whoami"
-
-var conf *config.Config
-
-var logger *slog.Logger
-
-func InitKratos(c *config.Config) {
-	conf = c
-}
-func SetLogger(l *slog.Logger) {
-	logger = l
-}
 
 func GetUserInfo(orySessionCookie string) (string, string, error) {
 	logger.Debug("kratos.GetUserInfo ->")
@@ -55,7 +39,7 @@ func getOryPayload(cookie string) (map[string]interface{}, error) {
 		Jar: jar,
 	}
 	// Create the GET request
-	req, err := http.NewRequest("GET", KRATOS_WHOAMI, nil)
+	req, err := http.NewRequest("GET", kratos_whoami_url, nil)
 	req.AddCookie(&http.Cookie{
 		Name:  "ory_kratos_session", // replace with the actual cookie name
 		Value: cookie,
@@ -75,8 +59,8 @@ func getOryPayload(cookie string) (map[string]interface{}, error) {
 	// // Make the request
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Printf("Error fetching %s: %v ", KRATOS_WHOAMI, err)
-		logger.Error(fmt.Sprint("error fetching ", KRATOS_WHOAMI), "error", err)
+		fmt.Printf("Error fetching %s: %v ", kratos_whoami_url, err)
+		logger.Error(fmt.Sprint("error fetching ", kratos_whoami_url), "error", err)
 		return map[string]interface{}{}, err
 	}
 	defer resp.Body.Close()
