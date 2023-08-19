@@ -71,7 +71,6 @@ func getOryPayload(cookie string) (map[string]interface{}, error) {
 
 	// // Set the necessary headers
 	req.Header.Set("Accept", "application/json")
-	// req.Header.Set("Origin", "http://web:8000")
 
 	// // Make the request
 	resp, err := client.Do(req)
