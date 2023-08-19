@@ -44,7 +44,6 @@ type DBMiddleware struct {
 func (m DBMiddleware) AddUserToCtx(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		jwt := r.Context().Value(JWTEncodedString).(string)
-		// unmarshal jwt
 
 		// cast to *jwtauth.JWTAuth
 		tokenAuth := jwtauth.New("HS256", []byte(m.jwtSecretKey), nil)
@@ -54,7 +53,13 @@ func (m DBMiddleware) AddUserToCtx(h http.Handler) http.Handler {
 			h.ServeHTTP(w, r)
 			return
 		}
-		username, _ := jwtAuthToken.Get("userInfo")
+		username, ok := jwtAuthToken.Get("username")
+		if !ok {
+			logger.Error(fmt.Sprintf("unable to add user to context in middleware: unable to get username from JWT: %v", jwt))
+			h.ServeHTTP(w, r)
+			return
+		}
+
 		user, err := m.db.GetUserByName(r.Context(), username.(string))
 		if err != nil {
 			logger.Error(fmt.Sprintf("unable to add user to context in middleware: unable to get user '%s' from db due to error: %v", username, err.Error()))
