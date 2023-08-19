@@ -11,7 +11,8 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/jwtauth"
 	"github.com/google/uuid"
-	"github.com/joshuaschlichting/gocms/auth"
+	"github.com/joshuaschlichting/gocms/auth/kratos"
+	auth "github.com/joshuaschlichting/gocms/auth/oauth2"
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/internal/apps/cms/admin/components"
 	"github.com/joshuaschlichting/gocms/internal/apps/cms/data/db"
@@ -44,33 +45,50 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 	})
 
 	r.Get("/getjwtandlogin", func(w http.ResponseWriter, r *http.Request) {
+
+		var jwtTokenS string
+		var err error
+
+		var username string
+		var email string
 		// get access code from request
 		code := r.URL.Query().Get("code")
 		if code == "" {
-			log.Println("No access code found in request URL params")
-			http.Error(w, "No access code found in request URL params", http.StatusBadRequest)
-			return
+			log.Println("no access code found in request URL params")
+		} else {
+			// get JWT
+			jwtTokenS, err = auth.GetAccessJWT(code)
+			if err != nil {
+				logger.Debug("", "error", err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			username, email, err = auth.GetUserInfo(jwtTokenS)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 		}
 
-		// get JWT
-		accessToken, err := auth.GetAccessJWT(code)
+		oryCookie, err := r.Cookie("ory_kratos_session")
 		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			log.Println("no Ory Kratos cookie found in request")
+		} else {
+			jwtTokenS, err = kratos.GetJWT(oryCookie.Value)
+			if err != nil {
+				logger.Debug("", "error", err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			username, email, err = kratos.GetUserInfo(jwtTokenS)
+			if err != nil {
+				logger.Debug("", "error", err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 		}
 
-		username, email, err := auth.GetUserInfo(accessToken)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
 		var tokenAuth *jwtauth.JWTAuth = jwtauth.New("HS256", []byte(config.Auth.JWT.SecretKey), nil)
 		claims := map[string]interface{}{
 			"userInfo": username,
@@ -81,7 +99,8 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 			"aud":      config.Auth.JWT.Audience,
 			"sub":      config.Auth.JWT.Subject,
 			// guid for jti
-			"jti": uuid.New().String(),
+			"jti":        uuid.New().String(),
+			"authSource": "xxxxxx",
 		}
 		// jwtauth.SetExpiryIn(claims, time.Duration(config.Auth.JWT.ExpirationTime))
 		jwtToken, tokenString, err := tokenAuth.Encode(claims)
@@ -102,6 +121,17 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 			Path:  "/",
 		})
 		http.Redirect(w, r, "/secure", http.StatusFound)
+	})
+
+	r.Get("/register", func(w http.ResponseWriter, r *http.Request) {
+		// execute the register template
+		err := tmpl.ExecuteTemplate(w, "registration_form", map[string]interface{}{
+			"RegisterURL": config.Auth.SignInUrl,
+			"sign_in_url": config.Auth.SignInUrl,
+		})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	})
 
 	r.Group(func(r chi.Router) {

@@ -13,7 +13,7 @@ import (
 	"path"
 
 	"github.com/go-chi/chi"
-	"github.com/joshuaschlichting/gocms/auth"
+	auth "github.com/joshuaschlichting/gocms/auth/oauth2"
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/filesystem"
 	"github.com/joshuaschlichting/gocms/internal/apps/cms/admin"

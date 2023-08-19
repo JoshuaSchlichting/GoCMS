@@ -13,6 +13,7 @@ func LogAllButStaticRequests(h http.Handler) http.Handler {
 			return
 		}
 		log.Printf("%s %s %s FROM %s", r.Method, r.RequestURI, r.Proto, r.RemoteAddr)
+		log.Printf("Cookies: %v", r.Cookies())
 		h.ServeHTTP(w, r)
 	})
 }
