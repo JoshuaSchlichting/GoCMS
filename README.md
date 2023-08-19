@@ -39,3 +39,5 @@ docker compose \
 > NOTE: include `--build` to rebuild as needed.
 
 If this is the first time starting the database, initialize the database using `./manager.sh --init`.
+
+First time accounts created in dev mode can easily be verified by email using the attached Mail Slurper server at `http://127.0.0.1:4436/`
