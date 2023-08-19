@@ -35,7 +35,6 @@ func GetUserInfo(orySessionCookie string) (string, string, error) {
 		logger.Error("error getting ory payload", "error", err)
 		return "", "", err
 	}
-	_ = data
 
 	username := data["identity"].(map[string]interface{})["traits"].(map[string]interface{})["username"].(string)
 	email := data["identity"].(map[string]interface{})["traits"].(map[string]interface{})["email"].(string)
