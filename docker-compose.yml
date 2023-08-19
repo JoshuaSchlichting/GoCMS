@@ -14,6 +14,8 @@ services:
       - POOL_ID=${POOL_ID}
       - REGION=${REGION}
     command: ./app --host=0.0.0.0 --port=8000
+    networks:
+      - intranet
   db:
     image: postgres:latest
     environment:
@@ -22,3 +24,5 @@ services:
       POSTGRES_DB: postgres
     ports:
       - "5432:5432"
+    networks:
+      - intranet
