@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  kratos-migrate:
+    environment:
+      - DSN=cockroach://root@cockroachd:26257/defaultdb?sslmode=disable&max_conns=20&max_idle_conns=4
+
+  kratos:
+    environment:
+      - DSN=cockroach://root@cockroachd:26257/defaultdb?sslmode=disable&max_conns=20&max_idle_conns=4
+
+  cockroachd:
+    image: cockroachdb/cockroach:v22.2.6
+    ports:
+      - "26257:26257"
+    command: start-single-node --insecure
+    networks:
+      - intranet
