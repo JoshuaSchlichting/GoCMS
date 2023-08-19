@@ -37,5 +37,6 @@ func GetAccessJWT(authorizationCode string) (string, error) {
 		logger.Debug(fmt.Sprintf("error getting token endpoint payload: %v\n", err), "tokenEndpoint", authClient.endpoint.AuthURL)
 		return "", err
 	}
+	logger.Debug("Cognito JWT", "payload", payload.AccessToken)
 	return payload.AccessToken, nil
 }

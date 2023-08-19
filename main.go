@@ -12,7 +12,10 @@ import (
 	"os"
 	"path"
 
+	"log/slog"
+
 	"github.com/go-chi/chi"
+	"github.com/joshuaschlichting/gocms/auth/kratos"
 	auth "github.com/joshuaschlichting/gocms/auth/oauth2"
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/filesystem"
@@ -22,7 +25,6 @@ import (
 	"github.com/joshuaschlichting/gocms/manager"
 	"github.com/joshuaschlichting/gocms/middleware"
 	_ "github.com/lib/pq"
-	"golang.org/x/exp/slog"
 )
 
 //go:embed static
@@ -63,6 +65,7 @@ func main() {
 	admin.SetLogger(logger)
 	blog.SetLogger(logger)
 	auth.SetLogger(logger)
+	kratos.SetLogger(logger)
 	config := config.LoadConfig(readConfigFile())
 	if manager.HandleIfManagerCall(*config, sqlFS) {
 		logger.Info("Manager program call finished...")
@@ -86,6 +89,9 @@ func main() {
 	// Create the router
 	r := chi.NewRouter()
 
+	// Init Kratos auth service
+	cmsConfig := (*config)["cms"]
+	kratos.InitKratos(&cmsConfig)
 	// Create file system for content delivery
 	homeDir, _ := os.UserHomeDir()
 	gocmsPath := path.Join(homeDir, "gocms")

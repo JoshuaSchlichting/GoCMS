@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"time"
 
+	"log/slog"
+
 	"github.com/go-chi/chi"
 	"github.com/go-chi/jwtauth"
 	"github.com/google/uuid"
@@ -16,7 +18,6 @@ import (
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/internal/apps/cms/admin/components"
 	"github.com/joshuaschlichting/gocms/internal/apps/cms/data/db"
-	"golang.org/x/exp/slog"
 )
 
 var logger *slog.Logger
@@ -75,6 +76,7 @@ func InitRoutes(r *chi.Mux, tmpl *template.Template, config *config.Config, quer
 		if err != nil {
 			log.Println("no Ory Kratos cookie found in request")
 		} else {
+			logger.Debug("Ory Kratos cookie found in request", "cookie", oryCookie.Value)
 			jwtTokenS, err = kratos.GetJWT(oryCookie.Value)
 			if err != nil {
 				logger.Debug("", "error", err)

@@ -3,8 +3,9 @@ package auth
 import (
 	"os"
 
+	"log/slog"
+
 	cognito "github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
-	"golang.org/x/exp/slog"
 	"golang.org/x/oauth2"
 
 	"github.com/aws/aws-sdk-go/aws"

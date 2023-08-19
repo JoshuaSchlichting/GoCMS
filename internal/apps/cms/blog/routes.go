@@ -9,11 +9,12 @@ import (
 	"net/http"
 	"strconv"
 
+	"log/slog"
+
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/internal/apps/cms/data/db"
-	"golang.org/x/exp/slog"
 )
 
 var logger *slog.Logger
