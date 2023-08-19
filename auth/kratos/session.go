@@ -32,8 +32,6 @@ func SetLogger(l *slog.Logger) {
 
 // GetJWT performs the whoami request to kratos and then constructs a JWT from the response
 func GetJWT(cookie string) (string, error) {
-	log.Println("kratos.GetJWT ->")
-	logger.Debug("kratos", "func", "GetJWT", "cookieParam", cookie)
 	// Create an HTTP client with a cookie jar
 	// The cookie jar is used to handle cookies automatically
 	jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
@@ -44,9 +42,6 @@ func GetJWT(cookie string) (string, error) {
 	client := &http.Client{
 		Jar: jar,
 	}
-	logger.Debug("jar created", "func", "GetJWT")
-	// Set the request URL
-	logger.Debug("constructing kratos request", "url", KRATOS_WHOAMI)
 	// Create the GET request
 	req, err := http.NewRequest("GET", KRATOS_WHOAMI, nil)
 	req.AddCookie(&http.Cookie{
