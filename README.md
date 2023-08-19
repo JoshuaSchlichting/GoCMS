@@ -18,9 +18,14 @@ What is working:
 The manager is a set of CLI args that can be used to manage the application. The manager is located in the `manager` package. To use the manager, execute the `manager.sh` shell script, followed by flags outlined in [`manager/flags.go`](manager/flags.go).
 
 ### Docker Compose
-Run this with a dummy postgresql database using `docker compose up`, include `--build` to rebuild as needed.
+Run this with a dummy postgresql database using `docker compose -f docker-compose.yml -f auth/kratos/quickstart.yml -f auth/kratos/quickstart-standalone.yml -f auth/kratos/quickstart-postgres.yml up`, include `--build` to rebuild as needed.
 You'll want to run `./manager.sh --init` after starting the database for the first time.
 
 ### The Data Layer / SQL
 The data layer is created by using [sqlc](https://docs.sqlc.dev/en/latest/index.html). The `db` package is generated using the `db/sql/sqlc.yaml` file. The `db/sql` folder contains the SQL files that are used to generate the `db` package. To generate new `sqlc` output, execute the following:
 `cd db/sql && sqlc generate`
+
+### Access Login Service
+Currently under development: `http://127.0.0.1:4455/welcome`
+
+
