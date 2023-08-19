@@ -9,7 +9,7 @@
 COMPOSE_ARGS="-f docker-compose.yml -f auth/kratos/quickstart.yml -f auth/kratos/quickstart-standalone.yml -f auth/kratos/quickstart-postgres.yml"
 
 if [ "$1" = "--down" ]; then
-  docker compose $COMPOSE_ARGS down
+  # docker compose $COMPOSE_ARGS down
   docker rm gocms-web-1
   exit 0
 fi
