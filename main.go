@@ -40,8 +40,16 @@ var sqlFS embed.FS
 var logger *slog.Logger
 
 func init() {
+
+}
+
+func main() {
+	var (
+		host      = flag.String("host", "", "host http address to listen on")
+		port      = flag.String("port", "8000", "port number for http listener")
+		debugFlag = flag.Bool("debug", false, "debug logging mode")
+	)
 	// Set up logging
-	debugFlag := flag.Bool("debug", false, "debug logging mode")
 	flag.Parse()
 	var programLevel = new(slog.LevelVar)
 
@@ -55,13 +63,6 @@ func init() {
 	admin.SetLogger(logger)
 	blog.SetLogger(logger)
 	auth.SetLogger(logger)
-}
-
-func main() {
-	var (
-		host = flag.String("host", "", "host http address to listen on")
-		port = flag.String("port", "8000", "port number for http listener")
-	)
 	config := config.LoadConfig(readConfigFile())
 	if manager.HandleIfManagerCall(*config, sqlFS) {
 		logger.Info("Manager program call finished...")
@@ -69,7 +70,6 @@ func main() {
 		return
 	}
 
-	flag.Parse()
 	// Add template functions
 	funcMap := commonFuncMap
 	// Load templates
