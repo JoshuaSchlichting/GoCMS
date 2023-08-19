@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-chi/jwtauth"
 	"github.com/google/uuid"
-	auth "github.com/joshuaschlichting/gocms/auth/oauth2"
+	auth "github.com/joshuaschlichting/gocms/auth/cognito"
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/internal/apps/cms/data/db"
 	"github.com/lestrrat-go/jwx/jwt"

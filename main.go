@@ -15,8 +15,8 @@ import (
 	"log/slog"
 
 	"github.com/go-chi/chi"
+	auth "github.com/joshuaschlichting/gocms/auth/cognito"
 	"github.com/joshuaschlichting/gocms/auth/kratos"
-	auth "github.com/joshuaschlichting/gocms/auth/oauth2"
 	"github.com/joshuaschlichting/gocms/config"
 	"github.com/joshuaschlichting/gocms/filesystem"
 	"github.com/joshuaschlichting/gocms/internal/apps/cms/admin"
