@@ -4,7 +4,7 @@ ___
 
 ### Current state of development
 What is working:
-- Admin panel auth is working with AWS Cogntio.
+- Auth via [Ory Kratos](https://github.com/ory/kratos)
 - `filesystem` package provides a working local filesystem and s3 filesystem of the same interface.
 - Dynamic HTML tables and forms are working.
 - Basic CRUD functionality is working with GUI interfaces, currently impelmented for the `user`, `organization`, and `user_group` tables.
@@ -17,10 +17,6 @@ What is working:
 ### Using the manager
 The manager is a set of CLI args that can be used to manage the application. The manager is located in the `manager` package. To use the manager, execute the `manager.sh` shell script, followed by flags outlined in [`manager/flags.go`](manager/flags.go).
 
-### Docker Compose
-Run this with a dummy postgresql database using `docker compose -f docker-compose.yml -f auth/kratos/quickstart.yml -f auth/kratos/quickstart-standalone.yml -f auth/kratos/quickstart-postgres.yml up`, include `--build` to rebuild as needed.
-You'll want to run `./manager.sh --init` after starting the database for the first time.
-
 ### The Data Layer / SQL
 The data layer is created by using [sqlc](https://docs.sqlc.dev/en/latest/index.html). The `db` package is generated using the `db/sql/sqlc.yaml` file. The `db/sql` folder contains the SQL files that are used to generate the `db` package. To generate new `sqlc` output, execute the following:
 `cd db/sql && sqlc generate`
@@ -28,4 +24,18 @@ The data layer is created by using [sqlc](https://docs.sqlc.dev/en/latest/index.
 ### Access Login Service
 Currently under development: `http://127.0.0.1:4455/welcome`
 
+## Getting Started
+### Docker Compose
+Run this with a dummy postgresql database using 
 
+```sh
+docker compose \
+    -f docker-compose.yml \
+    -f auth/kratos/quickstart.yml \
+    -f auth/kratos/quickstart-standalone.yml \
+    -f auth/kratos/quickstart-postgres.yml \
+    up
+```
+> NOTE: include `--build` to rebuild as needed.
+
+If this is the first time starting the database, initialize the database using `./manager.sh --init`.
