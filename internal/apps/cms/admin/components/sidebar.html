@@ -4,140 +4,158 @@
   nav bar with the same ID, which then causes the menu items
   to disappear when the window is horizontally shortened ¯\_(ツ)_/¯
 -->
-  <nav id="sidebar" class="sidebar js-sidebar"> 
-    <div class="sidebar-content js-simplebar">
-      <a class="sidebar-brand" href="/admin">
-        <span class="align-middle">Admin Dashboard</span>
-      </a>
-    
-      <ul class="sidebar-nav">
-        <li class="sidebar-header">
-          Pages
-        </li>
-    
-        <li id="dashboardLink" class="sidebar-item">
-          <a class="sidebar-link" href="#">
-            <i class="align-middle" data-feather="grid"></i> <span class="align-middle">Dashboard</span>
-          </a>
-        </li>
-    
-        <li id="upload_form" hx-get="upload_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
-          <a class="sidebar-link" href="#">
-            <i class="align-middle" data-feather="upload"></i> <span class="align-middle">Upload files</span>
-          </a>
-        </li>
-    
-        <li class="sidebar-header">
-          Blog Post Center
-        </li>
-    
-        <li id="my_blog_posts" hx-get="my_blog_posts" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
-          <a class="sidebar-link" href="#">
-            <i class="align-middle" data-feather="file-text"></i> <span class="align-middle">My Posts</span>
-          </a>
-        </li>
-    
-        <li id="draft_blog_posts" hx-get="draft_blog_posts" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
-          <a class="sidebar-link" href="#">
-            <i class="align-middle" data-feather="file-text"></i> <span class="align-middle">Draft Posts</span>
-          </a>
-        </li>
-    
-        <li id="new_blog_post" hx-get="new_blog_post" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
-          <a class="sidebar-link" href="#">
-            <i class="align-middle" data-feather="file-plus"></i> <span class="align-middle">New Post</span>
-          </a>
-        </li>
-    
-        <li class="sidebar-header">
-          Message Center
-        </li>
-    
-        <li id="inbox" hx-get="inbox" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
-          <a class="sidebar-link" href="#">
-            <i class="align-middle" data-feather="inbox"></i> <span class="align-middle">Inbox</span>
-          </a>
-        </li>
-    
-        <li id="sent_messages" hx-get="sent_messages" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
-          <a class="sidebar-link" href="#">
-            <i class="align-middle" data-feather="send"></i> <span class="align-middle">Sent</span>
-          </a>
-        </li>
-    
-        <li id="compose_msg" hx-get="compose_msg" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
-          <a class="sidebar-link" href="#">
-            <i class="align-middle" data-feather="edit-2"></i> <span class="align-middle">Compose</span>
-          </a>
-        </li>
-    
-        <li class="sidebar-header">
-          User Management
-        </li>
-    
-        <li id="create_user_form" hx-get="create_user_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
-          <a class="sidebar-link" href="#">
-            <i class="align-middle" data-feather="user-plus"></i> <span class="align-middle">Create User</span>
-          </a>
-        </li>
-    
-        <li id="edit_user_form" hx-get="edit_user_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
-          <a class="sidebar-link" href="#">
-            <i class="align-middle" data-feather="user-check"></i> <span class="align-middle">Edit User</span>
-          </a>
-        </li>
-    
-        <li id="delete_user_form" hx-get="delete_user_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
-          <a class="sidebar-link" href="#">
-            <i class="align-middle" data-feather="user-minus"></i> <span class="align-middle">Delete User</span>
-          </a>
-        </li>
-    
-        <li class="sidebar-header">
-          Organization Management
-        </li>
-    
-        <li id="create_org_form" hx-get="create_org_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
-          <a class="sidebar-link" href="#">
-            <i class="align-middle" data-feather="plus-circle"></i> <span class="align-middle">Create Organization</span>
-          </a>
-        </li>
-    
-        <li id="edit_org_form" hx-get="edit_org_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
-          <a class="sidebar-link" href="#">
-            <i class="align-middle" data-feather="edit-3"></i> <span class="align-middle">Edit Organization</span>
-          </a>
-        </li>
-    
-        <li id="delete_org_form" hx-get="delete_org_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
-          <a class="sidebar-link" href="#">
-            <i class="align-middle" data-feather="minus-circle"></i> <span class="align-middle">Delete Organization</span>
-          </a>
-        </li>
-    
-        <li class="sidebar-header">
-          User Group Management
-        </li>
-    
-        <li id="create_usergroup_form" hx-get="create_usergroup_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
-          <a class="sidebar-link" href="#">
-            <i class="align-middle" data-feather="users"></i> <span class="align-middle">Create User Group</span>
-          </a>
-        </li>
-    
-        <li id="edit_usergroup_form" hx-get="edit_usergroup_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
-          <a class="sidebar-link" href="#">
-            <i class="align-middle" data-feather="users"></i> <span class="align-middle">Edit User Group</span>
-          </a>
-        </li>
-    
-        <li id="delete_usergroup_form" hx-get="delete_usergroup_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
-          <a class="sidebar-link" href="#">
-            <i class="align-middle" data-feather="users"></i> <span class="align-middle">Delete User Group</span>
-          </a>
-        </li>
-      </ul>
-    </div>    
+<nav id="sidebar" class="sidebar js-sidebar"> 
+  <div class="sidebar-content js-simplebar">
+    <a class="sidebar-brand" href="/admin">
+      <span class="align-middle">Admin Dashboard</span>
+    </a>
+
+    <ul class="sidebar-nav">
+      <li class="sidebar-dropdown">
+        <a class="sidebar-link" href="#">
+          <i class="align-middle" data-feather="file-text"></i> <span class="align-middle">Pages</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li id="dashboardLink" class="sidebar-item">
+            <a class="sidebar-link" href="#">
+              <i class="align-middle" data-feather="grid"></i> <span class="align-middle">Dashboard</span>
+            </a>
+          </li>
+
+          <li id="upload_form" hx-get="upload_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+            <a class="sidebar-link" href="#">
+              <i class="align-middle" data-feather="upload"></i> <span class="align-middle">Upload files</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="sidebar-dropdown">
+        <a class="sidebar-link" href="#">
+          <i class="align-middle" data-feather="file-text"></i> <span class="align-middle">Blog Post Center</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li id="my_blog_posts" hx-get="my_blog_posts" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+            <a class="sidebar-link" href="#">
+              <i class="align-middle" data-feather="file-text"></i> <span class="align-middle">My Posts</span>
+            </a>
+          </li>
+
+          <li id="draft_blog_posts" hx-get="draft_blog_posts" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+            <a class="sidebar-link" href="#">
+              <i class="align-middle" data-feather="file-text"></i> <span class="align-middle">Draft Posts</span>
+            </a>
+          </li>
+
+          <li id="new_blog_post" hx-get="new_blog_post" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+            <a class="sidebar-link" href="#">
+              <i class="align-middle" data-feather="file-plus"></i> <span class="align-middle">New Post</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="sidebar-dropdown">
+        <a class="sidebar-link" href="#">
+          <i class="align-middle" data-feather="inbox"></i> <span class="align-middle">Message Center</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li id="inbox" hx-get="inbox" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+            <a class="sidebar-link" href="#">
+              <i class="align-middle" data-feather="inbox"></i> <span class="align-middle">Inbox</span>
+            </a>
+          </li>
+
+          <li id="sent_messages" hx-get="sent_messages" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+            <a class="sidebar-link" href="#">
+              <i class="align-middle" data-feather="send"></i> <span class="align-middle">Sent</span>
+            </a>
+          </li>
+
+          <li id="compose_msg" hx-get="compose_msg" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+            <a class="sidebar-link" href="#">
+              <i class="align-middle" data-feather="edit-2"></i> <span class="align-middle">Compose</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="sidebar-dropdown">
+        <a class="sidebar-link" href="#">
+          <i class="align-middle" data-feather="users"></i> <span class="align-middle">User Management</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li id="create_user_form" hx-get="create_user_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+            <a class="sidebar-link" href="#">
+              <i class="align-middle" data-feather="user-plus"></i> <span class="align-middle">Create User</span>
+            </a>
+          </li>
+
+          <li id="edit_user_form" hx-get="edit_user_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+            <a class="sidebar-link" href="#">
+              <i class="align-middle" data-feather="user-check"></i> <span class="align-middle">Edit User</span>
+            </a>
+          </li>
+
+          <li id="delete_user_form" hx-get="delete_user_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+            <a class="sidebar-link" href="#">
+              <i class="align-middle" data-feather="user-minus"></i> <span class="align-middle">Delete User</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="sidebar-dropdown">
+        <a class="sidebar-link" href="#">
+          <i class="align-middle" data-feather="users"></i> <span class="align-middle">Organization Management</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li id="create_org_form" hx-get="create_org_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+            <a class="sidebar-link" href="#">
+              <i class="align-middle" data-feather="plus-circle"></i> <span class="align-middle">Create Organization</span>
+            </a>
+          </li>
+
+          <li id="edit_org_form" hx-get="edit_org_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+            <a class="sidebar-link" href="#">
+              <i class="align-middle" data-feather="edit-3"></i> <span class="align-middle">Edit Organization</span>
+            </a>
+          </li>
+
+          <li id="delete_org_form" hx-get="delete_org_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+            <a class="sidebar-link" href="#">
+              <i class="align-middle" data-feather="minus-circle"></i> <span class="align-middle">Delete Organization</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="sidebar-dropdown">
+        <a class="sidebar-link" href="#">
+          <i class="align-middle" data-feather="users"></i> <span class="align-middle">User Group Management</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li id="create_usergroup_form" hx-get="create_usergroup_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+            <a class="sidebar-link" href="#">
+              <i class="align-middle" data-feather="users"></i> <span class="align-middle">Create User Group</span>
+            </a>
+          </li>
+
+          <li id="edit_usergroup_form" hx-get="edit_usergroup_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+            <a class="sidebar-link" href="#">
+              <i class="align-middle" data-feather="users"></i> <span class="align-middle">Edit User Group</span>
+            </a>
+          </li>
+
+          <li id="delete_usergroup_form" hx-get="delete_usergroup_form" hx-target="#main" hx-swap="innerHTML" class="sidebar-item">
+            <a class="sidebar-link" href="#">
+              <i class="align-middle" data-feather="users"></i> <span class="align-middle">Delete User Group</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>    
 </nav>
 
 <script type="text/javascript">
@@ -145,5 +163,32 @@
     $("#main").load("debug");
   });
   htmx.process(document.getElementById('sidebar'));
+
+
+
+
+$(document).ready(function() {
+  // Get all the dropdown items
+  var dropdownItems = document.querySelectorAll('.sidebar-dropdown');
+
+  // Loop through each dropdown item
+  for (var i = 0; i < dropdownItems.length; i++) {
+    // Add a click event listener to the item
+    dropdownItems[i].addEventListener('click', function() {
+      // Hide all other sub-items
+      var allSubItems = document.querySelectorAll('.sidebar-submenu');
+      for (var j = 0; j < allSubItems.length; j++) {
+        if (allSubItems[j] !== this.querySelector('ul')) {
+          allSubItems[j].style.display = 'none';
+        }
+      }
+
+      // Toggle the visibility of the nested list of sub-items
+      var subItems = this.querySelector('ul');
+      subItems.style.display = subItems.style.display === 'block' ? 'none' : 'block';
+    });
+  }
+})
+
 </script>
 {{end}}
