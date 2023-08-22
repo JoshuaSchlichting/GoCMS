@@ -127,31 +127,3 @@ func readConfigFile() []byte {
 	// read config.yml
 	return configYml
 }
-
-var commonFuncMap = template.FuncMap{
-	"mod": func(i, j int) int {
-		return i % j
-	},
-	"sub": func(a, b int) int {
-		return a - b
-	},
-	"add": func(a, b int) int {
-		return a + b
-	},
-	"seq": func(start, end int) []int {
-		var sequence []int
-		for i := start; i <= end; i++ {
-			sequence = append(sequence, i)
-		}
-		return sequence
-	},
-	"gt": func(a, b int) bool {
-		return a > b
-	},
-	"lt": func(a, b int) bool {
-		return a < b
-	},
-	"eq": func(a, b int) bool {
-		return a == b
-	},
-}
