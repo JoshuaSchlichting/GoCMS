@@ -59,6 +59,8 @@ func main() {
 	} else {
 		programLevel.Set(slog.LevelInfo)
 	}
+
+	// Set up logger
 	logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: programLevel}))
 	api.SetLogger(logger)
 	admin.SetLogger(logger)
