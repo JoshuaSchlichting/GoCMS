@@ -68,8 +68,6 @@ func (p *Presentor) EditListItemHTML(formID, formTitle, apiEndpoint, apiCallType
 		htmx.process(document.getElementById("%[1]s_form"));`, formID, apiEndpoint, apiCallType)
 	tableID := formID + "_table"
 
-	initDataTableCode := "" //fmt.Sprintf(`let table = new DataTable('#%s', {});`, tableID)
-
 	err := p.template.ExecuteTemplate(p.writer, "modify_item_form", map[string]interface{}{
 		"Form": generateForm(
 			formTitle,
@@ -86,7 +84,7 @@ func (p *Presentor) EditListItemHTML(formID, formTitle, apiEndpoint, apiCallType
 			TableID:      template.JS(tableID),
 			Table:        dataMap,
 			CallbackFunc: template.JS("setItemInForm"),
-			JavaScript:   template.JS(fmt.Sprintf(string(setItemInFormJS), jsSetFormElements+jsSetApiUrl, tableID)) + template.JS(initDataTableCode),
+			JavaScript:   template.JS(fmt.Sprintf(string(setItemInFormJS), jsSetFormElements+jsSetApiUrl, tableID)),
 		},
 	})
 	return err
