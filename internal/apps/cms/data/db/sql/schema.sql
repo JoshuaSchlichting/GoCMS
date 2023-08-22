@@ -41,6 +41,7 @@ create table if not exists public.message
     to_username text not null,
     subject text not null,
     message text not null,
+    read boolean not null default false,
     created_ts timestamp not null default current_timestamp,
     updated_ts timestamp not null default current_timestamp,
     from_id uuid not null

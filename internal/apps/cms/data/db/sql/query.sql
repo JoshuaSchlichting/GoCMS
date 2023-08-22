@@ -178,3 +178,8 @@ select
   updated_ts
 from public.blog_post
 where id = $1;
+
+-- name: SetMessageRead :exec
+update public.message
+  set read = $2
+where id = $1;
