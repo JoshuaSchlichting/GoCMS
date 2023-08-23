@@ -6,6 +6,41 @@
 
   <div class="navbar-collapse collapse">
     <ul class="navbar-nav navbar-align">
+      <button id="modeToggle" class="btn btn-primary">
+        Toggle Dark Mode
+      </button>
+      <script type="application/javascript">
+        document.getElementById('modeToggle').addEventListener('click', function () {
+          const body = document.body;
+
+          if (body.classList.contains('dark-mode')) {
+            body.classList.remove('dark-mode');
+            body.classList.add('bg-light');
+            body.classList.add('text-dark');
+          } else {
+            body.classList.add('dark-mode');
+            body.classList.remove('bg-light');
+            body.classList.remove('text-dark');
+          }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+          const body = document.body;
+
+          if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            // User's OS is set to dark mode
+            body.classList.add('dark-mode');
+            body.classList.remove('bg-light');
+            body.classList.remove('text-dark');
+          } else {
+            // User's OS is set to light mode or doesn't support color scheme preference
+            body.classList.remove('dark-mode');
+            body.classList.add('bg-light');
+            body.classList.add('text-dark');
+          }
+        });
+
+      </script>
       <li class="nav-item dropdown">
         <a class="nav-icon dropdown-toggle" href="#" id="alertsDropdown" data-bs-toggle="dropdown">
           <div class="position-relative">
@@ -156,13 +191,13 @@
             <a class="dropdown-item" href="#" onclick="goToSettings()"><i class="align-middle me-1"
                 data-feather="user"></i> Profile</a>
             <script type="application/javascript">
-                function goToSettings() {
-                  const currentUrl = window.location.href;
-                  const baseUrl = window.location.protocol + "//" + window.location.hostname;
-                  const newUrl = baseUrl + ":4455/settings" ;
-                  window.location = newUrl;
+              function goToSettings() {
+                const currentUrl = window.location.href;
+                const baseUrl = window.location.protocol + "//" + window.location.hostname;
+                const newUrl = baseUrl + ":4455/settings";
+                window.location = newUrl;
 
-                }
+              }
             </script>
             <a class="dropdown-item" href="#" onclick="goToSettings()"><i class="align-middle me-1"
                 data-feather="pie-chart"></i> Analytics</a>
