@@ -5,6 +5,7 @@
 
 # Why would you want to only rebuild the web service? Becuase it's a pain 
 # recreating your user in Kratos each time you restart the process.
+set -e
 
 COMPOSE_ARGS="-f docker-compose.yml -f auth/kratos/quickstart.yml -f auth/kratos/quickstart-standalone.yml -f auth/kratos/quickstart-postgres.yml"
 
